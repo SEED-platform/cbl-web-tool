@@ -130,10 +130,12 @@ def generate_locations_list(file):
     print(file_type)
 
     locations: list[Location] = []
+    
     if (file_type == "application/json"):
         file_content = file.read().decode('utf-8')
         locations = json.loads(file_content)
     else:
+        data_frame = pd.DataFrame()
         if (file_type == "application/csv" or file_type == "text/csv"):
             data_frame = pd.read_csv(file)
         elif (file_type == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"):       
