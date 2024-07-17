@@ -19,7 +19,8 @@ export class HomeComponent{
    userFile: any;
    jsonData: any;
    buildingArray: any[] = [];
-   tableMapToggle: boolean = false;
+   isTable: boolean = true;
+   toggleString: string = "Table";
 
 
     constructor(private apiHandler: FlaskRequests, private fileExportHandler: FileExportService) {
@@ -55,9 +56,17 @@ export class HomeComponent{
       
     }
 
-    
-
     exportJSON(): void {
       this.fileExportHandler.downloadJSON(this.jsonData, 'data.json');
+    }
+
+    tableMapToggle():void{
+      if (this.isTable){
+          this.isTable = false
+          this.toggleString = "Table";
+      }else{
+        this.isTable = true;
+          this.toggleString = "Map";
+      }
     }
 }
