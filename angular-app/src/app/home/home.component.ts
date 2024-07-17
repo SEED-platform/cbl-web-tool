@@ -1,4 +1,4 @@
-import { Component, signal} from '@angular/core';
+import { Component} from '@angular/core';
 import { CommonModule } from '@angular/common'; 
 import { ReactiveFormsModule } from '@angular/forms';
 import { FlaskRequests } from './service'; 
@@ -16,10 +16,11 @@ import { MapboxMapComponent } from '../mapbox-map/mapbox-map.component';
 
 
 export class HomeComponent{
-   userFile:any
-   flaskData: any;
+   userFile: any;
    jsonData: any;
    buildingArray: any[] = [];
+   isTable: boolean = true;
+   toggleString: string = "Table";
 
 
     constructor(private apiHandler: FlaskRequests, private fileExportHandler: FileExportService) {
@@ -27,7 +28,9 @@ export class HomeComponent{
 
     ngOnInit(): void {
       this.jsonData = sessionStorage.getItem("GEOJSONDATA");
-      console.log(this.jsonData)
+      if (this.jsonData){
+        this.buildingArray = JSON.parse(this.jsonData).features;
+      }
     }
 
 
@@ -53,14 +56,17 @@ export class HomeComponent{
       
     }
 
-    
-
     exportJSON(): void {
       this.fileExportHandler.downloadJSON(this.jsonData, 'data.json');
     }
 
-
-
-    
-
+    tableMapToggle():void{
+      if (this.isTable){
+          this.isTable = false
+          this.toggleString = "Table";
+      }else{
+        this.isTable = true;
+          this.toggleString = "Map";
+      }
+    }
 }

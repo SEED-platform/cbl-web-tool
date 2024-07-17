@@ -1,12 +1,13 @@
-import { Component, AfterViewInit} from '@angular/core';
+import { Component, AfterViewInit, ChangeDetectorRef} from '@angular/core';
 import * as mapboxgl from 'mapbox-gl';
+import { CommonModule } from '@angular/common'; 
 import { environment } from '../../environments/environment';  // Import environment
 
 
 @Component({
   selector: 'app-mapbox-map',
   standalone: true,
-  imports: [],
+  imports: [CommonModule],
   templateUrl: './mapbox-map.component.html',
   styleUrl: './mapbox-map.component.css'
 })
@@ -17,58 +18,72 @@ export class MapboxMapComponent implements AfterViewInit {
   style = 'mapbox://styles/mapbox/streets-v11';
   lat: number = 30.2672;
   lng: number = -97.7431;
+  buildingArray: any[] =[];
 
+  constructor(private cdr: ChangeDetectorRef) {}
 
   
   ngAfterViewInit() {
-    this.initializeMap();
+    this.initializeMapWithGeoJson();
   }
 
-  initializeMap() {
-    this.map = new mapboxgl.Map({
-      accessToken: environment.mapboxToken,
-      container: 'map', // Ensure this ID matches the container in your HTML
-      style: this.style,
-      zoom: 13,
-      center: [this.lng, this.lat]
-    });
 
-    this.map.on('load', () => {
-      this.addGeoJson();
-    });
-  }
 
-  addGeoJson() {
-    //if map not initialized exit function
-    if (!this.map) return;
-    
+  initializeMapWithGeoJson() {
     const localGeoJsonData = sessionStorage.getItem('GEOJSONDATA');
-  
+
      
     if (localGeoJsonData){
-    const geoJsonObject = JSON.parse(localGeoJsonData);
-    this.map.addSource('features', {
-      type: 'geojson',
-      data: geoJsonObject
-    });
-
-    this.map.addLayer({
-      id: 'features',
-      type: 'fill',
-      source: 'features',
-      paint: {
-        'fill-color': '#088',
-        'fill-opacity': 0.8
-      }
-    });
+      
+      const geoJsonObject = JSON.parse(localGeoJsonData);
+      this.buildingArray = geoJsonObject.features;
+      this.cdr.detectChanges();
+      const firstBuildingLongitude = this.buildingArray[0].properties.longitude;
+      const firstBuildingLatitude = this.buildingArray[0].properties.latitude;
+      const firstBuildingCoordinates = new mapboxgl.LngLat(firstBuildingLongitude, firstBuildingLatitude);
      
-    console.log(localGeoJsonData);
-    const firstBuildingLongitude = geoJsonObject.features[0].properties.longitude;
-    const firstBuildingLatitude = geoJsonObject.features[0].properties.latitude;
-    const center = new mapboxgl.LngLat(firstBuildingLongitude , firstBuildingLatitude);
-    this.map.setCenter(center);
-    }
+      this.map = new mapboxgl.Map({
+        accessToken: environment.mapboxToken,
+        container: 'map', // map is id of div in html
+        style: this.style,
+        attributionControl: false,
+        zoom: 15,
+        center: firstBuildingCoordinates
+      });
+  
+     
+      this.map.on('load', () => {
 
-   
+      if (!this.map) return; //if map not intialized exit load
+
+      this.map.addSource('features', {
+        type: 'geojson',
+        data: geoJsonObject
+      });
+  
+      this.map.addLayer({
+        id: 'features',
+        type: 'fill',
+        source: 'features',
+        paint: {
+          'fill-color': '#0B5E90',
+          'fill-opacity': 0.8
+        }
+      });
+
+      });
+      
+    }     
+  }
+
+
+  flyToCoordinates( clickedBuildingLong: number, clickedBuildingLat: number,) {
+    if (this.map) {
+       this.map.flyTo({
+        center:  new mapboxgl.LngLat(clickedBuildingLong, clickedBuildingLat),
+        zoom:15,
+        essential: true 
+       });
+    }
   }
 }

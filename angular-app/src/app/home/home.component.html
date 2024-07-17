@@ -8,12 +8,12 @@
   <button (click)="userFile = undefined">clear file</button>
 </div>
 <button (click)="uploadFileToServer()">upload file</button>
-<button (click)="exportJSON()" *ngIf="jsonData">Donwload data as JSON</button>
-
+<button (click)="exportJSON()"  *ngIf="jsonData">Donwload data in a GEOJSON Format</button>
+<button (click)="tableMapToggle()">{{toggleString}}</button>
 
 
 <div id="data-container" *ngIf="jsonData">
-<table>
+<table *ngIf="isTable">
   <thead>
     <tr>
       <th>Address</th>
@@ -55,7 +55,7 @@
   </tbody>
 </table>
 
-<app-mapbox-map></app-mapbox-map>
+<app-mapbox-map *ngIf="!isTable"> </app-mapbox-map>
 </div>
 
 
