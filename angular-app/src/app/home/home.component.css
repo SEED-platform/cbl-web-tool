@@ -1,0 +1,33 @@
+
+.file-container{
+    width: 300px;
+    height: 100px;
+    border: 4px dotted black;
+}
+
+.file{
+    padding: 5rem;
+    width: auto;
+    height: 5rem;
+}
+
+#data-container{
+    width: 800px;
+    height: 500px;
+}
+
+table{
+    border-collapse: collapse; /* Ensures borders are merged into a single border */
+}
+
+th, td {
+    border: 2px solid black; /* Sets the border for table cells */
+    padding: 8px; /* Optional: Adds space inside each cell */
+    text-align: left; /* Optional: Aligns text to the left inside cells */
+}
+
+td{
+    background-color: aquamarine;
+    max-width: 200px; /* Set a maximum width for cells */
+    overflow-x: auto; /* Enable horizontal scrolling */
+}

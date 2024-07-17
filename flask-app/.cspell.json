@@ -1,0 +1,21 @@
+{
+  "version": "0.2",
+  "language": "en",
+  "words": [
+    "autoload",
+    "geodataframe",
+    "iloc",
+    "notna",
+    "quadkey",
+    "quadkeys",
+    "streetaddress",
+    "subaddress",
+    "tqdm",
+    "UBID",
+    "usaddress",
+    "ZZYYY"
+  ],
+  "flagWords": [
+    "hte"
+  ]
+}

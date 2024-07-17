@@ -1,0 +1,41 @@
+[
+  {
+    "quality": "P1AAA",
+    "address": "100 W 14th Avenue Pkwy",
+    "longitude": -104.9896,
+    "latitude": 39.73777,
+    "postal_code": "80204-2713",
+    "side_of_street": "L",
+    "country": "US",
+    "state": "CO",
+    "county": "Denver",
+    "city": "Denver",
+    "neighborhood": "Civic Center"
+  },
+  {
+    "quality": "P1AAA",
+    "address": "200 E Colfax Ave",
+    "longitude": -104.98457,
+    "latitude": 39.73988,
+    "postal_code": "80203-1716",
+    "side_of_street": "L",
+    "country": "US",
+    "state": "CO",
+    "county": "Denver",
+    "city": "Denver",
+    "neighborhood": "Capitol Hill"
+  },
+  {
+    "quality": "P1AAA",
+    "address": "320 W Colfax Ave",
+    "longitude": -104.99231,
+    "latitude": 39.73924,
+    "postal_code": "80204-2605",
+    "side_of_street": "R",
+    "country": "US",
+    "state": "CO",
+    "county": "Denver",
+    "city": "Denver",
+    "neighborhood": "Civic Center"
+  }
+]

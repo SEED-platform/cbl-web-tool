@@ -1,0 +1,62 @@
+<div class="file-container" *ngIf="!userFile">
+
+  <input type="file" (change)="getUploadFileFromUser($event)" class="file" />
+</div>
+
+<div *ngIf="userFile">
+  File name: {{userFile.name}} <br />
+  <button (click)="userFile = undefined">clear file</button>
+</div>
+<button (click)="uploadFileToServer()">upload file</button>
+<button (click)="exportJSON()" *ngIf="jsonData">Donwload data as JSON</button>
+
+
+
+<div id="data-container" *ngIf="jsonData">
+<table>
+  <thead>
+    <tr>
+      <th>Address</th>
+      <th>City</th>
+      <th>State</th>
+      <th>Postal Code</th>
+      <th>Side of the Street</th>
+      <th>Neighborhood</th>
+      <th>County</th>
+      <th>Country</th>
+      <th>Latitude</th>
+      <th>Longitude</th>
+      <th>Quality</th>
+      <th>Footprint Match</th>
+      <th>Height</th>
+      <th>UBID</th>
+      <th>Coordinates</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <tr *ngFor = "let building of buildingArray"> 
+      <td>{{building.properties.address}}</td>
+      <td>{{building.properties.city}}</td>
+      <td>{{building.properties.state}}</td>
+      <td>{{building.properties.postal_code}}</td>
+      <td>{{building.properties.side_of_street}}</td>
+      <td>{{building.properties.neighborhood}}</td>
+      <td>{{building.properties.county}}</td>
+      <td>{{building.properties.country}}</td>
+      <td>{{building.properties.latitude}}</td>
+      <td>{{building.properties.longitude}}</td>
+      <td>{{building.properties.quality}}</td>
+      <td>{{building.properties.footprint_match}}</td>
+      <td>{{building.properties.height}}</td>
+      <td>{{building.properties.ubid}}</td>
+      <td>{{building.geometry.coordinates[0]}}</td>
+    </tr>
+  </tbody>
+</table>
+
+<app-mapbox-map></app-mapbox-map>
+</div>
+
+
+
