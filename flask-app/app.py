@@ -34,7 +34,6 @@ def send_data_to_client():
     return jsonify(global_user_data)
 
 
-
 @app.route('/api/submit_file', methods=['POST'])
 def get_file_from_client():
 
@@ -44,6 +43,9 @@ def get_file_from_client():
     # Retrieve user uploaded file and generate list of locations from it
     file = request.files['userFile']
     locations = generate_locations_list(file)
+
+    if (len(locations)) == 0:
+        return jsonify({'error': 'File is empty or in the wrong format'}), 400
 
     MAPQUEST_API_KEY = os.getenv("MAPQUEST_API_KEY")
     if not MAPQUEST_API_KEY:
@@ -140,9 +142,6 @@ def generate_locations_list(file):
             data_frame = pd.read_csv(file)
         elif (file_type == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"):       
             data_frame = pd.read_excel(file)
-
-        if data_frame.empty:
-            return jsonify({'error': 'File is empty or in the wront format'}), 400
 
         for index, row in data_frame.iterrows():
             street = data_frame.loc[index, 'Property Address']
