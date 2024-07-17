@@ -50,7 +50,12 @@
       <td>{{building.properties.footprint_match}}</td>
       <td>{{building.properties.height}}</td>
       <td>{{building.properties.ubid}}</td>
-      <td>{{building.geometry.coordinates[0]}}</td>
+      <td><ng-container *ngIf="building.geometry?.coordinates?.[0]; else poorData">
+        {{building.geometry.coordinates[0]}}
+      </ng-container>
+      <ng-template #poorData>
+        Poor Data
+      </ng-template></td>
     </tr>
   </tbody>
 </table>

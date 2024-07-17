@@ -66,7 +66,7 @@ def get_file_from_client():
     # with open('locations_data.json', 'w') as file:
         # file.write(data_json)
     
-    with open("../mapquest_tempfile.json", 'r') as f:
+    with open("mapquest_tempfile.json", 'r') as f:
         data = json.load(f)
 
     poorQualityCodes = ["Ambiguous", "P1CAA", "B1CAA", "B1ACA"]
