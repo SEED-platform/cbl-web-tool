@@ -1,15 +1,12 @@
-__pycache__
+__pycache__/
 .env
-.idea
 .python-version
-.ruff_cache
+.ruff_cache/
 
 dist
 
 /data/
 /locations.json
-/.venv/
-/utils/.DS_Store
 
 santa_monica_file_merger.py
 santa_monica_parser_2.py
