@@ -146,7 +146,7 @@ def generate_locations_list(file):
                 'city': city,
                 'state': state
             }
-            locations.append(location_dict)
+            locations.append(location_dict)        
 
     elif (file_type == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"):    
         data_frame = pd.read_excel(file)
@@ -161,6 +161,7 @@ def generate_locations_list(file):
                 'state': state
             }
             locations.append(location_dict)
+
     return locations
 
 
