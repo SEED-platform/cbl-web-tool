@@ -38,34 +38,12 @@ def send_data_to_client():
 @app.route('/api/submit_file', methods=['POST'])
 def get_file_from_client():
 
-    # recieving and reading file from user
+    # TODO: Before generating locations list, check/fix quality of data in file 
+    # perhaps user can do this manually
+
+    # Retrieve user uploaded file and generate list of locations from it
     file = request.files['userFile']
-    file_content = file.read()
-    file_type = file.content_type
-    print(file_type)
-
-    locations: list[Location] = []
-    if (file_type == "application/json"):
-        file_content = file_content.decode('utf-8')
-        locations = json.loads(file_content)
-
-    elif (file_type == "application/csv" or file_type == "text/csv"):
-        print("file is CSV format")
-
-    elif (file_type == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"):    
-        data_frame = pd.read_excel(file)
-        for index, row in data_frame.iterrows():
-            street = data_frame.loc[index, 'Property Address']
-            city = data_frame.loc[index, 'City']
-            state = data_frame.loc[index, 'State']
-
-            location_dict: Location = {
-                'street': street,
-                'city': city,
-                'state': state
-            }
-            locations.append(location_dict)
-
+    locations = generate_locations_list(file)
 
     MAPQUEST_API_KEY = os.getenv("MAPQUEST_API_KEY")
     if not MAPQUEST_API_KEY:
@@ -77,15 +55,16 @@ def get_file_from_client():
 
     for loc in locations:
         loc["street"] = normalize_address(loc["street"])
+        print(loc)
 
-    # data = geocode_addresses(locations, MAPQUEST_API_KEY)
+    data = geocode_addresses(locations, MAPQUEST_API_KEY)
 
     # data_json = json.dumps(data, indent=2)
     # with open('locations_data.json', 'w') as file:
         # file.write(data_json)
 
-    with open ('locations_data.json', 'r') as file:
-        data = json.load(file)
+    # with open ('locations_data.json', 'r') as file:
+        # data = json.load(file)
 
     poorQualityCodes = ["Ambiguous", "P1CAA", "B1CAA", "B1ACA"]
 
@@ -143,6 +122,46 @@ def get_file_from_client():
     final_geojson = gdf.to_json()
  
     return jsonify({"message": "success", "user_data": final_geojson}), 200
+
+
+# Generating a list of locations from user-inputted file
+def generate_locations_list(file):
+    file_type = file.content_type
+    print(file_type)
+
+    locations: list[Location] = []
+    if (file_type == "application/json"):
+        file_content = file.read().decode('utf-8')
+        locations = json.loads(file_content)
+
+    elif (file_type == "application/csv" or file_type == "text/csv"):
+        data_frame = pd.read_csv(file)
+        for index, row in data_frame.iterrows():
+            street = data_frame.loc[index, 'Property Address']
+            city = data_frame.loc[index, 'City']
+            state = data_frame.loc[index, 'State']
+
+            location_dict: Location = {
+                'street': street,
+                'city': city,
+                'state': state
+            }
+            locations.append(location_dict)
+
+    elif (file_type == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"):    
+        data_frame = pd.read_excel(file)
+        for index, row in data_frame.iterrows():
+            street = data_frame.loc[index, 'Property Address']
+            city = data_frame.loc[index, 'City']
+            state = data_frame.loc[index, 'State']
+
+            location_dict: Location = {
+                'street': street,
+                'city': city,
+                'state': state
+            }
+            locations.append(location_dict)
+    return locations
 
 
 if __name__ == '__main__':
