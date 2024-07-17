@@ -59,7 +59,7 @@ def get_file_from_client():
         loc["street"] = normalize_address(loc["street"])
         print(loc)
 
-    # data = geocode_addresses(locations, MAPQUEST_API_KEY)
+    data = geocode_addresses(locations, MAPQUEST_API_KEY)
 
     # data_json = json.dumps(data, indent=2)
     # with open('locations_data.json', 'w') as file:
@@ -68,8 +68,8 @@ def get_file_from_client():
     # with open ('locations_data.json', 'r') as file:
         # data = json.load(file)
     
-    with open("mapquest_tempfile.json") as f:
-        data = json.load(f)
+    # with open("../mapquest_tempfile.json") as f:
+        # data = json.load(f)
 
     poorQualityCodes = ["Ambiguous", "P1CAA", "B1CAA", "B1ACA"]
 
@@ -89,6 +89,7 @@ def get_file_from_client():
     update_quadkeys(list(quadkeys))
     
     loaded_quadkeys: dict[int, Any] = {}
+    index = 0
     for datum in data:
         if (datum["quality"] not in poorQualityCodes):
             quadkey = datum["quadkey"]
@@ -117,10 +118,10 @@ def get_file_from_client():
             # Determine UBIDs from footprints
             datum["ubid"] = encode_ubid(datum["geometry"])
         else:
-            datum["address"] = "Poor Data"
-            datum["city"] = "Poor Data"
-            datum["state"] = "Poor Data"
-            datum["postal_code"] = "Poor Data"
+            datum["address"] = normalize_address(locations[index]["street"])
+            datum["city"] = locations[index]["city"]
+            datum["state"] = locations[index]["state"]
+
             datum["side_of_street"] = "Poor Data"
             datum["neighborhood"] = "Poor Data"
             datum["county"] = "Poor Data"
@@ -129,9 +130,10 @@ def get_file_from_client():
             datum["longitude"] = "Poor Data"
             datum["quality"] = "Poor Data"
             datum["footprint_match"] = "Poor Data"
-            datum["height"] = "Poor Data"
-            datum["geometry"] = "Poor Data"
+            datum["height"] = None
+            datum["geometry"] = None
             datum["ubid"] = "Poor Data"
+        index = index + 1
 
 
     # Convert covered building list as GeoJSON
