@@ -141,6 +141,9 @@ def generate_locations_list(file):
         elif (file_type == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"):       
             data_frame = pd.read_excel(file)
 
+        if data_frame.empty:
+            return jsonify({'error': 'File is empty or in the wront format'}), 400
+
         for index, row in data_frame.iterrows():
             street = data_frame.loc[index, 'Property Address']
             city = data_frame.loc[index, 'City']
