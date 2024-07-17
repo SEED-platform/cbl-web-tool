@@ -65,8 +65,11 @@ def get_file_from_client():
     # with open('locations_data.json', 'w') as file:
         # file.write(data_json)
 
-    with open ('locations_data.json', 'r') as file:
-        data = json.load(file)
+    # with open ('locations_data.json', 'r') as file:
+        # data = json.load(file)
+    
+    with open("mapquest_tempfile.json") as f:
+        data = json.load(f)
 
     poorQualityCodes = ["Ambiguous", "P1CAA", "B1CAA", "B1ACA"]
 
@@ -113,14 +116,33 @@ def get_file_from_client():
 
             # Determine UBIDs from footprints
             datum["ubid"] = encode_ubid(datum["geometry"])
+        else:
+            datum["address"] = "Poor Data"
+            datum["city"] = "Poor Data"
+            datum["state"] = "Poor Data"
+            datum["postal_code"] = "Poor Data"
+            datum["side_of_street"] = "Poor Data"
+            datum["neighborhood"] = "Poor Data"
+            datum["county"] = "Poor Data"
+            datum["country"] = "Poor Data"
+            datum["latitude"] = "Poor Data"
+            datum["longitude"] = "Poor Data"
+            datum["quality"] = "Poor Data"
+            datum["footprint_match"] = "Poor Data"
+            datum["height"] = "Poor Data"
+            datum["geometry"] = "Poor Data"
+            datum["ubid"] = "Poor Data"
 
-    # Save covered building list as csv and GeoJSON
+
+    # Convert covered building list as GeoJSON
     columns = [
         "address", "city", "state", "postal_code", "side_of_street", "neighborhood", "county",
         "country", "latitude", "longitude", "quality", "footprint_match", "height", "ubid",
         "geometry"]
     
     gdf = gpd.GeoDataFrame(data=data, columns=columns)
+    
+
     final_geojson = gdf.to_json()
  
     return jsonify({"message": "success", "user_data": final_geojson}), 200
