@@ -57,14 +57,14 @@ def get_file_from_client():
         loc["street"] = normalize_address(loc["street"])
         print(loc)
 
-    data = geocode_addresses(locations, MAPQUEST_API_KEY)
+    # data = geocode_addresses(locations, MAPQUEST_API_KEY)
 
     # data_json = json.dumps(data, indent=2)
     # with open('locations_data.json', 'w') as file:
         # file.write(data_json)
 
-    # with open ('locations_data.json', 'r') as file:
-        # data = json.load(file)
+    with open ('locations_data.json', 'r') as file:
+        data = json.load(file)
 
     poorQualityCodes = ["Ambiguous", "P1CAA", "B1CAA", "B1ACA"]
 
@@ -133,23 +133,12 @@ def generate_locations_list(file):
     if (file_type == "application/json"):
         file_content = file.read().decode('utf-8')
         locations = json.loads(file_content)
+    else:
+        if (file_type == "application/csv" or file_type == "text/csv"):
+            data_frame = pd.read_csv(file)
+        elif (file_type == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"):       
+            data_frame = pd.read_excel(file)
 
-    elif (file_type == "application/csv" or file_type == "text/csv"):
-        data_frame = pd.read_csv(file)
-        for index, row in data_frame.iterrows():
-            street = data_frame.loc[index, 'Property Address']
-            city = data_frame.loc[index, 'City']
-            state = data_frame.loc[index, 'State']
-
-            location_dict: Location = {
-                'street': street,
-                'city': city,
-                'state': state
-            }
-            locations.append(location_dict)        
-
-    elif (file_type == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"):    
-        data_frame = pd.read_excel(file)
         for index, row in data_frame.iterrows():
             street = data_frame.loc[index, 'Property Address']
             city = data_frame.loc[index, 'City']
