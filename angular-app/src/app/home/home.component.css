@@ -11,13 +11,21 @@
     height: 5rem;
 }
 
-#data-container{
-    width: 800px;
-    height: 500px;
-}
+
 
 table{
     border-collapse: collapse; /* Ensures borders are merged into a single border */
+}
+#data-container{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    border: 0;
+    margin: 0;
+}
+
+th{
+    background-color: #0079C2;
 }
 
 th, td {
@@ -27,7 +35,6 @@ th, td {
 }
 
 td{
-    background-color: aquamarine;
     max-width: 200px; /* Set a maximum width for cells */
     overflow-x: auto; /* Enable horizontal scrolling */
 }

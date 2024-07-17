@@ -8,11 +8,12 @@
   <button (click)="userFile = undefined">clear file</button>
 </div>
 <button (click)="uploadFileToServer()">upload file</button>
-<button (click)="exportJSON()" *ngIf="jsonData">Donwload data as JSON</button>
-
+<button (click)="exportJSON()"  *ngIf="jsonData">Donwload data in a GEOJSON Format</button>
+<button>Table</button>
 
 
 <div id="data-container" *ngIf="jsonData">
+<button></button>
 <table>
   <thead>
     <tr>
