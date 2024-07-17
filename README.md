@@ -10,15 +10,14 @@ Given a list of addresses uploaded in JSON, CSV, or excel format, this tool will
 
 ### Prerequisites
 1. Optionally create a Virtualenv Environment in the flask-app directory
-3. Run `pip install flask` and `pip install flask_cors` to install the required flask components of the app
 2. Dependencies for the flask app are managed through Poetry, install with `pip install poetry`
-4. Create a `.env` file in the flask-app directory with your MapQuest API key in the format:
+3. Create a `.env` file in the flask-app directory with your MapQuest API key in the format:
     ```dotenv
     MAPQUEST_API_KEY=XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
     ```
     Note that if an env key for MAPQUEST_API_KEY exists in your profile, then it use that over the .env file.
-5. Install dependencies with `poetry install`
-6. In the angular-app directory, install angular by running `npm install -g @angular/cli@17`
+4. Install dependencies with `poetry install`
+5. In the angular-app directory, install angular by running `npm install -g @angular/cli@17`
 
 ### Running the Web App
 1. Run the web app by opening two terminals: one with the working directory as angular-app and running `ng serve -o` and the other with the working directory as flask-app and running `python app.py`
