@@ -1,41 +1,1402 @@
 [
   {
-    "quality": "P1AAA",
-    "address": "100 W 14th Avenue Pkwy",
-    "longitude": -104.9896,
-    "latitude": 39.73777,
-    "postal_code": "80204-2713",
-    "side_of_street": "L",
-    "country": "US",
-    "state": "CO",
-    "county": "Denver",
-    "city": "Denver",
-    "neighborhood": "Civic Center"
+    "street": "1333 2nd St",
+    "city": "Santa Monica",
+    "state": "CA"
   },
   {
-    "quality": "P1AAA",
-    "address": "200 E Colfax Ave",
-    "longitude": -104.98457,
-    "latitude": 39.73988,
-    "postal_code": "80203-1716",
-    "side_of_street": "L",
-    "country": "US",
-    "state": "CO",
-    "county": "Denver",
-    "city": "Denver",
-    "neighborhood": "Capitol Hill"
+    "street": "1451-1457 3rd Street Promenade",
+    "city": "Santa Monica",
+    "state": "CA"
   },
   {
-    "quality": "P1AAA",
-    "address": "320 W Colfax Ave",
-    "longitude": -104.99231,
-    "latitude": 39.73924,
-    "postal_code": "80204-2605",
-    "side_of_street": "R",
-    "country": "US",
-    "state": "CO",
-    "county": "Denver",
-    "city": "Denver",
-    "neighborhood": "Civic Center"
+    "street": "120 Broadway",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "520 Broadway",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "525 Broadway",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "1524 Cloverfield Blvd",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "417-425 Colorado Ave",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "2200 Colorado Ave",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "2842-2912 Colorado Ave",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "1650 Euclid St",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "1447 Lincoln Blvd",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "1550 Lincoln Blvd",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "1625 Lincoln Blvd",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "1661-1669 Lincoln Blvd",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "3110 Main St",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "2419-2425 Michigan Ave",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "1541-1551 Ocean Ave",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "1733 Ocean Ave",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "2901 Ocean Park Blvd",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "2700 Pennsylvania Ave",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "2929 Pennsylvania Ave",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "201 Santa Monica Blvd",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "402 Santa Monica Blvd",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "429 Santa Monica Blvd",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "2021 Santa Monica Blvd",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "2825 Santa Monica Blvd",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "1703-1741 Stewart St",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "401 Wilshire Blvd",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "601 Wilshire Blvd",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "2001 Wilshire Blvd",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "2300 Wilshire Blvd",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "2444 Wilshire Blvd",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "2730 Wilshire Blvd",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "3223 Wilshire Blvd",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "500 Broadway",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "829 Broadway",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "1811-1855 Centinela Ave",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "315 Colorado Ave",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "2401 Colorado Ave",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "2450 Colorado Ave",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "2903 Lincoln Blvd",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "2000 Main St",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "2415-2525 Michigan Ave",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "1299 Ocean Ave",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "1431 Ocean Ave",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "2701 Ocean Park Blvd",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "100 Wilshire Blvd",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "233 Wilshire Blvd",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "808 Wilshire Blvd",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "1410-1430 5th St",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "1450 5th St",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "1540 6th St",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "1260 15th St",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "1245 16th St",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "1631-1645 16th St",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "1301 20th St",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "1655 26th St",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "2014-2058 Broadway",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "2525 Colorado Ave",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "2834 Colorado Ave",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "3301 Exposition Blvd",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "3001-3013 Main St",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "2716 Ocean Park Blvd",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "3000 Ocean Park Blvd",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "225 Santa Monica Blvd",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "2001 Santa Monica Blvd",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "3130 Wilshire Blvd",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "801 2nd St",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "1111 2nd St",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "1127-1129 2nd St",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "1232 2nd St",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "1321 2nd St",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "1431 2nd St",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "1540 2nd St",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "1555 2nd St",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "855 3rd St",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "1125 3rd St",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "1311-1313 3rd Street Promenade",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "1453 3rd Street Promenade",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "950 4th St",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "1122-1136 4th St",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "1219 4th St",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "1250 4th St",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "1320 4th St",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "1440-1454 4th St",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "1455 4th St",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "1502 4th St",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "1707 4th St",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "2035 4th St",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "3111 4th St",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "1115 5th St",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "1320 5th St",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "1324 5th St",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "1324 5th St",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "1336 5th St",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "1415 5th St",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "1425 5th St",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "1448-1554 5th St",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "1530 5th St",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "1233 6th St",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "1234 6th St",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "1422 6th St",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "1528 6th St",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "1548 6th St",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "1920 6th St",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "1039 7th St",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "1112 7th St",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "1314 7th St",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "1422 7th St",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "1432 7th St",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "1543 7th St",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "921 10th St",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "1310 11 St",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "1310 11th St",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "1251 14th St",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "1834-1848 14th St",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "1233 15th St",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "1340 15th St",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "1223 16th St",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "1310 16th St",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "1447 17th St",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "807-811 21st St",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "1441 21st St",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "1328 22nd St",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "1620 26th St",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "1633 26th St",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "1681 26th St",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "2800 28th St",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "2901 28th St",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "2951 28th St",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "2900 31st St",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "2950 31st St",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "3000-3100 31st St",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "702 Arizona Ave",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "2021 Arizona Ave",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "201-211 Broadway",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "425 Broadway",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "500 Broadway",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "501 Broadway",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "606 Broadway",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "710 Broadway",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "2001 Broadway",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "2400 Broadway",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "2450 Broadway",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "2500 Broadway",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "220 Broadway Dr",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "1502 Broadway St",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "101 California Ave",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "330 California Ave",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "1601 Cloverfield Blvd",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "1644 Cloverfield Blvd",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "1707 Cloverfield Blvd",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "1707 Cloverfield Blvd",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "1959 Cloverfield Blvd",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "120 Colorado Ave",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "302 Colorado Ave",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "302 Colorado Ave",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "315 Colorado Ave",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "501-505 Colorado Ave",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "1100-1120 Colorado Ave",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "1330 Colorado Ave",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "2110 Colorado Ave",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "2120 Colorado Ave",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "2150 Colorado Ave",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "2220 Colorado Ave",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "2425-2501 Colorado Ave",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "2600-2800 Colorado Ave",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "2772 Donald Douglas Loop N",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "2800 Donald Douglas Loop N",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "3003 Exposition Blvd",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "3401 Exposition Blvd",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "3401 Exposition Blvd",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "1338 Fifth St",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "707 Idaho Ave",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "958 Lincoln Blvd",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "1021 Lincoln Blvd",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "1430 Lincoln Blvd",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "1626 Lincoln Blvd",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "1641 Lincoln Blvd",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "1650 Lincoln Blvd",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "1655 Lincoln Blvd",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "2601-2635 Lincoln Blvd",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "1776 Main St",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "315 Montana Ave",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "521 Montana Ave",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "3030 Nebraska Ave",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "2700-2800 Neilson Way",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "3100 Neilson Way",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "1755 Ocean Ave",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "101-201 Ocean Ave",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "535 Ocean Ave",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "701 OCEAN Ave",
+    "city": "SANTA MONICA",
+    "state": "CA"
+  },
+  {
+    "street": "801 Ocean Ave",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "849 Ocean Ave",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "1133 Ocean Ave",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "1133 Ocean Ave",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "1221 Ocean Ave",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "1401 Ocean Ave",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "1515-1525 Ocean Ave",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "1700 Ocean Ave",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "1705 Ocean Ave",
+    "city": "SANTA MONICA",
+    "state": "CA"
+  },
+  {
+    "street": "1725 Ocean Ave",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "1740 Ocean Ave",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "1819 Ocean Ave",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "1828 Ocean Ave",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "2021 Ocean Ave",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "2107 Ocean Ave",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "1910 Ocean Way",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "3010 Ocean Park Blvd",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "1725 Ocean Front",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "10-150 Ocean Park Blvd",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "2850 Ocean Park Blvd",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "3100 Ocean Park Blvd",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "3250 Ocean Park Blvd",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "3340 Ocean Park Blvd",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "3420 Ocean Park Blvd",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "2001 Olympic Blvd",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "2029 Olympic Blvd",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "2425 Olympic Blvd",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "2701 Olympic Blvd",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "2701 Olympic Blvd",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "3220-3300 Olympic Blvd",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "333 Olympic Dr",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "2900 W Olympic Blvd",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "3000 W Olympic Blvd",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "3030 W Olympic Blvd",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "1 Pico Blvd",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "234 Pico Blvd",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "430-506 Pico Blvd",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "530 Pico Blvd",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "2501 Pico Blvd",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "3402 Pico Blvd",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "220 San Vicente Blvd",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "101 Santa Monica Blvd",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "101 Santa Monica Blvd",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "214 Santa Monica Blvd",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "501 Santa Monica Blvd",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "601 Santa Monica Blvd",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "620-632 Santa Monica Blvd",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "1230 Santa Monica Blvd",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "1726 Santa Monica Blvd",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "1920 Santa Monica Blvd",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "2020 Santa Monica Blvd",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "2031 Santa Monica Blvd",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "2121 Santa Monica Blvd",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "3219-3223 Santa Monica Blvd",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "395 Santa Monica Pl",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "1618 Stanford St",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "1630 Stewart St",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "1647 Stewart St",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "1660 Stewart St",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "1740 Stewart St",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "1740 Stewart St",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "1800 Stewart St",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "1800 Stewart St",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "205 Washington Ave",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "101 Wilshire Blvd",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "606 Wilshire Blvd",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "700 Wilshire Blvd",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "2811 Wilshire Blvd",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "3000-3018 Wilshire Blvd",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "1118 3rd St",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "1515 7th St",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "1011 11th St",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "1721 22nd St",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "710 Broadway",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "101 California Ave",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "124 Idaho Ave",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "1685 Main St",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "3122 Nebraska Ave",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "101 Ocean Ave",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "515 Ocean Ave",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "951 OCEAN Ave",
+    "city": "SANTA MONICA",
+    "state": "CA"
+  },
+  {
+    "street": "415 Pacific Coast Hwy",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "1900 Pico Blvd",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "1900 Pico Blvd",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "700 Santa Monica Blvd",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "1630 Stewart St",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "11701 Texas Ave",
+    "city": "Santa Monica",
+    "state": "CA"
+  },
+  {
+    "street": "2425 Virginia Ave",
+    "city": "Santa Monica",
+    "state": "CA"
   }
 ]

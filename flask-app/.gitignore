@@ -11,3 +11,4 @@ dist
 santa_monica_file_merger.py
 santa_monica_parser_2.py
 mapquest_tempfile.json
+locations_data.json

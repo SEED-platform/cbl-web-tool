@@ -34,15 +34,16 @@ def send_data_to_client():
     return jsonify(global_user_data)
 
 
+# TODO: Before generating locations list, check/fix quality of data in file 
+# perhaps user can do this manually
 @app.route('/api/submit_file', methods=['POST'])
 def get_file_from_client():
 
-    # TODO: Before generating locations list, check/fix quality of data in file 
-    # perhaps user can do this manually
-
     # Retrieve user uploaded file and generate list of locations from it
     file = request.files['userFile']
-    locations = generate_locations_list(file)
+    # locations = generate_locations_list(file)
+    with open('locations_data.json', 'r') as file:
+        locations = json.load(file)
 
     if (len(locations)) == 0:
         return jsonify({'error': 'File is empty or in the wrong format'}), 400
@@ -59,17 +60,14 @@ def get_file_from_client():
         loc["street"] = normalize_address(loc["street"])
         print(loc)
 
-    data = geocode_addresses(locations, MAPQUEST_API_KEY)
+    # data = geocode_addresses(locations, MAPQUEST_API_KEY)
 
     # data_json = json.dumps(data, indent=2)
     # with open('locations_data.json', 'w') as file:
         # file.write(data_json)
-
-    # with open ('locations_data.json', 'r') as file:
-        # data = json.load(file)
     
-    # with open("../mapquest_tempfile.json") as f:
-        # data = json.load(f)
+    with open("../mapquest_tempfile.json", 'r') as f:
+        data = json.load(f)
 
     poorQualityCodes = ["Ambiguous", "P1CAA", "B1CAA", "B1ACA"]
 
