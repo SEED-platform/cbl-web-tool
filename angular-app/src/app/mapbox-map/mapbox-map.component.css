@@ -1,10 +1,10 @@
 #map {
-    height: 600px; /* Full viewport height */
-    width: 100%; /* Full width */
+    height: 700px; /* Full viewport height */
+    width: 1800px; /* Full width */
     display: flex;
     justify-content: flex-end; 
     position: relative;
-    margin: 0;
+    margin-top: 20px;
 
   }
 
@@ -37,4 +37,9 @@
 
   .addressbox:hover{
      cursor: pointer;
+  }
+
+
+  .red-font {
+    color: red;
   }

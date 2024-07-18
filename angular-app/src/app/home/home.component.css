@@ -11,30 +11,65 @@
     height: 5rem;
 }
 
+.red-font{
+    color: red;
+}
+
+
+
+#map-ref{
+    width: 90vw;
+}
+
+
+.outer-wrapper{
+ border: 1px solid black; 
+ margin-top: 20px;
+ padding: 0;
+ max-width: 1800px;
+}
+
+.table-wrapper{
+    max-height: 600px;
+    overflow-y: scroll;
+    scrollbar-width: thin;
+}
 
 
 table{
-    border-collapse: collapse; /* Ensures borders are merged into a single border */
-}
-#data-container{
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    border: 0;
-    margin: 0;
+  border-collapse: separate;
+  border-spacing: 0px;
 }
 
 th{
-    background-color: #0079C2;
+    position: sticky;
+    top: 0px;
+    background-color: #0B5E90;
+    color: white;
 }
-
-th, td {
-    border: 2px solid black; /* Sets the border for table cells */
-    padding: 8px; /* Optional: Adds space inside each cell */
-    text-align: left; /* Optional: Aligns text to the left inside cells */
-}
-
 td{
-    max-width: 200px; /* Set a maximum width for cells */
-    overflow-x: auto; /* Enable horizontal scrolling */
+    padding: 10px;
+    max-width: 300px;
 }
+
+#coordinateData{
+ 
+    overflow-y: scroll;
+}
+
+
+
+th, td{
+    border: 1px solid black;
+}
+
+
+
+
+
+
+
+
+
+
+

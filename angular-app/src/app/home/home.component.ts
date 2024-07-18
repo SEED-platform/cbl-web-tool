@@ -20,7 +20,7 @@ export class HomeComponent{
    jsonData: any;
    buildingArray: any[] = [];
    isTable: boolean = true;
-   toggleString: string = "Table";
+   toggleString: string = "Map";
 
 
     constructor(private apiHandler: FlaskRequests, private fileExportHandler: FileExportService) {
