@@ -1,8 +1,0 @@
-.idea/
-.venv/
-.DS_Store
-mapquest_tempfile.json
-/locations_data.json
-flask-app/locations_data.json
-
-
