@@ -2,13 +2,19 @@ __pycache__/
 .env
 .python-version
 .ruff_cache/
+.idea/
+env/
 
 dist
 
-/data/
-/locations.json
+data/
+.venv/
+.DS_Store
 
+# temporary files used for referencing/testing
 santa_monica_file_merger.py
 santa_monica_parser_2.py
 mapquest_tempfile.json
 locations_data.json
+locations.json
+main.py
