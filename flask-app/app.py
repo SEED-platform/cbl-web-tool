@@ -41,11 +41,10 @@ def get_and_check_file():
     if (isinstance(json_dict_list, LocationError)):
         return jsonify({'error': f'{json_dict_list.message}'}), 400
     
-    # if file is succesfully read, send to front end for manual editing
-    # (for cells with no data in the data table, perhaps Rahman can make them highlighted red)
+    # this should be continuously checked until the file passes the checks
     isGoodData = check_data_quality(json_dict_list)
     if isGoodData == False:
-        return jsonify({'error': 'Uploaded a file with poorly formatted data. Make sure data is formatted properly.'}), 400
+        return jsonify({'error': 'Uploaded a file with poorly formatted data. May be missing 3 required unique columns'}), 400
 
     json_data = json.dumps(json_dict_list)
     return jsonify({"message": "success", "user_data": json_data}), 200
@@ -74,7 +73,7 @@ def convert_to_json_dict_list(file):
     
     if (file_type == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"):   
         try:
-            data_frame = pd.read_excel('data/covered-buildings.csv')
+            data_frame = pd.read_excel(file)
             json_data = data_frame.to_json(orient='records')
             json_dict_list = json.loads(json_data)
         except:
@@ -84,7 +83,7 @@ def convert_to_json_dict_list(file):
 
     if (file_type == "application/csv" or file_type == "text/csv"):
         try:
-            data_frame = pd.read_csv('data/covered-buildings.csv')
+            data_frame = pd.read_csv(file)
             json_data = data_frame.to_json(orient='records')
             json_dict_list = json.loads(json_data)
         except:
@@ -96,14 +95,26 @@ def convert_to_json_dict_list(file):
 # Checking for duplicates in the list of dictionaries 
 def check_data_quality(json_dict_list):
     for i in range(len(json_dict_list) - 1):
-        property1 = json_dict_list[i]
+        dict1 = json_dict_list[i]
+
+        # Enforcing the required unique column names 
+        if "Property Address" and "property address" not in dict1:
+            return False
+        if "City" and "city" not in dict1:
+            return False
+        if "State" and "state" not in dict1:
+            return False
 
         for j in range(i + 1, len(json_dict_list)):
-            property2 = json_dict_list[j]
+            dict2 = json_dict_list[j]
 
-            if (property1 == property2):
-                property1["duplicate?"] = "possible duplicate"
-                property2["duplicate?"] = "possible duplicate"
+            if (dict1 == dict2):
+                dict1["duplicate?"] = "possible duplicate"
+                dict2["duplicate?"] = "possible duplicate"
+
+            else: 
+                dict1["duplicate?"] = ""
+                dict2["duplicate?"] = ""
 
     # values must only be primitive types
     for d in json_dict_list:
@@ -114,8 +125,6 @@ def check_data_quality(json_dict_list):
     return True
             
                 
-
-
 # Generating a list of locations from user-inputted file
 def generate_locations_list(json_dict_list):
     locations: list[Location] = []
@@ -125,13 +134,13 @@ def generate_locations_list(json_dict_list):
         city = ''
         state = ''
         for key in d.keys():
-            if "address" in key.lower() or "street" in key.lower():
+            if "property address" == key.lower():
                 street = d[key]
 
-            if "city" in key.lower():
+            if "city" == key.lower():
                 city = d[key]
 
-            if "state" in key.lower():
+            if "state" == key.lower():
                 state = d[key]
 
         loc_dict = {
