@@ -15,6 +15,7 @@ import pandas as pd
 from shapely.geometry import Point
 
 from utils.common import Location
+from utils import LocationError
 from utils.geocode_addresses import geocode_addresses
 from utils.normalize_address import normalize_address
 from utils.ubid import bounding_box, centroid, encode_ubid
@@ -28,155 +29,118 @@ warnings.filterwarnings("ignore", category=UserWarning)
 app = Flask(__name__)
 CORS(app)
 
-global_user_data = {"user_data": ""}
-@app.route('/api/data',  methods=['GET'])
-def send_data_to_client():
-    return jsonify(global_user_data)
+@app.route('/api/submit_file',  methods=['POST'])
+def get_and_check_file():
 
-
-# TODO: Before generating locations list, check/fix quality of data in file 
-# perhaps user can do this manually
-@app.route('/api/submit_file', methods=['POST'])
-def get_file_from_client():
-
-    # Retrieve user uploaded file and generate list of locations from it
     file = request.files['userFile']
-    # locations = generate_locations_list(file)
-    with open('locations_data.json', 'r') as file:
-        locations = json.load(file)
+    json_dict_list = convert_to_json_dict_list(file)
 
-    if (len(locations)) == 0:
-        return jsonify({'error': 'File is empty or in the wrong format'}), 400
-
-    MAPQUEST_API_KEY = os.getenv("MAPQUEST_API_KEY")
-    if not MAPQUEST_API_KEY:
-        sys.exit("Missing MapQuest API key")
-
-    quadkey_path = Path("data/quadkeys")
-    if not quadkey_path.exists():
-        quadkey_path.mkdir(parents=True, exist_ok=True)
-
-    for loc in locations:
-        loc["street"] = normalize_address(loc["street"])
-        print(loc)
-
-    # data = geocode_addresses(locations, MAPQUEST_API_KEY)
-
-    # data_json = json.dumps(data, indent=2)
-    # with open('locations_data.json', 'w') as file:
-        # file.write(data_json)
+    if (len(json_dict_list) == 0):
+        return jsonify({'error': 'Uploaded a file in the wrong format. Please upload different format'}), 400
     
-    with open("mapquest_tempfile.json", 'r') as f:
-        data = json.load(f)
-
-    poorQualityCodes = ["Ambiguous", "P1CAA", "B1CAA", "B1ACA"]
-
-    # Find all quadkeys that the coordinates fall within
-    quadkeys = set()
-    for datum in data:
-        if (datum["quality"] not in poorQualityCodes):
-            tile = mercantile.tile(datum["longitude"], datum["latitude"], 9)
-            quadkey = int(mercantile.quadkey(tile))
-            quadkeys.add(quadkey)
-            datum["quadkey"] = quadkey
-
-    # Download quadkey dataset links
-    update_dataset_links()
-
-    # Download quadkeys
-    update_quadkeys(list(quadkeys))
+    if (isinstance(json_dict_list, LocationError)):
+        return jsonify({'error': f'{json_dict_list.message}'}), 400
     
-    loaded_quadkeys: dict[int, Any] = {}
-    index = 0
-    for datum in data:
-        if (datum["quality"] not in poorQualityCodes):
-            quadkey = datum["quadkey"]
-            if quadkey not in loaded_quadkeys:
-                print(f"Loading {quadkey}")
+    # if file is succesfully read, send to front end for manual editing
+    # (for cells with no data in the data table, perhaps Rahman can make them highlighted red)
+    isGoodData = check_data_quality(json_dict_list)
+    if isGoodData == False:
+        return jsonify({'error': 'Uploaded a file with poorly formatted data. Make sure data is formatted properly.'}), 400
 
-                with gzip.open(f"data/quadkeys/{quadkey}.geojsonl.gz", "rb") as f:
-                    loaded_quadkeys[quadkey] = gpd.read_file(f)
-                    print(f"  {len(loaded_quadkeys[quadkey])} footprints in quadkey")
+    json_data = json.dumps(json_dict_list)
+    return jsonify({"message": "success", "user_data": json_data}), 200
 
-            geojson = loaded_quadkeys[quadkey]
-            point = Point(datum["longitude"], datum["latitude"])
-            point_gdf = gpd.GeoDataFrame(crs="epsg:4326", geometry=[point])
+    # after editing is succesful, generate list of locations and check data quality
+    # locations = generate_locations_list(json_dict_list)
+    # Finally, run CBL-workflow
 
-            # intersections have `geometry`, `index_right`, and `height`
-            intersections = gpd.sjoin(point_gdf, geojson)
-            if len(intersections) >= 1:
-                footprint = geojson.iloc[intersections.iloc[0].index_right]
-                datum["footprint_match"] = "intersection"
-            else:
-                footprint = geojson.iloc[geojson.distance(point).sort_values().index[0]]
-                datum["footprint_match"] = "closest"
-            datum["geometry"] = footprint.geometry
-            datum["height"] = footprint.height if footprint.height != -1 else None
-
-            # Determine UBIDs from footprints
-            datum["ubid"] = encode_ubid(datum["geometry"])
-        else:
-            datum["address"] = normalize_address(locations[index]["street"])
-            datum["city"] = locations[index]["city"]
-            datum["state"] = locations[index]["state"]
-
-            datum["side_of_street"] = "Poor Data"
-            datum["neighborhood"] = "Poor Data"
-            datum["county"] = "Poor Data"
-            datum["country"] = "Poor Data"
-            datum["latitude"] = "Poor Data"
-            datum["longitude"] = "Poor Data"
-            datum["quality"] = "Poor Data"
-            datum["footprint_match"] = "Poor Data"
-            datum["height"] = None
-            datum["geometry"] = None
-            datum["ubid"] = "Poor Data"
-        index = index + 1
-
-
-    # Convert covered building list as GeoJSON
-    columns = [
-        "address", "city", "state", "postal_code", "side_of_street", "neighborhood", "county",
-        "country", "latitude", "longitude", "quality", "footprint_match", "height", "ubid",
-        "geometry"]
-    
-    gdf = gpd.GeoDataFrame(data=data, columns=columns)
     
 
-    final_geojson = gdf.to_json()
- 
-    return jsonify({"message": "success", "user_data": final_geojson}), 200
+    
+# NOTE: When converting to a data_frame, duplicate columns will be renamed (i.e Address and Address_1)
+# SO, the json file and the resulting dictionary can have keys like Address and Address_1
+def convert_to_json_dict_list(file):
+    file_type = file.content_type
+    newError = LocationError("Failed to read file.")
+
+    if (file_type == "application/json"):
+        try: 
+            file_content = file.read().decode('utf-8')
+            json_dict_list = json.loads(file_content)
+        except:
+            return newError
+
+        return json_dict_list
+    
+    if (file_type == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"):   
+        try:
+            data_frame = pd.read_excel('data/covered-buildings.csv')
+            json_data = data_frame.to_json(orient='records')
+            json_dict_list = json.loads(json_data)
+        except:
+            return newError
+
+        return json_dict_list
+
+    if (file_type == "application/csv" or file_type == "text/csv"):
+        try:
+            data_frame = pd.read_csv('data/covered-buildings.csv')
+            json_data = data_frame.to_json(orient='records')
+            json_dict_list = json.loads(json_data)
+        except:
+            return newError
+
+        return json_dict_list
+
+
+# Checking for duplicates in the list of dictionaries 
+def check_data_quality(json_dict_list):
+    for i in range(len(json_dict_list) - 1):
+        property1 = json_dict_list[i]
+
+        for j in range(i + 1, len(json_dict_list)):
+            property2 = json_dict_list[j]
+
+            if (property1 == property2):
+                property1["duplicate?"] = "possible duplicate"
+                property2["duplicate?"] = "possible duplicate"
+
+    # values must only be primitive types
+    for d in json_dict_list:
+        for value in d.values():
+            if not isinstance(value, (int, str, bool)): 
+                return False
+            
+    return True
+            
+                
 
 
 # Generating a list of locations from user-inputted file
-def generate_locations_list(file):
-    file_type = file.content_type
-    print(file_type)
-
+def generate_locations_list(json_dict_list):
     locations: list[Location] = []
-    
-    if (file_type == "application/json"):
-        file_content = file.read().decode('utf-8')
-        locations = json.loads(file_content)
-    else:
-        data_frame = pd.DataFrame()
-        if (file_type == "application/csv" or file_type == "text/csv"):
-            data_frame = pd.read_csv(file)
-        elif (file_type == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"):       
-            data_frame = pd.read_excel(file)
 
-        for index, row in data_frame.iterrows():
-            street = data_frame.loc[index, 'Property Address']
-            city = data_frame.loc[index, 'City']
-            state = data_frame.loc[index, 'State']
+    for d in json_dict_list:
+        street = ''
+        city = ''
+        state = ''
+        for key in d.keys():
+            if "address" in key.lower() or "street" in key.lower():
+                street = d[key]
 
-            location_dict: Location = {
-                'street': street,
-                'city': city,
-                'state': state
-            }
-            locations.append(location_dict)
+            if "city" in key.lower():
+                city = d[key]
 
+            if "state" in key.lower():
+                state = d[key]
+
+        loc_dict = {
+            'street': street,
+            'city': city,
+            'state': state
+        }
+        locations.append(loc_dict)
+            
     return locations
 
 

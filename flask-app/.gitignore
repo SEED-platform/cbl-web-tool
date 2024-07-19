@@ -18,3 +18,5 @@ mapquest_tempfile.json
 locations_data.json
 locations.json
 main.py
+tester.py
+tester.json
