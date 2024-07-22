@@ -4,6 +4,8 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { FlaskRequests } from './service'; 
 import { FileExportService } from '../file-export.service';
 import { MapboxMapComponent } from '../mapbox-map/mapbox-map.component';
+import { FirstTableComponent } from '../first-table/first-table.component';
+import { Router } from '@angular/router';
 
 
 @Component({
@@ -11,7 +13,7 @@ import { MapboxMapComponent } from '../mapbox-map/mapbox-map.component';
   standalone: true,
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css'], 
-  imports: [ReactiveFormsModule, CommonModule, MapboxMapComponent] 
+  imports: [ReactiveFormsModule, CommonModule, MapboxMapComponent, FirstTableComponent] 
 })
 
 
@@ -23,7 +25,7 @@ export class HomeComponent{
    toggleString: string = "Table";
 
 
-    constructor(private apiHandler: FlaskRequests, private fileExportHandler: FileExportService) {
+    constructor(private apiHandler: FlaskRequests, private fileExportHandler: FileExportService, private router: Router) {
     }
 
     ngOnInit(): void {
@@ -37,12 +39,26 @@ export class HomeComponent{
     getUploadFileFromUser(event: any){
       this.userFile = event.target.files[0];
     }
+     
 
+    uploadInitialFileToServer() {
+      let fileData = new FormData();
+      fileData.append("userFile", this.userFile); 
+      console.log("File data prepared:", this.userFile);
+      this.apiHandler.sendInitialData(fileData).subscribe(
+        (response) => {
+          console.log(response.message); // Handle successful response
+          this.jsonData = response.user_data
+          sessionStorage.setItem('FIRSTTABLEDATA', this.jsonData);
+      },
+      (errorResponse) => {
+          console.log(errorResponse.error.error); // Handle error response
+      });
+    }
     uploadFileToServer() {
       let fileData = new FormData();
       fileData.append("userFile", this.userFile); 
       console.log("File data prepared:", this.userFile);
-
       this.apiHandler.sendData(fileData).subscribe(
         (response) => {
           console.log(response.message); // Handle successful response
@@ -67,6 +83,12 @@ export class HomeComponent{
       }else{
         this.isTable = true;
           this.toggleString = "Map";
+      }
+    }
+
+    checkNavigation(): void {
+      if (this.userFile) {
+        this.router.navigate(['/first-table']);
       }
     }
 }

@@ -1,0 +1,16 @@
+
+.header-input {
+    width: 100%;  /* Ensure the input spans the full width */
+    height: 100%; /* Ensure the input spans the full height */
+    border: none; /* Remove the border */
+    background-color: transparent; /* Make the background transparent */
+    text-align: center; /* Center align text */
+    padding: 0; /* Remove padding */
+    margin: 0; /* Remove margin */
+  }
+
+
+.handsontable thead th:nth-child(even),
+.handsontable tbody tr:nth-child(odd) th {
+  background-color: #d7f1e1;
+}

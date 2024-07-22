@@ -7,9 +7,13 @@
   File name: {{userFile.name}} <br />
   <button (click)="userFile = undefined">clear file</button>
 </div>
-<button (click)="uploadFileToServer()">upload file</button>
+<button (click)="uploadInitialFileToServer()">upload file</button>
 <button (click)="exportJSON()"  *ngIf="jsonData">Donwload data in a GEOJSON Format</button>
 <button (click)="tableMapToggle()">{{toggleString}}</button>
+
+
+
+<button (click)="checkNavigation()" *ngIf="userFile">Navigate to Table</button>
 
 
 <div id="data-container" *ngIf="jsonData">
