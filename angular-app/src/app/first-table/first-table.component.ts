@@ -1,6 +1,7 @@
 import { Component, ViewChild, AfterViewInit, ElementRef, ViewEncapsulation } from '@angular/core';
 import Handsontable from 'handsontable';
 import "handsontable/dist/handsontable.full.css";
+import { FlaskRequests } from '../service';
 
 @Component({
   selector: 'app-first-table',
@@ -19,6 +20,9 @@ export class FirstTableComponent implements AfterViewInit {
   colHeaders: string[] = [];
   dataArray: any[][] = [[]];
 
+
+
+  constructor(private apiHandler: FlaskRequests){}
 
   ngAfterViewInit(): void {
       let storedUserData = sessionStorage.getItem('FIRSTTABLEDATA');
@@ -134,6 +138,20 @@ export class FirstTableComponent implements AfterViewInit {
     }
   
     return arrayOfObjects;
+  }
+
+
+  checkData(){
+     const userObjectArray = this.arrayArrToObjectArr(this.dataArray, this.colHeaders);
+     const jsonString = JSON.stringify(userObjectArray)
+     console.log(jsonString);
+     this.apiHandler.checkData(jsonString).subscribe(
+      (response) => {
+        console.log(response.message); // Handle successful response
+    },
+    (errorResponse) => {
+        console.log(errorResponse.error.message); // Handle error response
+    });
   }
 }
 

@@ -1,7 +1,7 @@
 import { Component} from '@angular/core';
 import { CommonModule } from '@angular/common'; 
 import { ReactiveFormsModule } from '@angular/forms';
-import { FlaskRequests } from './service'; 
+import { FlaskRequests } from '../service'; 
 import { FileExportService } from '../file-export.service';
 import { MapboxMapComponent } from '../mapbox-map/mapbox-map.component';
 import { FirstTableComponent } from '../first-table/first-table.component';
@@ -20,6 +20,7 @@ import { Router } from '@angular/router';
 export class HomeComponent{
    userFile: any;
    jsonData: any;
+   initialJsonData: any;
    buildingArray: any[] = [];
    isTable: boolean = true;
    toggleString: string = "Table";
@@ -30,6 +31,7 @@ export class HomeComponent{
 
     ngOnInit(): void {
       this.jsonData = sessionStorage.getItem("GEOJSONDATA");
+      console.log(this.jsonData);
       if (this.jsonData){
         this.buildingArray = JSON.parse(this.jsonData).features;
       }
@@ -48,13 +50,17 @@ export class HomeComponent{
       this.apiHandler.sendInitialData(fileData).subscribe(
         (response) => {
           console.log(response.message); // Handle successful response
-          this.jsonData = response.user_data
-          sessionStorage.setItem('FIRSTTABLEDATA', this.jsonData);
+          this.initialJsonData = response.user_data
+          sessionStorage.setItem('FIRSTTABLEDATA', this.initialJsonData);
+          if (this.userFile) {
+            this.router.navigate(['/first-table']);
+          }
       },
       (errorResponse) => {
-          console.log(errorResponse.error.error); // Handle error response
+          console.log(errorResponse.error.message); // Handle error response
       });
     }
+
     uploadFileToServer() {
       let fileData = new FormData();
       fileData.append("userFile", this.userFile); 
@@ -86,9 +92,5 @@ export class HomeComponent{
       }
     }
 
-    checkNavigation(): void {
-      if (this.userFile) {
-        this.router.navigate(['/first-table']);
-      }
-    }
+ 
 }

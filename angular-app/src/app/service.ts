@@ -20,4 +20,9 @@ export class FlaskRequests {
   sendData(fileData: FormData): Observable<any> {
     return this.http.post<any>('http://127.0.0.1:5001/api/submit_file', fileData );
   }
+
+  checkData(jsonString: string): Observable<any> {
+    return this.http.post<any>('http://127.0.0.1:5001/api/check_data',  { value: jsonString }, // Send JSON object with 'value' key
+      { headers: { 'Content-Type': 'application/json' }});
+  }
 }

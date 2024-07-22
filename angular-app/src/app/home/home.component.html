@@ -9,15 +9,13 @@
 </div>
 <button (click)="uploadInitialFileToServer()">upload file</button>
 <button (click)="exportJSON()"  *ngIf="jsonData">Donwload data in a GEOJSON Format</button>
-<button (click)="tableMapToggle()">{{toggleString}}</button>
+<button (click)="tableMapToggle()" *ngIf="jsonData">{{toggleString}}</button>
 
 
-
-<button (click)="checkNavigation()" *ngIf="userFile">Navigate to Table</button>
 
 
 <div id="data-container" *ngIf="jsonData">
-<table *ngIf="isTable">
+<table  *ngIf="isTable && jsonData">
   <thead>
     <tr>
       <th>Address</th>
