@@ -55,8 +55,8 @@ def get_and_check_file():
 @app.route('/api/check_data',  methods=['POST'])
 def check_edited_data():
   
-    json_dict_list = request.json.get('value')
-    print(json_dict_list)
+    json_string = request.json.get('value')
+    json_dict_list = json.loads(json_string)
 
     isGoodData = check_data_quality(json_dict_list)
     if isGoodData == False:
