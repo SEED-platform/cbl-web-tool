@@ -49,15 +49,139 @@ def get_and_check_file():
     json_data = json.dumps(json_dict_list)
     return jsonify({"message": "success", "user_data": json_data}), 200
 
-    # after editing is succesful, generate list of locations and check data quality
-    # locations = generate_locations_list(json_dict_list)
+    # after data checking and editing is succesful, generate list of locations 
     # Finally, run CBL-workflow
 
     
+# This should have its own route at some point (user clicks a button and runs CBL-workflow)
+def run_cbl_workflow():
+    
+    try:
+        json_dict_list = json.loads('locations.json')   # reading from here temporarily
+    except ValueError:
+        return jsonify({'error': 'Something went wrong while reading the edited json'}), 400
+
+    locations = generate_locations_list(json_dict_list)
+
+    MAPQUEST_API_KEY = os.getenv("MAPQUEST_API_KEY")
+    if not MAPQUEST_API_KEY:
+        sys.exit("Missing MapQuest API key")
+
+    quadkey_path = Path("data/quadkeys")
+    if not quadkey_path.exists():
+        quadkey_path.mkdir(parents=True, exist_ok=True)
+
+    for loc in locations:
+        loc["street"] = normalize_address(loc["street"])
+        print(loc)
+
+    # data = geocode_addresses(locations, MAPQUEST_API_KEY)
+
+    with open("mapquest_tempfile.json", 'r') as f:
+        data = json.load(f)
+
+    poorQualityCodes = ["Ambiguous", "P1CAA", "B1CAA", "B1ACA"]
+
+    # Find all quadkeys that the coordinates fall within
+    quadkeys = set()
+    for datum in data:
+        if (datum["quality"] not in poorQualityCodes):
+            tile = mercantile.tile(datum["longitude"], datum["latitude"], 9)
+            quadkey = int(mercantile.quadkey(tile))
+            quadkeys.add(quadkey)
+            datum["quadkey"] = quadkey
+
+    # Download quadkey dataset links
+    update_dataset_links()
+
+    # Download quadkeys
+    update_quadkeys(list(quadkeys))
+
+    loaded_quadkeys: dict[int, Any] = {}
+    index = 0
+    for datum in data:
+        if (datum["quality"] not in poorQualityCodes):
+            quadkey = datum["quadkey"]
+            if quadkey not in loaded_quadkeys:
+                print(f"Loading {quadkey}")
+
+                with gzip.open(f"data/quadkeys/{quadkey}.geojsonl.gz", "rb") as f:
+                    loaded_quadkeys[quadkey] = gpd.read_file(f)
+                    print(f"  {len(loaded_quadkeys[quadkey])} footprints in quadkey")
+
+            geojson = loaded_quadkeys[quadkey]
+            point = Point(datum["longitude"], datum["latitude"])
+            point_gdf = gpd.GeoDataFrame(crs="epsg:4326", geometry=[point])
+
+            # intersections have `geometry`, `index_right`, and `height`
+            intersections = gpd.sjoin(point_gdf, geojson)
+            if len(intersections) >= 1:
+                footprint = geojson.iloc[intersections.iloc[0].index_right]
+                datum["footprint_match"] = "intersection"
+            else:
+                footprint = geojson.iloc[geojson.distance(point).sort_values().index[0]]
+                datum["footprint_match"] = "closest"
+            datum["geometry"] = footprint.geometry
+            datum["height"] = footprint.height if footprint.height != -1 else None
+
+            # Determine UBIDs from footprints
+            datum["ubid"] = encode_ubid(datum["geometry"])
+        else:
+            datum["address"] = normalize_address(locations[index]["street"])
+            datum["city"] = locations[index]["city"]
+            datum["state"] = locations[index]["state"]
+            datum["postal_code"] = "Poor Data"
+            datum["side_of_street"] = "Poor Data"
+            datum["neighborhood"] = "Poor Data"
+            datum["county"] = "Poor Data"
+            datum["country"] = "Poor Data"
+            datum["latitude"] = "Poor Data"
+            datum["longitude"] = "Poor Data"
+            datum["quality"] = "Poor Data"
+            datum["footprint_match"] = "Poor Data"
+            datum["height"] = None
+            datum["geometry"] = None
+            datum["ubid"] = "Poor Data"
+        index = index + 1
+
+    # since the data dict contains information only from mapquest, need to merge original 
+    # dict and the data dict to display all information
+    merged_data = []
+    for i in range(len(data)):
+        dict1 = json_dict_list[i]
+        dict2 = data[i]
+        if (dict1 != dict2):
+            merged_dict = merge_dicts(dict1, dict2)
+            merged_data.append(merged_dict)
+        else:
+            merged_data.append(dict1)
+
+    columns = []
+    for key in merged_data[0].keys():
+        columns.append(key)
+
+    # Convert covered building list as GeoJSON
+    gdf = gpd.GeoDataFrame(data=merged_data, columns=columns)
+    final_geojson = gdf.to_json()
+
+    # return final_geojson
+
+
+def merge_dicts(dict1, dict2):
+    merged_dict = {}
+    for key, value in dict1.items():
+        merged_dict[key.lower()] = value
+    
+    for key, value in dict2.items():
+        merged_dict[key.lower()] = value
+    
+    return merged_dict
+
 
     
-# NOTE: When converting to a data_frame, duplicate columns will be renamed (i.e Address and Address_1)
-# SO, the json file and the resulting dictionary can have keys like Address and Address_1
+# NOTE: When converting to a data_frame, duplicate columns will be renamed (i.e Address and Address
+# will become Address and Address.1) SO, the json file and the resulting 
+# dictionary may have keys like Address and Address.1
 def convert_to_json_dict_list(file):
     file_type = file.content_type
     newError = LocationError("Failed to read file.")
@@ -98,11 +222,11 @@ def check_data_quality(json_dict_list):
         dict1 = json_dict_list[i]
 
         # Enforcing the required unique column names 
-        if "Property Address" and "property address" not in dict1:
+        if "Address" not in dict1 and "address" not in dict1:
             return False
-        if "City" and "city" not in dict1:
+        if "City" not in dict1 and "city" not in dict1:
             return False
-        if "State" and "state" not in dict1:
+        if "State" not in dict1 and "state" not in dict1:
             return False
 
         for j in range(i + 1, len(json_dict_list)):
@@ -134,7 +258,7 @@ def generate_locations_list(json_dict_list):
         city = ''
         state = ''
         for key in d.keys():
-            if "property address" == key.lower():
+            if "address" == key.lower():
                 street = d[key]
 
             if "city" == key.lower():
