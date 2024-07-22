@@ -15,7 +15,7 @@ import pandas as pd
 from shapely.geometry import Point
 
 from utils.common import Location
-from utils import LocationError
+from utils.location_error import LocationError
 from utils.geocode_addresses import geocode_addresses
 from utils.normalize_address import normalize_address
 from utils.ubid import bounding_box, centroid, encode_ubid
@@ -36,15 +36,14 @@ def get_and_check_file():
     json_dict_list = convert_to_json_dict_list(file)
 
     if (len(json_dict_list) == 0):
-        return jsonify({'error': 'Uploaded a file in the wrong format. Please upload different format'}), 400
+        return jsonify({'message': 'Uploaded a file in the wrong format. Please upload different format'}), 400
     
     if (isinstance(json_dict_list, LocationError)):
-        return jsonify({'error': f'{json_dict_list.message}'}), 400
+        return jsonify({'message': f'{json_dict_list.message}'}), 400
     
-    # this should be continuously checked until the file passes the checks
     isGoodData = check_data_quality(json_dict_list)
     if isGoodData == False:
-        return jsonify({'error': 'Uploaded a file with poorly formatted data. May be missing 3 required unique columns'}), 400
+        return jsonify({'message': 'Uploaded a file with poorly formatted data. May be missing 3 required unique columns'}), 400
 
     json_data = json.dumps(json_dict_list)
     return jsonify({"message": "success", "user_data": json_data}), 200
@@ -52,8 +51,20 @@ def get_and_check_file():
     # after data checking and editing is succesful, generate list of locations 
     # Finally, run CBL-workflow
 
+
+@app.route('/api/check_data',  methods=['POST'])
+def check_edited_data():
+    json_dict_list = 0
+
+    isGoodData = check_data_quality(json_dict_list)
+    if isGoodData == False:
+        return jsonify({'message': 'Data is poorly formatted. May be missing 3 required unique columns'}), 400
     
-# This should have its own route at some point (user clicks a button and runs CBL-workflow)
+    json_data = json.dumps(json_dict_list)
+    return jsonify({"message": "success", "user_data": json_data}), 200
+
+    
+@app.route('/api/generate_cbl',  methods=['POST'])
 def run_cbl_workflow():
     
     try:
