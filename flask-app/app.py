@@ -79,8 +79,6 @@ def run_cbl_workflow():
         return jsonify({'message': 'Something went wrong while reading the edited json'}), 400
 
     locations = generate_locations_list(json_dict_list)
-    print(json_dict_list)
-    print(locations)
 
     MAPQUEST_API_KEY = os.getenv("MAPQUEST_API_KEY")
     if not MAPQUEST_API_KEY:
@@ -94,6 +92,7 @@ def run_cbl_workflow():
         loc["street"] = normalize_address(loc["street"])
 
     data = geocode_addresses(locations, MAPQUEST_API_KEY)
+    print(data)
 
     # with open("mapquest_tempfile.json", 'r') as f:
     #     data = json.load(f)
@@ -164,7 +163,7 @@ def run_cbl_workflow():
 
     # since the data dict contains information only from mapquest, need to merge original 
     # dict and the data dict to display all information
-    print(data)
+
     merged_data = []
     for i in range(len(data)):
         dict1 = json_dict_list[i]
@@ -182,7 +181,6 @@ def run_cbl_workflow():
     # Convert covered building list as GeoJSON
     gdf = gpd.GeoDataFrame(data=merged_data, columns=columns)
     final_geojson = gdf.to_json()
-    print(final_geojson)
  
     return jsonify({"message": "success", "user_data": final_geojson}), 200
  

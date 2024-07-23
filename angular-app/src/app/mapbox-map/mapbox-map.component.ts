@@ -81,7 +81,7 @@ export class MapboxMapComponent implements AfterViewInit {
     if (this.map) {
        this.map.flyTo({
         center:  new mapboxgl.LngLat(clickedBuildingLong, clickedBuildingLat),
-        zoom:15,
+        zoom:17.5,
         essential: true 
        });
     }
