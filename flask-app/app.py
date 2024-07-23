@@ -68,9 +68,12 @@ def check_edited_data():
     
 @app.route('/api/generate_cbl',  methods=['POST'])
 def run_cbl_workflow():
+    json_dict_list = []
+    locations: list[Location] = []
     
     try:
-        json_dict_list = json.loads('locations.json')   # reading from here temporarily
+        json_string = request.json.get('value')
+        json_dict_list = json.loads(json_string)
     except ValueError:
         return jsonify({'error': 'Something went wrong while reading the edited json'}), 400
 
@@ -86,12 +89,11 @@ def run_cbl_workflow():
 
     for loc in locations:
         loc["street"] = normalize_address(loc["street"])
-        print(loc)
 
-    # data = geocode_addresses(locations, MAPQUEST_API_KEY)
+    data = geocode_addresses(locations, MAPQUEST_API_KEY)
 
-    with open("mapquest_tempfile.json", 'r') as f:
-        data = json.load(f)
+    # with open("mapquest_tempfile.json", 'r') as f:
+    #     data = json.load(f)
 
     poorQualityCodes = ["Ambiguous", "P1CAA", "B1CAA", "B1ACA"]
 
@@ -177,7 +179,7 @@ def run_cbl_workflow():
     gdf = gpd.GeoDataFrame(data=merged_data, columns=columns)
     final_geojson = gdf.to_json()
 
-    # return final_geojson
+    return jsonify({"message": "success", "user_data": final_geojson}), 200
 
 
 def merge_dicts(dict1, dict2):
