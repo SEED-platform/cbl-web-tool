@@ -13,7 +13,7 @@ import { environment } from '../../environments/environment';  // Import environ
 })
 
 
-export class MapboxMapComponent implements AfterViewInit {
+export class MapboxMapComponent implements AfterViewInit{
   map: mapboxgl.Map | undefined;
   style = 'mapbox://styles/mapbox/streets-v11';
   lat: number = 30.2672;
@@ -70,7 +70,8 @@ export class MapboxMapComponent implements AfterViewInit {
           'fill-opacity': 0.8
         }
       });
-
+      
+        
       });
       
     }     
@@ -86,4 +87,5 @@ export class MapboxMapComponent implements AfterViewInit {
        });
     }
   }
+
 }

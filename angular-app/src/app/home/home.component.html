@@ -17,7 +17,6 @@
 <div id="data-container" *ngIf="jsonData">
 <table  *ngIf="isTable && jsonData">
   <thead>
-    <tr>
       <th>Address</th>
       <th>City</th>
       <th>State</th>
@@ -33,12 +32,11 @@
       <th>Height</th>
       <th>UBID</th>
       <th>Coordinates</th>
-    </tr>
   </thead>
 
   <tbody>
     <tr *ngFor = "let building of buildingArray"> 
-      <td>{{building.properties.address}}</td>
+      <td [ngClass]="{ 'red-font': !building.geometry}">{{building.properties.address}}</td>
       <td>{{building.properties.city}}</td>
       <td>{{building.properties.state}}</td>
       <td>{{building.properties.postal_code}}</td>
@@ -52,18 +50,21 @@
       <td>{{building.properties.footprint_match}}</td>
       <td>{{building.properties.height}}</td>
       <td>{{building.properties.ubid}}</td>
-      <td><ng-container *ngIf="building.geometry?.coordinates?.[0]; else poorData">
+      <td id="coordinateData">  
+        <ng-container *ngIf="building.geometry?.coordinates?.[0]; else poorData">
         {{building.geometry.coordinates[0]}}
-      </ng-container>
-      <ng-template #poorData>
+        </ng-container>
+        <ng-template #poorData>
         Poor Data
-      </ng-template></td>
+        </ng-template></td>
     </tr>
   </tbody>
 </table>
-
-<app-mapbox-map *ngIf="!isTable"> </app-mapbox-map>
 </div>
+</div>
+
+<app-mapbox-map id="map-ref" *ngIf="!isTable && jsonData"> </app-mapbox-map>
+
 
 
 
