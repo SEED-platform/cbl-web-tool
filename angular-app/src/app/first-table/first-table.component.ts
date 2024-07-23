@@ -2,11 +2,14 @@ import { Component, ViewChild, AfterViewInit, ElementRef, ViewEncapsulation } fr
 import Handsontable from 'handsontable';
 import "handsontable/dist/handsontable.full.css";
 import { FlaskRequests } from '../service';
+import { Router } from '@angular/router';
+import { CommonModule } from '@angular/common';
+
 
 @Component({
   selector: 'app-first-table',
   standalone: true,
-  imports: [],
+  imports: [CommonModule],
   templateUrl: './first-table.component.html',
   styleUrl: './first-table.component.css',
   encapsulation: ViewEncapsulation.None
@@ -14,15 +17,16 @@ import { FlaskRequests } from '../service';
 export class FirstTableComponent implements AfterViewInit {
   @ViewChild('tableContainer', { static: false }) example2!: ElementRef<HTMLDivElement>;
   hotInstance!: Handsontable;
-
-  
   data: any[] = [];
   colHeaders: string[] = [];
   dataArray: any[][] = [[]];
+  jsonString: string = '';
+  jsonData: object[] = [];
+  jsonCheck: boolean = false;
 
 
 
-  constructor(private apiHandler: FlaskRequests){}
+  constructor(private apiHandler: FlaskRequests, private router: Router){}
 
   ngAfterViewInit(): void {
       let storedUserData = sessionStorage.getItem('FIRSTTABLEDATA');
@@ -148,9 +152,25 @@ export class FirstTableComponent implements AfterViewInit {
      this.apiHandler.checkData(jsonString).subscribe(
       (response) => {
         console.log(response.message); // Handle successful response
+        this.jsonString = response.user_data
+        this.jsonCheck = true
     },
     (errorResponse) => {
         console.log(errorResponse.error.message); // Handle error response
+    });
+  }
+
+
+  uploadJsonToServer() {
+    this.apiHandler.sendJsonData(this.jsonString).subscribe(
+      (response) => {
+        console.log(response.message); // Handle successful response
+        this.jsonString = response.user_data
+        sessionStorage.setItem('GEOJSONDATA', this.jsonString);
+        this.router.navigate(['']);
+    },
+    (errorResponse) => {
+        console.error(errorResponse.error.message); // Handle error response
     });
   }
 }

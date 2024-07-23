@@ -75,7 +75,6 @@ export class HomeComponent{
       (errorResponse) => {
           console.error(errorResponse.error.message); // Handle error response
       });
-      
     }
 
     exportJSON(): void {
@@ -83,6 +82,7 @@ export class HomeComponent{
     }
 
     tableMapToggle():void{
+      this.buildingArray = JSON.parse(this.jsonData).features;
       if (this.isTable){
           this.isTable = false
           this.toggleString = "Table";
