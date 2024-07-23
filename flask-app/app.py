@@ -38,12 +38,12 @@ def get_and_check_file():
     if (len(json_dict_list) == 0):
         return jsonify({'message': 'Uploaded a file in the wrong format. Please upload different format'}), 400
     
-    if (isinstance(json_dict_list, LocationError)):
+    if isinstance(json_dict_list, LocationError):
         return jsonify({'message': f'{json_dict_list.message}'}), 400
     
     isGoodData = check_data_quality(json_dict_list)
-    if isGoodData == False:
-        return jsonify({'message': 'Uploaded a file with poorly formatted data. May be missing 3 required unique columns'}), 400
+    if isinstance(isGoodData, LocationError):
+        return jsonify({'message': f'{json_dict_list.message}', "user_data": json_data}), 400
 
     json_data = json.dumps(json_dict_list)
     return jsonify({"message": "success", "user_data": json_data}), 200
@@ -59,8 +59,8 @@ def check_edited_data():
     json_dict_list = json.loads(json_string)
 
     isGoodData = check_data_quality(json_dict_list)
-    if isGoodData == False:
-        return jsonify({'message': 'Data is poorly formatted. May be missing 3 required unique columns'}), 400
+    if isinstance(isGoodData, LocationError):
+        return jsonify({'message': f'{json_dict_list.message}', "user_data": json_data}), 400
     
     json_data = json.dumps(json_dict_list)
     return jsonify({"message": "success", "user_data": json_data}), 200
@@ -236,11 +236,11 @@ def check_data_quality(json_dict_list):
 
         # Enforcing the required unique column names 
         if "Address" not in dict1 and "address" not in dict1:
-            return False
+            return LocationError("Missing unique 'Address' column")
         if "City" not in dict1 and "city" not in dict1:
-            return False
+            return LocationError("Missing unique 'City' column")
         if "State" not in dict1 and "state" not in dict1:
-            return False
+            return LocationError("Missing unique 'State' column")
 
         for j in range(i + 1, len(json_dict_list)):
             dict2 = json_dict_list[j]
@@ -257,9 +257,8 @@ def check_data_quality(json_dict_list):
     for d in json_dict_list:
         for value in d.values():
             if not isinstance(value, (int, str, bool)): 
-                return False
+                return LocationError("Data is formatted poorly in one of the table cells")
             
-    return True
             
                 
 # Generating a list of locations from user-inputted file
