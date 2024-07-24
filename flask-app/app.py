@@ -16,6 +16,10 @@ from shapely.geometry import Point
 
 from utils.common import Location
 from utils.location_error import LocationError
+from utils.check_data_quality import check_data_quality
+from utils.generate_locations_list import generate_locations_list
+from utils.convert_file_to_dict import convert_file_to_dict
+from utils.merge_dicts import merge_dicts
 from utils.geocode_addresses import geocode_addresses
 from utils.normalize_address import normalize_address
 from utils.ubid import bounding_box, centroid, encode_ubid
@@ -33,7 +37,7 @@ CORS(app)
 def get_and_check_file():
 
     file = request.files['userFile']
-    json_dict_list = convert_to_json_dict_list(file)
+    json_dict_list = convert_file_to_dict(file)
 
     if (len(json_dict_list) == 0):
         return jsonify({'message': 'Uploaded a file in the wrong format. Please upload different format'}), 400
@@ -47,9 +51,6 @@ def get_and_check_file():
 
     json_data = json.dumps(json_dict_list)
     return jsonify({"message": "success", "user_data": json_data}), 200
-
-    # after data checking and editing is succesful, generate list of locations 
-    # Finally, run CBL-workflow
 
 
 @app.route('/api/check_data',  methods=['POST'])
@@ -184,116 +185,6 @@ def run_cbl_workflow():
  
     return jsonify({"message": "success", "user_data": final_geojson}), 200
  
-
-
-def merge_dicts(dict1, dict2):
-    merged_dict = {}
-    for key, value in dict1.items():
-        merged_dict[key.lower()] = value
-    
-    for key, value in dict2.items():
-        merged_dict[key.lower()] = value
-    
-    return merged_dict
-
-
-    
-# NOTE: When converting to a data_frame, duplicate columns will be renamed (i.e Address and Address
-# will become Address and Address.1) SO, the json file and the resulting 
-# dictionary may have keys like Address and Address.1
-def convert_to_json_dict_list(file):
-    file_type = file.content_type
-    newError = LocationError("Failed to read file.")
-
-    if (file_type == "application/json"):
-        try: 
-            file_content = file.read().decode('utf-8')
-            json_dict_list = json.loads(file_content)
-        except:
-            return newError
-
-        return json_dict_list
-    
-    if (file_type == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"):   
-        try:
-            data_frame = pd.read_excel(file)
-            json_data = data_frame.to_json(orient='records')
-            json_dict_list = json.loads(json_data)
-        except:
-            return newError
-
-        return json_dict_list
-
-    if (file_type == "application/csv" or file_type == "text/csv"):
-        try:
-            data_frame = pd.read_csv(file)
-            json_data = data_frame.to_json(orient='records')
-            json_dict_list = json.loads(json_data)
-        except:
-            return newError
-
-        return json_dict_list
-
-
-# Checking for duplicates in the list of dictionaries 
-def check_data_quality(json_dict_list):
-    for i in range(len(json_dict_list) - 1):
-        dict1 = json_dict_list[i]
-
-        # Enforcing the required unique column names 
-        if "Address" not in dict1 and "address" not in dict1:
-            return LocationError("Missing unique 'Address' column")
-        if "City" not in dict1 and "city" not in dict1:
-            return LocationError("Missing unique 'City' column")
-        if "State" not in dict1 and "state" not in dict1:
-            return LocationError("Missing unique 'State' column")
-
-        for j in range(i + 1, len(json_dict_list)):
-            dict2 = json_dict_list[j]
-
-            if (dict1 == dict2):
-                dict1["duplicate?"] = "possible duplicate"
-                dict2["duplicate?"] = "possible duplicate"
-
-            else: 
-                dict1["duplicate?"] = ""
-                dict2["duplicate?"] = ""
-
-    # values must only be primitive types
-    for d in json_dict_list:
-        for value in d.values():
-            if not isinstance(value, (int, str, bool)): 
-                return LocationError("Data is formatted poorly in one of the table cells")
-            
-            
-                
-# Generating a list of locations from user-inputted file
-def generate_locations_list(json_dict_list):
-    locations: list[Location] = []
-
-    for d in json_dict_list:
-        street = ''
-        city = ''
-        state = ''
-        for key in d.keys():
-            if "address" == key.lower():
-                street = d[key]
-
-            if "city" == key.lower():
-                city = d[key]
-
-            if "state" == key.lower():
-                state = d[key]
-
-        loc_dict = {
-            'street': street,
-            'city': city,
-            'state': state
-        }
-        locations.append(loc_dict)
-            
-    return locations
-
 
 if __name__ == '__main__':
     app.run(port=5001)

@@ -38,7 +38,7 @@
 
   <tbody>
     <tr *ngFor = "let building of buildingArray"> 
-      <td>{{building.properties.address}}</td>
+      <td [ngClass]="{ 'red-font': !building.geometry}">{{building.properties.street_address}}</td>
       <td>{{building.properties.city}}</td>
       <td>{{building.properties.state}}</td>
       <td>{{building.properties.postal_code}}</td>
