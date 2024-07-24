@@ -37,19 +37,19 @@ CORS(app)
 def get_and_check_file():
 
     file = request.files['userFile']
-    json_dict_list = convert_file_to_dict(file)
+    file_data = convert_file_to_dict(file)
 
-    if (len(json_dict_list) == 0):
+    if not file_data or len(file_data) == 0:
         return jsonify({'message': 'Uploaded a file in the wrong format. Please upload different format'}), 400
     
-    if isinstance(json_dict_list, LocationError):
-        return jsonify({'message': f'{json_dict_list.message}'}), 400
+    if isinstance(file_data, LocationError):
+        return jsonify({'message': f'{file_data.message}'}), 400
     
-    isGoodData = check_data_quality(json_dict_list)
+    json_data = json.dumps(file_data)
+    isGoodData = check_data_quality(file_data)
     if isinstance(isGoodData, LocationError):
-        return jsonify({'message': f'{json_dict_list.message}', "user_data": json_data}), 400
+        return jsonify({'message': f'{isGoodData.message}', "user_data": json_data}), 400
 
-    json_data = json.dumps(json_dict_list)
     return jsonify({"message": "success", "user_data": json_data}), 200
 
 
@@ -57,29 +57,28 @@ def get_and_check_file():
 def check_edited_data():
   
     json_string = request.json.get('value')
-    json_dict_list = json.loads(json_string)
+    file_data = json.loads(json_string)
+    json_data = json.dumps(file_data)
 
-    isGoodData = check_data_quality(json_dict_list)
+    isGoodData = check_data_quality(file_data)
     if isinstance(isGoodData, LocationError):
-        return jsonify({'message': f'{json_dict_list.message}', "user_data": json_data}), 400
+        return jsonify({'message': f'{isGoodData.message}', "user_data": json_data}), 400
     
-    json_data = json.dumps(json_dict_list)
     return jsonify({"message": "success", "user_data": json_data}), 200
 
     
 @app.route('/api/generate_cbl',  methods=['POST'])
 def run_cbl_workflow():
-    json_dict_list = []
+    file_data = []
     locations: list[Location] = []
-    
     
     try:
         json_string = request.json.get('value')
-        json_dict_list = json.loads(json_string)
+        file_data = json.loads(json_string)
     except ValueError:
         return jsonify({'message': 'Something went wrong while reading the edited json'}), 400
 
-    locations = generate_locations_list(json_dict_list)
+    locations = generate_locations_list(file_data)
 
     MAPQUEST_API_KEY = os.getenv("MAPQUEST_API_KEY")
     if not MAPQUEST_API_KEY:
@@ -93,7 +92,6 @@ def run_cbl_workflow():
         loc["street"] = normalize_address(loc["street"])
 
     data = geocode_addresses(locations, MAPQUEST_API_KEY)
-    print(data)
 
     # with open("mapquest_tempfile.json", 'r') as f:
     #     data = json.load(f)
@@ -167,7 +165,7 @@ def run_cbl_workflow():
 
     merged_data = []
     for i in range(len(data)):
-        dict1 = json_dict_list[i]
+        dict1 = file_data[i]
         dict2 = data[i]
         if (dict1 != dict2):
             merged_dict = merge_dicts(dict1, dict2)

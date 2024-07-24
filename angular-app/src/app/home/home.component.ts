@@ -24,6 +24,7 @@ export class HomeComponent{
    buildingArray: any[] = [];
    isTable: boolean = true;
    toggleString: string = "Table";
+   fatalErrorArray: string[] = ["Uploaded a file in the wrong format. Please upload different format", "Failed to read file."]
 
 
     constructor(private apiHandler: FlaskRequests, private fileExportHandler: FileExportService, private router: Router) {
@@ -58,7 +59,15 @@ export class HomeComponent{
       },
       (errorResponse) => {
           console.log(errorResponse.error.message); // Handle error response
+          
+          if (this.userFile && !this.fatalErrorArray.includes(errorResponse.error.message)){
+            this.initialJsonData = errorResponse.error.user_data;
+            sessionStorage.setItem('FIRSTTABLEDATA', this.initialJsonData);
+            console.log(this.initialJsonData);
+            this.router.navigate(['/first-table']);
+          }
       });
+    
     }
 
     uploadFileToServer() {
