@@ -106,7 +106,7 @@ export class FirstTableComponent implements OnInit {
   checkData(){
     const finalUserJson = this.convertAgGridDataToJson()
     
-    this.apiHandler.checkData(JSON.stringify(finalUserJson)).subscribe(
+    this.apiHandler.checkData(finalUserJson).subscribe(
      (response) => {
        console.log(response.message); // Handle successful response
        this.ValidatedJsonString = response.user_data
