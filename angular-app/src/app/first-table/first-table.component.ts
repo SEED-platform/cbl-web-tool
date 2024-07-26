@@ -1,5 +1,4 @@
-import { Component, OnInit, AfterViewInit, ChangeDetectorRef} from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { Component, OnInit, ChangeDetectorRef} from '@angular/core';
 import {ColDef, GridOptions} from 'ag-grid-community';
 import { CommonModule } from '@angular/common'; // Import CommonModule
 import { AgGridAngular } from 'ag-grid-angular'
