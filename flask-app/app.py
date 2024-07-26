@@ -33,9 +33,47 @@ warnings.filterwarnings("ignore", category=UserWarning)
 app = Flask(__name__)
 CORS(app)
 
+
+@app.route('/api/merge_files',  methods=['POST'])
+def merge_two_files():
+    file1 = request.files['userFile1']
+    file2 = request.files['userFile2']
+    file1_data = convert_file_to_dict(file1)
+    file2_data = convert_file_to_dict(file2)
+
+    if not file1_data or len(file1_data) == 0:
+        return jsonify({'message': 'Uploaded a file in the wrong format. Please upload different format'}), 400
+    
+    if isinstance(file1_data, LocationError):
+        return jsonify({'message': f'{file1_data.message}'}), 400
+    
+    if not file2_data or len(file2_data) == 0:
+        return jsonify({'message': 'Uploaded a file in the wrong format. Please upload different format'}), 400
+    
+    if isinstance(file2_data, LocationError):
+        return jsonify({'message': f'{file2_data.message}'}), 400
+
+    merged_data = []
+    for i in range(len(file2_data)):
+        dict1 = file1_data[i]
+        dict2 = file2_data[i]
+        if (dict1 != dict2):
+            merged_dict = merge_dicts(dict1, dict2)
+            merged_data.append(merged_dict)
+        else:
+            merged_data.append(dict1)
+
+    json_data = json.dumps(merged_data)
+    isGoodData = check_data_quality(merged_data)
+
+    if isinstance(isGoodData, LocationError):
+        return jsonify({'message': f'{isGoodData.message}', "user_data": json_data}), 400
+
+    return jsonify({"message": "success", "user_data": json_data}), 200
+
+
 @app.route('/api/submit_file',  methods=['POST'])
 def get_and_check_file():
-
     file = request.files['userFile']
     file_data = convert_file_to_dict(file)
 
@@ -47,6 +85,7 @@ def get_and_check_file():
     
     json_data = json.dumps(file_data)
     isGoodData = check_data_quality(file_data)
+
     if isinstance(isGoodData, LocationError):
         return jsonify({'message': f'{isGoodData.message}', "user_data": json_data}), 400
 
@@ -55,7 +94,6 @@ def get_and_check_file():
 
 @app.route('/api/check_data',  methods=['POST'])
 def check_edited_data():
-  
     json_string = request.json.get('value')
     file_data = json.loads(json_string)
     json_data = json.dumps(file_data)
@@ -80,7 +118,7 @@ def run_cbl_workflow():
 
     locations = generate_locations_list(file_data)
 
-    MAPQUEST_API_KEY = os.getenv("MAPQUEST_API_KEY")
+    MAPQUEST_API_KEY = os.getenv("MAPQUEST_API_KEY")    # will need to change this to retrieve user's api key
     if not MAPQUEST_API_KEY:
         sys.exit("Missing MapQuest API key")
 
@@ -91,7 +129,11 @@ def run_cbl_workflow():
     for loc in locations:
         loc["street"] = normalize_address(loc["street"])
 
-    data = geocode_addresses(locations, MAPQUEST_API_KEY)
+    try:
+        data = geocode_addresses(locations, MAPQUEST_API_KEY)
+    except Exception as e:
+        return jsonify({'message': 'Failed geocoding property states due to MapQuest error. " "Your MapQuest API Key is either invalid or at its limit.'}), 400
+     
 
     # with open("mapquest_tempfile.json", 'r') as f:
     #     data = json.load(f)
@@ -162,7 +204,6 @@ def run_cbl_workflow():
 
     # since the data dict contains information only from mapquest, need to merge original 
     # dict and the data dict to display all information
-
     merged_data = []
     for i in range(len(data)):
         dict1 = file_data[i]
