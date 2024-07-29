@@ -123,7 +123,7 @@ export class FirstTableComponent implements OnInit {
        console.log(response.message); // Handle successful response
        this.geoJsonString= response.user_data
        sessionStorage.setItem('GEOJSONDATA', this.geoJsonString);
-       this.router.navigate(['']);
+       this.router.navigate(['cbl-table']);
    },
    (errorResponse) => {
        console.error(errorResponse.error.message); // Handle error response

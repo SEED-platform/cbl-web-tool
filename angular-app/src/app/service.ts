@@ -30,4 +30,9 @@ export class FlaskRequests {
     return this.http.post<any>('http://127.0.0.1:5001/api/generate_cbl', { value: jsonString }, // Send JSON object with 'value' key
       { headers: { 'Content-Type': 'application/json' }});
 }
+
+  sendFinalExportJsonData(jsonString: string): Observable<any> {
+  return this.http.post<any>('http://127.0.0.1:5001/api/export_geojson', { value: jsonString }, // Send JSON object with 'value' key
+    { headers: { 'Content-Type': 'application/json'}});
+  }
 }

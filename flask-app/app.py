@@ -116,11 +116,14 @@ def run_cbl_workflow():
     for loc in locations:
         loc["street"] = normalize_address(loc["street"])
 
-    try:
-        data = geocode_addresses(locations, MAPQUEST_API_KEY)
-    except Exception as e:
-        return jsonify({'message': 'Failed geocoding property states due to MapQuest error. " "Your MapQuest API Key is either invalid or at its limit.'}), 400
-     
+    # try:
+    #     data = geocode_addresses(locations, MAPQUEST_API_KEY)
+    # except Exception as e:
+    #     return jsonify({'message': 'Failed geocoding property states due to MapQuest error. " "Your MapQuest API Key is either invalid or at its limit.'}), 400
+
+    with open('testing.json', 'r') as fr:
+        data = json.load(fr)
+
     poorQualityCodes = ["Ambiguous", "P1CAA", "B1CAA", "B1ACA"]
 
     # Find all quadkeys that the coordinates fall within
@@ -252,6 +255,14 @@ def reverse_geocode():
             print("Latitude:", item["latLng"]["lat"])
             print("Longitude:", item["latLng"]["lng"])
 
+
+
+@app.route('/api/export_geojson',  methods=['POST'])
+def export_geojson():
+    json_string = request.json.get('value')
+    data = json.loads(json_string)
+    print(data)
+    return jsonify({"message": "suc"}), 200
 
 if __name__ == '__main__':
     app.run(port=5001)

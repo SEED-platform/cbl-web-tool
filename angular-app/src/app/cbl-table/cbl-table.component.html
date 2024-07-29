@@ -2,8 +2,11 @@
 
 
 <ag-grid-angular class="ag-theme-quartz" style="height: 500px; width: 100%;"
-[rowData]="geoJson"
+[rowData]="rowData"
 [columnDefs]="colDefs"
 [defaultColDef]="defaultColDef"
 (gridReady)="onGridReady($event)"
+
  />
+
+ <button (click)="exportAsJson()">Export as JSON</button>
