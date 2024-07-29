@@ -5,7 +5,7 @@ import json
 # NOTE: When converting to a data_frame, duplicate columns will be renamed (i.e Address and Address
 # will become Address and Address.1) SO, the json file and the resulting 
 # dictionary may have keys like Address and Address.1
-def convert_file_to_dict(file):
+def convert_file_to_dicts(file):
     file_type = file.content_type
     newError = LocationError("Failed to read file.")
 

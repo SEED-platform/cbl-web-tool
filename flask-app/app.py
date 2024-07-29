@@ -8,6 +8,7 @@ import sys
 from pathlib import Path
 from typing import Any
 import warnings
+import requests
 
 import geopandas as gpd
 import mercantile
@@ -18,7 +19,7 @@ from utils.common import Location
 from utils.location_error import LocationError
 from utils.check_data_quality import check_data_quality
 from utils.generate_locations_list import generate_locations_list
-from utils.convert_file_to_dict import convert_file_to_dict
+from utils.convert_file_to_dicts import convert_file_to_dicts
 from utils.merge_dicts import merge_dicts
 from utils.geocode_addresses import geocode_addresses
 from utils.normalize_address import normalize_address
@@ -35,34 +36,20 @@ CORS(app)
 
 
 @app.route('/api/merge_files',  methods=['POST'])
-def merge_two_files():
-    file1 = request.files['userFile1']
-    file2 = request.files['userFile2']
-    file1_data = convert_file_to_dict(file1)
-    file2_data = convert_file_to_dict(file2)
-
-    if not file1_data or len(file1_data) == 0:
-        return jsonify({'message': 'Uploaded a file in the wrong format. Please upload different format'}), 400
-    
-    if isinstance(file1_data, LocationError):
-        return jsonify({'message': f'{file1_data.message}'}), 400
-    
-    if not file2_data or len(file2_data) == 0:
-        return jsonify({'message': 'Uploaded a file in the wrong format. Please upload different format'}), 400
-    
-    if isinstance(file2_data, LocationError):
-        return jsonify({'message': f'{file2_data.message}'}), 400
-
+def merge_files():
+    files = []
     merged_data = []
-    for i in range(len(file2_data)):
-        dict1 = file1_data[i]
-        dict2 = file2_data[i]
-        if (dict1 != dict2):
-            merged_dict = merge_dicts(dict1, dict2)
-            merged_data.append(merged_dict)
-        else:
-            merged_data.append(dict1)
 
+    for file in files:
+        file_data = convert_file_to_dicts(file)
+        if not file_data or len(file_data) == 0:
+            return jsonify({'message': 'Uploaded a file in the wrong format. Please upload different format'}), 400
+    
+        if isinstance(file_data, LocationError):
+            return jsonify({'message': f'{file_data.message}'}), 400
+        
+        merged_data.extend(file_data)
+    
     json_data = json.dumps(merged_data)
     isGoodData = check_data_quality(merged_data)
 
@@ -75,7 +62,7 @@ def merge_two_files():
 @app.route('/api/submit_file',  methods=['POST'])
 def get_and_check_file():
     file = request.files['userFile']
-    file_data = convert_file_to_dict(file)
+    file_data = convert_file_to_dicts(file)
 
     if not file_data or len(file_data) == 0:
         return jsonify({'message': 'Uploaded a file in the wrong format. Please upload different format'}), 400
@@ -134,10 +121,6 @@ def run_cbl_workflow():
     except Exception as e:
         return jsonify({'message': 'Failed geocoding property states due to MapQuest error. " "Your MapQuest API Key is either invalid or at its limit.'}), 400
      
-
-    # with open("mapquest_tempfile.json", 'r') as f:
-    #     data = json.load(f)
-
     poorQualityCodes = ["Ambiguous", "P1CAA", "B1CAA", "B1ACA"]
 
     # Find all quadkeys that the coordinates fall within
@@ -221,9 +204,44 @@ def run_cbl_workflow():
     # Convert covered building list as GeoJSON
     gdf = gpd.GeoDataFrame(data=merged_data, columns=columns)
     final_geojson = gdf.to_json()
- 
+    
     return jsonify({"message": "success", "user_data": final_geojson}), 200
- 
 
+
+@app.route('/api/reverse_geocode',  methods=['POST'])
+def reverse_geocode():
+    MAPQUEST_API_KEY = os.getenv("MAPQUEST_API_KEY")    # will need to change this to retrieve user's api key
+    if not MAPQUEST_API_KEY:
+        sys.exit("Missing MapQuest API key")
+
+    latitude = 30.333472        # these will come from the user or be calculated from manually drawn footprint
+    longitude = -81.470448
+
+    response = requests.post(
+            f"https://www.mapquestapi.com/geocoding/v1/reverse?key={MAPQUEST_API_KEY}",
+            json={
+                "location": {
+                    "latLng": {
+                    "lat": latitude,
+                    "lng": longitude
+                    }
+                },
+                "options": {
+                    "thumbMaps": False
+                },
+                "includeNearestIntersection": False,
+                "includeRoadMetadata": False
+                }
+            )
+    if response.status_code == 401:
+        return jsonify({"message": "Failed geocoding property states due to MapQuest error. " "API Key is invalid with message: {response.content}."}), 400
+    
+    if response.status_code == 403:
+         return jsonify({"message": "Failed geocoding property states due to MapQuest error. Your MapQuest API Key is either invalid or at its limit."}), 400
+
+    result = response.json().get("results")
+
+
+    
 if __name__ == '__main__':
     app.run(port=5001)
