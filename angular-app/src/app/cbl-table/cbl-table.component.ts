@@ -27,6 +27,7 @@ export class CblTableComponent implements OnInit {
   public rowData: any[] = []; 
 
   defaultColDef = {
+    alwaysShowHorizontalScroll: true,
     flex: 1,
     minWidth: 100,
     sortable: false,

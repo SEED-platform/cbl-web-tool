@@ -24,7 +24,9 @@
               {
                 "glob": "**/*",
                 "input": "public"
-              }
+              },
+              "src/assets",
+              "src/assets/nrel.ico"
             ],
             "styles": [
               "src/styles.css"

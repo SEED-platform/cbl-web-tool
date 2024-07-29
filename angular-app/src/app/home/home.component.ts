@@ -5,6 +5,7 @@ import { FlaskRequests } from '../service';
 import { FileExportService } from '../file-export.service';
 import { MapboxMapComponent } from '../mapbox-map/mapbox-map.component';
 import { FirstTableComponent } from '../first-table/first-table.component';
+import { CblTableComponent } from '../cbl-table/cbl-table.component';
 import { Router } from '@angular/router';
 
 
@@ -13,7 +14,7 @@ import { Router } from '@angular/router';
   standalone: true,
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css'], 
-  imports: [ReactiveFormsModule, CommonModule, MapboxMapComponent, FirstTableComponent] 
+  imports: [ReactiveFormsModule, CommonModule, MapboxMapComponent, FirstTableComponent, CblTableComponent] 
 })
 
 
@@ -22,8 +23,6 @@ export class HomeComponent{
    jsonData: any;
    initialJsonData: any;
    buildingArray: any[] = [];
-   isTable: boolean = true;
-   toggleString: string = "Table";
    fatalErrorArray: string[] = ["Uploaded a file in the wrong format. Please upload different format", "Failed to read file."]
 
 
@@ -90,16 +89,7 @@ export class HomeComponent{
       this.fileExportHandler.downloadJSON(this.jsonData, 'data.json');
     }
 
-    tableMapToggle():void{
-      this.buildingArray = JSON.parse(this.jsonData).features;
-      if (this.isTable){
-          this.isTable = false
-          this.toggleString = "Table";
-      }else{
-        this.isTable = true;
-          this.toggleString = "Map";
-      }
-    }
+ 
 
  
 }
