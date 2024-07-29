@@ -1,0 +1,9 @@
+<p>cbl-table works!</p>
+
+
+<ag-grid-angular class="ag-theme-quartz" style="height: 500px; width: 100%;"
+[rowData]="geoJson"
+[columnDefs]="colDefs"
+[defaultColDef]="defaultColDef"
+(gridReady)="onGridReady($event)"
+ />
