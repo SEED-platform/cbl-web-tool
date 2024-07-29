@@ -244,7 +244,6 @@ def reverse_geocode():
 
     result = response.json().get("results")
     
-
     for location in result:
         for item in location.get("locations", []):
             print("Street_Address:", item.get("street"))
@@ -255,52 +254,7 @@ def reverse_geocode():
             print("Latitude:", item["latLng"]["lat"])
             print("Longitude:", item["latLng"]["lng"])
 
-
-@app.route('/api/export_geojson',  methods=['POST'])
-def export_geojson():
-    json_string = request.json.get('value')
-    geojson_data = json.loads(json_string)
-
-    list_of_geojson = []
-    
-    for data in geojson_data:
-        coords = data['coordinates'].split(',')
-        coords = [(float(coords[i]), float(coords[i + 1])) for i in range(0, len(coords), 2)]
-
-        geojson = {
-            "type": "FeatureCollection",
-            "features": [
-                {
-                    "type": "Feature",
-                    "geometry": {
-                        "type": "Polygon",
-                        "coordinates": [coords]  # Polygon coordinates should be in a list
-                    },
-                    "properties": {
-                        "street_address": data['street_address'],
-                        "city": data['city'],
-                        "state": data['state'],
-                        "quality": data['quality'],
-                        "longitude": data['longitude'],
-                        "latitude": data['latitude'],
-                        "postal_code": data['postal_code'],
-                        "side_of_street": data['side_of_street'],
-                        "country": data['country'],
-                        "county": data['county'],
-                        "neighborhood": data['neighborhood'],
-                        "quadkey": data['quadkey'],
-                        "footprint_match": data['footprint_match'],
-                        "height": data['height'],
-                        "ubid": data['ubid']
-                    }
-                }
-            ]
-        }
-        list_of_geojson.append(geojson)
-
-        print(list_of_geojson)
-
-
+    return jsonify({"message": "suc"}), 200
 
 
 
@@ -314,50 +268,25 @@ def export_geojson():
     for data in geojson_data:
         coords = data['coordinates'].split(',')
         coords = [(float(coords[i]), float(coords[i + 1])) for i in range(0, len(coords), 2)]
+        properties = data
+        properties.pop('coordinates', None)
 
         geojson = {
             "type": "FeatureCollection",
             "features": [
                 {
                     "type": "Feature",
+                    "properties": properties,
                     "geometry": {
                         "type": "Polygon",
-                        "coordinates": [coords]  # Polygon coordinates should be in a list
-                    },
-                    "properties": {
-                        "street_address": data['street_address'],
-                        "city": data['city'],
-                        "state": data['state'],
-                        "quality": data['quality'],
-                        "longitude": data['longitude'],
-                        "latitude": data['latitude'],
-                        "postal_code": data['postal_code'],
-                        "side_of_street": data['side_of_street'],
-                        "country": data['country'],
-                        "county": data['county'],
-                        "neighborhood": data['neighborhood'],
-                        "quadkey": data['quadkey'],
-                        "footprint_match": data['footprint_match'],
-                        "height": data['height'],
-                        "ubid": data['ubid']
+                        "coordinates": [coords]
                     }
                 }
             ]
         }
         list_of_geojson.append(geojson)
 
-        print(list_of_geojson)
-
-
-
-
-
-
-@app.route('/api/export_geojson',  methods=['POST'])
-def export_geojson():
-    json_string = request.json.get('value')
-    data = json.loads(json_string)
-    print(data)
+    print(list_of_geojson)
     return jsonify({"message": "suc"}), 200
 
 if __name__ == '__main__':
