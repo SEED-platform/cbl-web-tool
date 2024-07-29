@@ -240,8 +240,18 @@ def reverse_geocode():
          return jsonify({"message": "Failed geocoding property states due to MapQuest error. Your MapQuest API Key is either invalid or at its limit."}), 400
 
     result = response.json().get("results")
-
-
     
+
+    for location in result:
+        for item in location.get("locations", []):
+            print("Street_Address:", item.get("street"))
+            print("City:", item.get("adminArea5"))
+            print("State:", item.get("adminArea3"))
+            print("Country:", item.get("adminArea1"))
+            print("Postal Code:", item.get("postalCode"))
+            print("Latitude:", item["latLng"]["lat"])
+            print("Longitude:", item["latLng"]["lng"])
+
+
 if __name__ == '__main__':
     app.run(port=5001)
