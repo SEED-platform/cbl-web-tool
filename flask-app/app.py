@@ -244,7 +244,6 @@ def reverse_geocode():
 
     result = response.json().get("results")
     
-
     for location in result:
         for item in location.get("locations", []):
             print("Street_Address:", item.get("street"))
@@ -255,13 +254,39 @@ def reverse_geocode():
             print("Latitude:", item["latLng"]["lat"])
             print("Longitude:", item["latLng"]["lng"])
 
+    return jsonify({"message": "suc"}), 200
+
 
 
 @app.route('/api/export_geojson',  methods=['POST'])
 def export_geojson():
     json_string = request.json.get('value')
-    data = json.loads(json_string)
-    print(data)
+    geojson_data = json.loads(json_string)
+
+    list_of_geojson = []
+    
+    for data in geojson_data:
+        coords = data['coordinates'].split(',')
+        coords = [(float(coords[i]), float(coords[i + 1])) for i in range(0, len(coords), 2)]
+        properties = data
+        properties.pop('coordinates', None)
+
+        geojson = {
+            "type": "FeatureCollection",
+            "features": [
+                {
+                    "type": "Feature",
+                    "properties": properties,
+                    "geometry": {
+                        "type": "Polygon",
+                        "coordinates": [coords]
+                    }
+                }
+            ]
+        }
+        list_of_geojson.append(geojson)
+
+    print(list_of_geojson)
     return jsonify({"message": "suc"}), 200
 
 if __name__ == '__main__':
