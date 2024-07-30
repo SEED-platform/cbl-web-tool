@@ -212,49 +212,47 @@ def run_cbl_workflow():
 
 
 @app.route('/api/reverse_geocode',  methods=['POST'])
-def reverse_geocode():
-    MAPQUEST_API_KEY = os.getenv("MAPQUEST_API_KEY")    # will need to change this to retrieve user's api key
-    if not MAPQUEST_API_KEY:
-        sys.exit("Missing MapQuest API key")
+def reverse_geocode():  
+    coords = 0
+    lat = 30.333472        
+    lon = -81.470448
+    url = f"https://api.mapbox.com/geocoding/v5/mapbox.places/{lon},{lat}.json"
+    params = {
+        'access_token': "pk.eyJ1Ijoicm1pYW4tbnJlbCIsImEiOiJjbHlvc2lkNm8wbG1uMmlwcHR1aDZlMTR0In0.dZtyvX6DjlnEF8FVL7FV4Q",  
+        'limit': 1  
+    }
 
-    latitude = 30.333472        # these will come from the user or be calculated from manually drawn footprint
-    longitude = -81.470448
+    response = requests.get(url, params=params)
+    if response.status_code == 403 or response.status_code == 401:
+        return jsonify({"message": "Error: Could not reverse geocode using the mapbox API."}), 400
+    
+    result = response.json()
+    properties = {}
+    try:
+        data = result["features"][0]["place_name"]
+        data = data.split(",")
+        properties["street_address"] = data[0]
+        properties["city"] = data[1]
+        properties["state"] = data[2].split(" ")[0]
+        properties["postal_code"] = data[2].split(" ")[1]
+        properties["country"] = data[3]
 
-    response = requests.post(
-            f"https://www.mapquestapi.com/geocoding/v1/reverse?key={MAPQUEST_API_KEY}",
-            json={
-                "location": {
-                    "latLng": {
-                    "lat": latitude,
-                    "lng": longitude
+        geojson = {
+            "type": "FeatureCollection",
+            "features": [
+                {
+                    "type": "Feature",
+                    "properties": properties,
+                    "geometry": {
+                        "type": "Polygon",
+                        "coordinates": [coords]
                     }
-                },
-                "options": {
-                    "thumbMaps": False
-                },
-                "includeNearestIntersection": False,
-                "includeRoadMetadata": False
                 }
-            )
-    if response.status_code == 401:
-        return jsonify({"message": "Failed geocoding property states due to MapQuest error. " "API Key is invalid with message: {response.content}."}), 400
-    
-    if response.status_code == 403:
-         return jsonify({"message": "Failed geocoding property states due to MapQuest error. Your MapQuest API Key is either invalid or at its limit."}), 400
-
-    result = response.json().get("results")
-    
-    for location in result:
-        for item in location.get("locations", []):
-            print("Street_Address:", item.get("street"))
-            print("City:", item.get("adminArea5"))
-            print("State:", item.get("adminArea3"))
-            print("Country:", item.get("adminArea1"))
-            print("Postal Code:", item.get("postalCode"))
-            print("Latitude:", item["latLng"]["lat"])
-            print("Longitude:", item["latLng"]["lng"])
-
-    return jsonify({"message": "suc"}), 200
+            ]
+        }
+        return jsonify({"message": "success", "user_data": geojson}), 200
+    except Exception:
+        return jsonify({"message": "Error: Reverse Geocoding returned poor data. Please enter data manually."}), 200
 
 
 
