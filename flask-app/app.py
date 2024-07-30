@@ -255,7 +255,6 @@ def reverse_geocode():
         return jsonify({"message": "Error: Reverse Geocoding returned poor data. Please enter data manually."}), 200
 
 
-
 @app.route('/api/export_geojson',  methods=['POST'])
 def export_geojson():
     json_string = request.json.get('value')
