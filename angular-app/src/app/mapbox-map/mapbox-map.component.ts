@@ -3,6 +3,8 @@ import { GeoJsonService } from '../services/geojson.service';
 import * as mapboxgl from 'mapbox-gl';
 import { CommonModule } from '@angular/common'; 
 import { environment } from '../../environments/environment';  // Import environment
+import { Subscription } from 'rxjs';  // Import Subscription
+
 
 
 @Component({
@@ -20,22 +22,42 @@ export class MapboxMapComponent implements OnInit {
   lat: number = 30.2672;
   lng: number = -97.7431;
   buildingArray: any[] =[];
+  private geoJsonSubscription: Subscription | undefined;
+  private featureClickSubscription: Subscription | undefined;
 
   constructor(private cdr: ChangeDetectorRef, private geoJsonService: GeoJsonService) {}
 
   
   ngOnInit() {
-    this.initializeMapWithGeoJson();
+    this.geoJsonSubscription = this.geoJsonService.getGeoJson().subscribe(geoJsonObject => {
+      this.initializeMapWithGeoJson(geoJsonObject);
+    });
+
+    this.featureClickSubscription = this.geoJsonService.selectedFeature$.subscribe(feature => {
+      if (feature) {
+        this.flyToCoordinates(feature.longitude, feature.latitude);
+      }
+    });
   }
 
+  ngOnDestroy() {
+    if (this.geoJsonSubscription) {
+      this.geoJsonSubscription.unsubscribe();
+    }
+    if (this.featureClickSubscription) {
+      this.featureClickSubscription.unsubscribe();
+    }
+  }
 
+  initializeMapWithGeoJson(geoJsonObject: any) {
+    if (!geoJsonObject || !geoJsonObject.features || geoJsonObject.features.length === 0) {
+      console.error("Invalid GeoJSON data or no features found");
+      return;
+    }
 
-  initializeMapWithGeoJson() {
-    const localGeoJsonData = this.geoJsonService.getGeoJson();
-     console.log("map", localGeoJsonData);
      
 
-      const geoJsonObject = localGeoJsonData;
+    
       this.buildingArray = geoJsonObject.features;
       this.cdr.detectChanges();
       const firstBuildingLongitude = this.buildingArray[0].properties.longitude;
@@ -82,6 +104,7 @@ export class MapboxMapComponent implements OnInit {
                     center: new mapboxgl.LngLat(longitude,latitude),
                     zoom: 17.5 // Optionally adjust zoom level when flying to the feature
                 });
+                this.geoJsonService.emitClickEvent(latitude, longitude);
             }
         }
     });
@@ -90,6 +113,7 @@ export class MapboxMapComponent implements OnInit {
   
 
   flyToCoordinates(clickedBuildingLong: number, clickedBuildingLat: number) {
+     console.log(clickedBuildingLat);
     if (this.map) {
        this.map.flyTo({
         center:  new mapboxgl.LngLat(clickedBuildingLong, clickedBuildingLat),

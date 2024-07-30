@@ -8,7 +8,7 @@ import { MapboxMapComponent } from '../mapbox-map/mapbox-map.component';
 import { FirstTableComponent } from '../first-table/first-table.component';
 import { CblTableComponent } from '../cbl-table/cbl-table.component';
 import { Router } from '@angular/router';
-
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-home',
@@ -23,6 +23,7 @@ export class HomeComponent{
    userFile: any;
    jsonData: any;
    initialJsonData: any;
+   private geoJsonSubscription: Subscription | undefined;
  
    fatalErrorArray: string[] = ["Uploaded a file in the wrong format. Please upload different format", "Failed to read file."]
 
@@ -30,8 +31,16 @@ export class HomeComponent{
     constructor(private apiHandler: FlaskRequests, private fileExportHandler: FileExportService, private router: Router, private geoJsonService: GeoJsonService) {}
 
     ngOnInit(): void {
-      this.jsonData = this.geoJsonService.getGeoJson();
-      console.log("onit", this.jsonData);
+      this.geoJsonSubscription = this.geoJsonService.getGeoJson().subscribe(data => {
+        this.jsonData = data;
+        console.log("GeoJSON data updated in HomeComponent", this.jsonData);
+      });
+    }
+
+    ngOnDestroy(): void {
+      if (this.geoJsonSubscription) {
+        this.geoJsonSubscription.unsubscribe();
+      }
     }
     
     isObjectEmpty(obj: object): boolean {
@@ -80,6 +89,7 @@ export class HomeComponent{
           console.log(response.message); // Handle successful response
           this.jsonData = response.user_data
           sessionStorage.setItem('GEOJSONDATA', this.jsonData);
+          this.geoJsonService.setGeoJson(this.jsonData);
       },
       (errorResponse) => {
           console.error(errorResponse.error.message); // Handle error response
