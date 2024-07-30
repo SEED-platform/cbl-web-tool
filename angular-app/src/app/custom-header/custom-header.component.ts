@@ -64,11 +64,9 @@ export class CustomHeaderComponent implements IHeaderAngularComp {
  
       if (this.index !== undefined) {
         let colDefs = JSON.parse(sessionStorage.getItem("COL") || '[]');
-        console.log(colDefs);
     
         if (colDefs[this.index]) {
           colDefs[this.index].headerName = this.name;
-          console.log(colDefs);
         }
     
          

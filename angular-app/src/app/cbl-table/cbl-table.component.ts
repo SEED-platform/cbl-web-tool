@@ -1,12 +1,13 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import {ColDef} from 'ag-grid-community';
-import { CommonModule } from '@angular/common'; // Import CommonModule
+import { CommonModule } from '@angular/common'; 
 import { AgGridAngular } from 'ag-grid-angular';
 import "ag-grid-community/styles/ag-grid.css";
 import 'ag-grid-community/styles/ag-theme-quartz.css';
-import { FlaskRequests } from '../service';
+import { FlaskRequests } from '../services/server.service';
+import { GeoJsonService } from '../services/geojson.service';
 import { Router } from '@angular/router';
-import {ValueGetterParams} from "@ag-grid-community/core";
+import { ValueGetterParams } from "@ag-grid-community/core";
 import Papa from 'papaparse';
 
 
@@ -19,6 +20,7 @@ import Papa from 'papaparse';
   templateUrl: './cbl-table.component.html',
   styleUrl: './cbl-table.component.css'
 })
+
 export class CblTableComponent implements OnInit {
   featuresArray: any[] = [];
   colDefs: ColDef[] = [];
@@ -27,7 +29,6 @@ export class CblTableComponent implements OnInit {
   public rowData: any[] = []; 
 
   defaultColDef = {
-    alwaysShowHorizontalScroll: true,
     flex: 1,
     minWidth: 100,
     sortable: false,
@@ -35,44 +36,44 @@ export class CblTableComponent implements OnInit {
     editable: true,
   };
 
-  constructor(private apiHandler: FlaskRequests, private router: Router, private cdr: ChangeDetectorRef) { }
+  constructor(private apiHandler: FlaskRequests, private router: Router, private cdr: ChangeDetectorRef, private geoJsonService: GeoJsonService) { }
+  
 
-   
+  ngOnInit(): void {
+    this.parseGeoJson(); //gets value from cbl workflow
+    this.featuresArray = this.geoJson.features;
+    this.rowData = this.featuresArray;
+    this.setColumnDefs();
+  }
+
   onGridReady(params: any) {
     this.gridApi = params.api;
     this.gridApi.sizeColumnsToFit();
   }
 
   
-  ngOnInit(): void {
-    this.parseGeoJson();
-    this.featuresArray = this.geoJson.features;
-    this.rowData = this.featuresArray;
-    this.setColumnDefs();
-    console.log("dsfas", this.rowData);
-  }
-
+ 
   parseGeoJson(){
     try {
-      this.geoJson = JSON.parse(sessionStorage.getItem('GEOJSONDATA') || '[]');
+      this.geoJson = this.geoJsonService.getGeoJson();
     } catch (e) {
-      console.error("Failed to parse GeoJSON data:", e);
-      this.geoJson = []; // Or handle it according to your needs
+      console.error("Error retrieving GeoJSON data:", e);
+      this.geoJson = {}; // Or handle it according to your needs
     }
   }
 
 
 
   setColumnDefs() {
+        if(!this.geoJson || (Object.keys(this.geoJson).length === 0 && this.geoJson.constructor === Object)){
+          return;
+        }
         this.featuresArray = this.geoJson.features;
         let keys:any;
-       
         keys = Object.keys(this.featuresArray[0].properties);     
         
         keys.push('coordinates');      
-        console.log(keys)
-
-
+     
       this.colDefs = keys.map((key:any) => ({
         field: key,
         headerName: key, 

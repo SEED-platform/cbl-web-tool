@@ -1,4 +1,5 @@
-import { Component, AfterViewInit, ChangeDetectorRef} from '@angular/core';
+import { Component, ChangeDetectorRef, OnInit} from '@angular/core';
+import { GeoJsonService } from '../services/geojson.service';
 import * as mapboxgl from 'mapbox-gl';
 import { CommonModule } from '@angular/common'; 
 import { environment } from '../../environments/environment';  // Import environment
@@ -13,29 +14,28 @@ import { environment } from '../../environments/environment';  // Import environ
 })
 
 
-export class MapboxMapComponent implements AfterViewInit {
+export class MapboxMapComponent implements OnInit {
   map: mapboxgl.Map | undefined;
   style = 'mapbox://styles/mapbox/streets-v11';
   lat: number = 30.2672;
   lng: number = -97.7431;
   buildingArray: any[] =[];
 
-  constructor(private cdr: ChangeDetectorRef) {}
+  constructor(private cdr: ChangeDetectorRef, private geoJsonService: GeoJsonService) {}
 
   
-  ngAfterViewInit() {
+  ngOnInit() {
     this.initializeMapWithGeoJson();
   }
 
 
 
   initializeMapWithGeoJson() {
-    const localGeoJsonData = sessionStorage.getItem('GEOJSONDATA');
-
+    const localGeoJsonData = this.geoJsonService.getGeoJson();
+     console.log("map", localGeoJsonData);
      
-    if (localGeoJsonData){
-      
-      const geoJsonObject = JSON.parse(localGeoJsonData);
+
+      const geoJsonObject = localGeoJsonData;
       this.buildingArray = geoJsonObject.features;
       this.cdr.detectChanges();
       const firstBuildingLongitude = this.buildingArray[0].properties.longitude;
@@ -71,13 +71,25 @@ export class MapboxMapComponent implements AfterViewInit {
         }
       });
 
-      });
-      
-    }     
+      this.map.on('click', 'features', (e) => {
+        if (e.features && e.features.length > 0) {
+       
+            const longitude =  e.features[0].properties.longitude;
+            const latitude = e.features[0].properties.latitude;
+            if (this.map) {
+                // Fly to the clicked feature's coordinates
+                this.map.flyTo({
+                    center: new mapboxgl.LngLat(longitude,latitude),
+                    zoom: 17.5 // Optionally adjust zoom level when flying to the feature
+                });
+            }
+        }
+    });
+      });   
   }
+  
 
-
-  flyToCoordinates( clickedBuildingLong: number, clickedBuildingLat: number,) {
+  flyToCoordinates(clickedBuildingLong: number, clickedBuildingLat: number) {
     if (this.map) {
        this.map.flyTo({
         center:  new mapboxgl.LngLat(clickedBuildingLong, clickedBuildingLat),
