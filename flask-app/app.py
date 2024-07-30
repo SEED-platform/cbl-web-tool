@@ -8,6 +8,7 @@ import sys
 from pathlib import Path
 from typing import Any
 import warnings
+import requests
 
 import geopandas as gpd
 import mercantile
@@ -16,6 +17,10 @@ from shapely.geometry import Point
 
 from utils.common import Location
 from utils.location_error import LocationError
+from utils.check_data_quality import check_data_quality
+from utils.generate_locations_list import generate_locations_list
+from utils.convert_file_to_dicts import convert_file_to_dicts
+from utils.merge_dicts import merge_dicts
 from utils.geocode_addresses import geocode_addresses
 from utils.normalize_address import normalize_address
 from utils.ubid import bounding_box, centroid, encode_ubid
@@ -29,58 +34,78 @@ warnings.filterwarnings("ignore", category=UserWarning)
 app = Flask(__name__)
 CORS(app)
 
-@app.route('/api/submit_file',  methods=['POST'])
-def get_and_check_file():
 
-    file = request.files['userFile']
-    json_dict_list = convert_to_json_dict_list(file)
+@app.route('/api/merge_files',  methods=['POST'])
+def merge_files():
+    files = []
+    merged_data = []
 
-    if (len(json_dict_list) == 0):
-        return jsonify({'message': 'Uploaded a file in the wrong format. Please upload different format'}), 400
+    for file in files:
+        file_data = convert_file_to_dicts(file)
+        if not file_data or len(file_data) == 0:
+            return jsonify({'message': 'Uploaded a file in the wrong format. Please upload different format'}), 400
     
-    if isinstance(json_dict_list, LocationError):
-        return jsonify({'message': f'{json_dict_list.message}'}), 400
+        if isinstance(file_data, LocationError):
+            return jsonify({'message': f'{file_data.message}'}), 400
+        
+        merged_data.extend(file_data)
     
-    isGoodData = check_data_quality(json_dict_list)
+    json_data = json.dumps(merged_data)
+    isGoodData = check_data_quality(merged_data)
+
     if isinstance(isGoodData, LocationError):
-        return jsonify({'message': f'{json_dict_list.message}', "user_data": json_data}), 400
+        return jsonify({'message': f'{isGoodData.message}', "user_data": json_data}), 400
 
-    json_data = json.dumps(json_dict_list)
     return jsonify({"message": "success", "user_data": json_data}), 200
 
-    # after data checking and editing is succesful, generate list of locations 
-    # Finally, run CBL-workflow
+
+@app.route('/api/submit_file',  methods=['POST'])
+def get_and_check_file():
+    file = request.files['userFile']
+    file_data = convert_file_to_dicts(file)
+
+    if not file_data or len(file_data) == 0:
+        return jsonify({'message': 'Uploaded a file in the wrong format. Please upload different format'}), 400
+    
+    if isinstance(file_data, LocationError):
+        return jsonify({'message': f'{file_data.message}'}), 400
+    
+    json_data = json.dumps(file_data)
+    isGoodData = check_data_quality(file_data)
+
+    if isinstance(isGoodData, LocationError):
+        return jsonify({'message': f'{isGoodData.message}', "user_data": json_data}), 400
+
+    return jsonify({"message": "success", "user_data": json_data}), 200
 
 
 @app.route('/api/check_data',  methods=['POST'])
 def check_edited_data():
-  
     json_string = request.json.get('value')
-    json_dict_list = json.loads(json_string)
+    file_data = json.loads(json_string)
+    json_data = json.dumps(file_data)
 
-    isGoodData = check_data_quality(json_dict_list)
+    isGoodData = check_data_quality(file_data)
     if isinstance(isGoodData, LocationError):
-        return jsonify({'message': f'{json_dict_list.message}', "user_data": json_data}), 400
+        return jsonify({'message': f'{isGoodData.message}', "user_data": json_data}), 400
     
-    json_data = json.dumps(json_dict_list)
     return jsonify({"message": "success", "user_data": json_data}), 200
 
     
 @app.route('/api/generate_cbl',  methods=['POST'])
 def run_cbl_workflow():
-    json_dict_list = []
+    file_data = []
     locations: list[Location] = []
-    
     
     try:
         json_string = request.json.get('value')
-        json_dict_list = json.loads(json_string)
+        file_data = json.loads(json_string)
     except ValueError:
         return jsonify({'message': 'Something went wrong while reading the edited json'}), 400
 
-    locations = generate_locations_list(json_dict_list)
+    locations = generate_locations_list(file_data)
 
-    MAPQUEST_API_KEY = os.getenv("MAPQUEST_API_KEY")
+    MAPQUEST_API_KEY = os.getenv("MAPQUEST_API_KEY")    # will need to change this to retrieve user's api key
     if not MAPQUEST_API_KEY:
         sys.exit("Missing MapQuest API key")
 
@@ -91,11 +116,13 @@ def run_cbl_workflow():
     for loc in locations:
         loc["street"] = normalize_address(loc["street"])
 
-    data = geocode_addresses(locations, MAPQUEST_API_KEY)
-    print(data)
+    # try:
+    #     data = geocode_addresses(locations, MAPQUEST_API_KEY)
+    # except Exception as e:
+    #     return jsonify({'message': 'Failed geocoding property states due to MapQuest error. " "Your MapQuest API Key is either invalid or at its limit.'}), 400
 
-    # with open("mapquest_tempfile.json", 'r') as f:
-    #     data = json.load(f)
+    with open('testing.json', 'r') as fr:
+        data = json.load(fr)
 
     poorQualityCodes = ["Ambiguous", "P1CAA", "B1CAA", "B1ACA"]
 
@@ -163,10 +190,9 @@ def run_cbl_workflow():
 
     # since the data dict contains information only from mapquest, need to merge original 
     # dict and the data dict to display all information
-
     merged_data = []
     for i in range(len(data)):
-        dict1 = json_dict_list[i]
+        dict1 = file_data[i]
         dict2 = data[i]
         if (dict1 != dict2):
             merged_dict = merge_dicts(dict1, dict2)
@@ -181,119 +207,87 @@ def run_cbl_workflow():
     # Convert covered building list as GeoJSON
     gdf = gpd.GeoDataFrame(data=merged_data, columns=columns)
     final_geojson = gdf.to_json()
- 
+    
     return jsonify({"message": "success", "user_data": final_geojson}), 200
- 
 
 
-def merge_dicts(dict1, dict2):
-    merged_dict = {}
-    for key, value in dict1.items():
-        merged_dict[key.lower()] = value
+@app.route('/api/reverse_geocode',  methods=['POST'])
+def reverse_geocode():
+    MAPQUEST_API_KEY = os.getenv("MAPQUEST_API_KEY")    # will need to change this to retrieve user's api key
+    if not MAPQUEST_API_KEY:
+        sys.exit("Missing MapQuest API key")
+
+    latitude = 30.333472        # these will come from the user or be calculated from manually drawn footprint
+    longitude = -81.470448
+
+    response = requests.post(
+            f"https://www.mapquestapi.com/geocoding/v1/reverse?key={MAPQUEST_API_KEY}",
+            json={
+                "location": {
+                    "latLng": {
+                    "lat": latitude,
+                    "lng": longitude
+                    }
+                },
+                "options": {
+                    "thumbMaps": False
+                },
+                "includeNearestIntersection": False,
+                "includeRoadMetadata": False
+                }
+            )
+    if response.status_code == 401:
+        return jsonify({"message": "Failed geocoding property states due to MapQuest error. " "API Key is invalid with message: {response.content}."}), 400
     
-    for key, value in dict2.items():
-        merged_dict[key.lower()] = value
+    if response.status_code == 403:
+         return jsonify({"message": "Failed geocoding property states due to MapQuest error. Your MapQuest API Key is either invalid or at its limit."}), 400
+
+    result = response.json().get("results")
     
-    return merged_dict
+    for location in result:
+        for item in location.get("locations", []):
+            print("Street_Address:", item.get("street"))
+            print("City:", item.get("adminArea5"))
+            print("State:", item.get("adminArea3"))
+            print("Country:", item.get("adminArea1"))
+            print("Postal Code:", item.get("postalCode"))
+            print("Latitude:", item["latLng"]["lat"])
+            print("Longitude:", item["latLng"]["lng"])
+
+    return jsonify({"message": "suc"}), 200
 
 
+
+@app.route('/api/export_geojson',  methods=['POST'])
+def export_geojson():
+    json_string = request.json.get('value')
+    geojson_data = json.loads(json_string)
+
+    list_of_geojson = []
     
-# NOTE: When converting to a data_frame, duplicate columns will be renamed (i.e Address and Address
-# will become Address and Address.1) SO, the json file and the resulting 
-# dictionary may have keys like Address and Address.1
-def convert_to_json_dict_list(file):
-    file_type = file.content_type
-    newError = LocationError("Failed to read file.")
+    for data in geojson_data:
+        coords = data['coordinates'].split(',')
+        coords = [(float(coords[i]), float(coords[i + 1])) for i in range(0, len(coords), 2)]
+        properties = data
+        properties.pop('coordinates', None)
 
-    if (file_type == "application/json"):
-        try: 
-            file_content = file.read().decode('utf-8')
-            json_dict_list = json.loads(file_content)
-        except:
-            return newError
-
-        return json_dict_list
-    
-    if (file_type == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"):   
-        try:
-            data_frame = pd.read_excel(file)
-            json_data = data_frame.to_json(orient='records')
-            json_dict_list = json.loads(json_data)
-        except:
-            return newError
-
-        return json_dict_list
-
-    if (file_type == "application/csv" or file_type == "text/csv"):
-        try:
-            data_frame = pd.read_csv(file)
-            json_data = data_frame.to_json(orient='records')
-            json_dict_list = json.loads(json_data)
-        except:
-            return newError
-
-        return json_dict_list
-
-
-# Checking for duplicates in the list of dictionaries 
-def check_data_quality(json_dict_list):
-    for i in range(len(json_dict_list) - 1):
-        dict1 = json_dict_list[i]
-
-        # Enforcing the required unique column names 
-        if "Address" not in dict1 and "address" not in dict1:
-            return LocationError("Missing unique 'Address' column")
-        if "City" not in dict1 and "city" not in dict1:
-            return LocationError("Missing unique 'City' column")
-        if "State" not in dict1 and "state" not in dict1:
-            return LocationError("Missing unique 'State' column")
-
-        for j in range(i + 1, len(json_dict_list)):
-            dict2 = json_dict_list[j]
-
-            if (dict1 == dict2):
-                dict1["duplicate?"] = "possible duplicate"
-                dict2["duplicate?"] = "possible duplicate"
-
-            else: 
-                dict1["duplicate?"] = ""
-                dict2["duplicate?"] = ""
-
-    # values must only be primitive types
-    for d in json_dict_list:
-        for value in d.values():
-            if not isinstance(value, (int, str, bool)): 
-                return LocationError("Data is formatted poorly in one of the table cells")
-            
-            
-                
-# Generating a list of locations from user-inputted file
-def generate_locations_list(json_dict_list):
-    locations: list[Location] = []
-
-    for d in json_dict_list:
-        street = ''
-        city = ''
-        state = ''
-        for key in d.keys():
-            if "address" == key.lower():
-                street = d[key]
-
-            if "city" == key.lower():
-                city = d[key]
-
-            if "state" == key.lower():
-                state = d[key]
-
-        loc_dict = {
-            'street': street,
-            'city': city,
-            'state': state
+        geojson = {
+            "type": "FeatureCollection",
+            "features": [
+                {
+                    "type": "Feature",
+                    "properties": properties,
+                    "geometry": {
+                        "type": "Polygon",
+                        "coordinates": [coords]
+                    }
+                }
+            ]
         }
-        locations.append(loc_dict)
-            
-    return locations
+        list_of_geojson.append(geojson)
 
+    print(list_of_geojson)
+    return jsonify({"message": "suc"}), 200
 
 if __name__ == '__main__':
     app.run(port=5001)

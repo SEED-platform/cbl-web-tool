@@ -24,7 +24,9 @@
               {
                 "glob": "**/*",
                 "input": "public"
-              }
+              },
+              "src/assets",
+              "src/assets/nrel.ico"
             ],
             "styles": [
               "src/styles.css"
@@ -85,7 +87,8 @@
               }
             ],
             "styles": [
-              "node_modules/handsontable/dist/handsontable.full.css",
+              "node_modules/ag-grid-community/styles/ag-theme-quartz.css",
+              "node_modules/ag-grid-community/styles/ag-grid.css",
               "src/styles.css"
             ],
             "scripts": []

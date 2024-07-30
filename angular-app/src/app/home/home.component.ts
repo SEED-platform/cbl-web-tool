@@ -1,10 +1,12 @@
 import { Component} from '@angular/core';
 import { CommonModule } from '@angular/common'; 
 import { ReactiveFormsModule } from '@angular/forms';
-import { FlaskRequests } from '../service'; 
+import { FlaskRequests } from '../services/server.service'; 
 import { FileExportService } from '../file-export.service';
+import { GeoJsonService } from '../services/geojson.service';
 import { MapboxMapComponent } from '../mapbox-map/mapbox-map.component';
 import { FirstTableComponent } from '../first-table/first-table.component';
+import { CblTableComponent } from '../cbl-table/cbl-table.component';
 import { Router } from '@angular/router';
 
 
@@ -13,7 +15,7 @@ import { Router } from '@angular/router';
   standalone: true,
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css'], 
-  imports: [ReactiveFormsModule, CommonModule, MapboxMapComponent, FirstTableComponent] 
+  imports: [ReactiveFormsModule, CommonModule, MapboxMapComponent, FirstTableComponent, CblTableComponent] 
 })
 
 
@@ -21,22 +23,20 @@ export class HomeComponent{
    userFile: any;
    jsonData: any;
    initialJsonData: any;
-   buildingArray: any[] = [];
-   isTable: boolean = true;
-   toggleString: string = "Map";
+ 
+   fatalErrorArray: string[] = ["Uploaded a file in the wrong format. Please upload different format", "Failed to read file."]
 
 
-    constructor(private apiHandler: FlaskRequests, private fileExportHandler: FileExportService, private router: Router) {
-    }
+    constructor(private apiHandler: FlaskRequests, private fileExportHandler: FileExportService, private router: Router, private geoJsonService: GeoJsonService) {}
 
     ngOnInit(): void {
-      this.jsonData = sessionStorage.getItem("GEOJSONDATA");
-      console.log(this.jsonData);
-      if (this.jsonData){
-        this.buildingArray = JSON.parse(this.jsonData).features;
-      }
+      this.jsonData = this.geoJsonService.getGeoJson();
+      console.log("onit", this.jsonData);
     }
-
+    
+    isObjectEmpty(obj: object): boolean {
+      return !obj || (Object.keys(obj).length === 0 && obj.constructor === Object);
+    }
 
     getUploadFileFromUser(event: any){
       this.userFile = event.target.files[0];
@@ -45,8 +45,8 @@ export class HomeComponent{
 
     uploadInitialFileToServer() {
       let fileData = new FormData();
+
       fileData.append("userFile", this.userFile); 
-      console.log("File data prepared:", this.userFile);
       this.apiHandler.sendInitialData(fileData).subscribe(
         (response) => {
           console.log(response.message); // Handle successful response
@@ -55,10 +55,20 @@ export class HomeComponent{
           if (this.userFile) {
             this.router.navigate(['/first-table']);
           }
-      },
-      (errorResponse) => {
+        },
+        (errorResponse) => {
           console.log(errorResponse.error.message); // Handle error response
-      });
+        
+          if (this.userFile && !this.fatalErrorArray.includes(errorResponse.error.message)){
+            this.initialJsonData = errorResponse.error.user_data;
+            sessionStorage.setItem('FIRSTTABLEDATA', this.initialJsonData);
+            console.log(this.initialJsonData);
+            this.router.navigate(['/first-table']);
+          }else{
+            alert(errorResponse.error.message);
+          }
+        });
+    
     }
 
     uploadFileToServer() {
@@ -69,7 +79,6 @@ export class HomeComponent{
         (response) => {
           console.log(response.message); // Handle successful response
           this.jsonData = response.user_data
-          this.buildingArray = JSON.parse(this.jsonData).features;
           sessionStorage.setItem('GEOJSONDATA', this.jsonData);
       },
       (errorResponse) => {
@@ -81,16 +90,4 @@ export class HomeComponent{
       this.fileExportHandler.downloadJSON(this.jsonData, 'data.json');
     }
 
-    tableMapToggle():void{
-      this.buildingArray = JSON.parse(this.jsonData).features;
-      if (this.isTable){
-          this.isTable = false
-          this.toggleString = "Table";
-      }else{
-        this.isTable = true;
-          this.toggleString = "Map";
-      }
-    }
-
- 
 }

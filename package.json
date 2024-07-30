@@ -1,0 +1,9 @@
+{
+  "dependencies": {
+    "ag-grid-angular": "^32.0.2",
+    "gridjs": "^6.2.0",
+    "gridjs-angular": "^2.0.0",
+    "jspreadsheet-ce": "^4.2.1",
+    "papaparse": "^5.4.1"
+  }
+}
