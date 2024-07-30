@@ -9,6 +9,7 @@ import { GeoJsonService } from '../services/geojson.service';
 import { Router } from '@angular/router';
 import { ValueGetterParams } from "@ag-grid-community/core";
 import Papa from 'papaparse';
+import { Subscription } from 'rxjs';
 
 
 
@@ -27,6 +28,8 @@ export class CblTableComponent implements OnInit {
   geoJson: any;
   private gridApi: any;
   public rowData: any[] = []; 
+  private geoJsonSubscription: Subscription | undefined;
+  private clickEventSubscription: Subscription | undefined;
 
   defaultColDef = {
     flex: 1,
@@ -40,11 +43,28 @@ export class CblTableComponent implements OnInit {
   
 
   ngOnInit(): void {
-    this.parseGeoJson(); //gets value from cbl workflow
-    this.featuresArray = this.geoJson.features;
-    this.rowData = this.featuresArray;
-    this.setColumnDefs();
+      this.geoJsonSubscription = this.geoJsonService.getGeoJson().subscribe(data => {
+      this.geoJson = data;
+      this.updateTable();
+    });
+
+
+    this.clickEventSubscription = this.geoJsonService.clickEvent$.subscribe(clickEvent => {
+      if (clickEvent) {
+        this.scrollToFeature(clickEvent.latitude, clickEvent.longitude);
+      }
+    });
   }
+
+  ngOnDestroy(): void {
+    if (this.geoJsonSubscription) {
+      this.geoJsonSubscription.unsubscribe();
+    }
+    if (this.clickEventSubscription) {
+      this.clickEventSubscription.unsubscribe();
+    }
+  }
+
 
   onGridReady(params: any) {
     this.gridApi = params.api;
@@ -53,13 +73,15 @@ export class CblTableComponent implements OnInit {
 
   
  
-  parseGeoJson(){
-    try {
-      this.geoJson = this.geoJsonService.getGeoJson();
-    } catch (e) {
-      console.error("Error retrieving GeoJSON data:", e);
-      this.geoJson = {}; // Or handle it according to your needs
+  updateTable() {
+    if (!this.geoJson || !this.geoJson.features) {
+      console.error('Invalid GeoJSON data');
+      return;
     }
+
+    this.featuresArray = this.geoJson.features;
+    this.rowData = this.featuresArray;
+    this.setColumnDefs();
   }
 
 
@@ -68,7 +90,7 @@ export class CblTableComponent implements OnInit {
         if(!this.geoJson || (Object.keys(this.geoJson).length === 0 && this.geoJson.constructor === Object)){
           return;
         }
-        this.featuresArray = this.geoJson.features;
+
         let keys:any;
         keys = Object.keys(this.featuresArray[0].properties);     
         
@@ -121,4 +143,32 @@ export class CblTableComponent implements OnInit {
       }
     );
   }
+
+  scrollToFeature(latitude: number, longitude: number) {
+    const feature = this.rowData.find((f: any) => 
+      f.properties.latitude === latitude && f.properties.longitude === longitude
+    );
+  
+    if (feature && this.gridApi) {
+      this.gridApi.ensureIndexVisible(this.rowData.indexOf(feature), 'top');
+      const index = this.rowData.indexOf(feature);
+      const rowNode = this.gridApi.getDisplayedRowAtIndex(index);
+      if (rowNode) {
+        rowNode.setSelected(true);
+      }
+      
+    }
+  }
+
+  onRowSelected(event: any) {
+  
+    if (event.node.isSelected()) {
+      const data = event.node.data;
+      const latitude = data.properties.latitude;
+      const longitude = data.properties.longitude;
+      console.log(latitude)
+      this.geoJsonService.emitSelectedFeature(latitude, longitude);
+    }
+  }
+
 }

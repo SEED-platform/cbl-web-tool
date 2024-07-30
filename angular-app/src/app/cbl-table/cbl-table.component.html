@@ -4,6 +4,8 @@
 [columnDefs]="colDefs"
 [defaultColDef]="defaultColDef"
 (gridReady)="onGridReady($event)"
+[rowSelection]="'single'" 
+(rowSelected)="onRowSelected($event)"
  />
 </div>
  <button (click)="exportAsJson()">Export as JSON</button>

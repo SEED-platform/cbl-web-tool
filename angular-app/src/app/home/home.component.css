@@ -11,6 +11,29 @@
     height: 5rem;
 }
 
+.red-font{
+    color: red;
+}
+
+
+
+#map-ref{
+    width: 90vw;
+}
+
+
+.outer-wrapper{
+ border: 1px solid black; 
+ margin-top: 20px;
+ padding: 0;
+ max-width: 1800px;
+}
+
+.table-wrapper{
+    max-height: 600px;
+    overflow-y: scroll;
+    scrollbar-width: thin;
+}
 
 
 table{
