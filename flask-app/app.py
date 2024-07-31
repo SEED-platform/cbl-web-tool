@@ -214,8 +214,9 @@ def run_cbl_workflow():
 @app.route('/api/reverse_geocode',  methods=['POST'])
 def reverse_geocode():  
     coords = 0
-    lat = 30.333472        
+    lat = 30.333472        # these will come from the user at some point
     lon = -81.470448
+
     url = f"https://api.mapbox.com/geocoding/v5/mapbox.places/{lon},{lat}.json"
     params = {
         'access_token': "pk.eyJ1Ijoicm1pYW4tbnJlbCIsImEiOiJjbHlvc2lkNm8wbG1uMmlwcHR1aDZlMTR0In0.dZtyvX6DjlnEF8FVL7FV4Q",  
@@ -236,8 +237,13 @@ def reverse_geocode():
         properties["state"] = data[2].split(" ")[0]
         properties["postal_code"] = data[2].split(" ")[1]
         properties["country"] = data[3]
+    except Exception:
+        print("missing data from reverse geocoding")
 
-        geojson = {
+    if not properties or len(properties) == 0:
+        return jsonify({"message": "Error: Reverse geocoding returned poor data."}), 400
+    
+    geojson = {
             "type": "FeatureCollection",
             "features": [
                 {
@@ -250,9 +256,7 @@ def reverse_geocode():
                 }
             ]
         }
-        return jsonify({"message": "success", "user_data": geojson}), 200
-    except Exception:
-        return jsonify({"message": "Error: Reverse Geocoding returned poor data. Please enter data manually."}), 200
+    return jsonify({"message": "success", "user_data": geojson}), 200
 
 
 @app.route('/api/export_geojson',  methods=['POST'])
@@ -284,7 +288,8 @@ def export_geojson():
         list_of_geojson.append(geojson)
 
     print(list_of_geojson)
-    return jsonify({"message": "suc"}), 200
+    final_geojson = json.dumps(list_of_geojson)
+    return jsonify({"message": "success", "user_data": final_geojson}), 200
 
 if __name__ == '__main__':
     app.run(port=5001)
