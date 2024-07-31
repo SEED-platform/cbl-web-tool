@@ -13,7 +13,7 @@ import requests
 import geopandas as gpd
 import mercantile
 import pandas as pd
-from shapely.geometry import Point
+from shapely.geometry import Point, Polygon
 
 from utils.common import Location
 from utils.location_error import LocationError
@@ -213,9 +213,18 @@ def run_cbl_workflow():
 
 @app.route('/api/reverse_geocode',  methods=['POST'])
 def reverse_geocode():  
-    coords = 0
-    lat = 30.333472        # these will come from the user at some point
+    coords = 0      # coordinates will come from user
+
+    # generate polygon from coordinates 
+
+
+    # calculate lat, long (center of polygon)
+    lat = 30.333472        
     lon = -81.470448
+
+    # encode ubid from coordinates 
+
+
 
     url = f"https://api.mapbox.com/geocoding/v5/mapbox.places/{lon},{lat}.json"
     params = {

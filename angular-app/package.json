@@ -20,6 +20,7 @@
     "@angular/platform-browser-dynamic": "^18.1.0",
     "@angular/router": "^18.1.0",
     "@handsontable/angular": "^14.4.0",
+    "@mapbox/mapbox-gl-draw": "^1.4.3",
     "@wolf-table/table": "^0.0.1",
     "ag-grid-angular": "^32.0.2",
     "gridjs": "^6.2.0",
