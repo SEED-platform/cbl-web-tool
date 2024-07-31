@@ -213,18 +213,16 @@ def run_cbl_workflow():
 
 @app.route('/api/reverse_geocode',  methods=['POST'])
 def reverse_geocode():  
-    coords = 0      # coordinates will come from user
-
-    # generate polygon from coordinates 
-
+    coords = [[-3.70497,40.59092],[-3.71467,40.59672],[-3.71977,40.6058]]      # coordinates will come from user in the future
+    polygon = Polygon(coords)
+    centroid = polygon.centroid
 
     # calculate lat, long (center of polygon)
-    lat = 30.333472        
-    lon = -81.470448
+    lat = centroid.x       
+    lon = centroid.y
 
     # encode ubid from coordinates 
-
-
+    ubid = encode_ubid(polygon)
 
     url = f"https://api.mapbox.com/geocoding/v5/mapbox.places/{lon},{lat}.json"
     params = {
@@ -239,6 +237,7 @@ def reverse_geocode():
     result = response.json()
     properties = {}
     try:
+        properties["ubid"] = ubid
         data = result["features"][0]["place_name"]
         data = data.split(",")
         properties["street_address"] = data[0]
