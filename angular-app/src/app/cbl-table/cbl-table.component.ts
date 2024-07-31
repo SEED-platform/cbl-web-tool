@@ -30,6 +30,7 @@ export class CblTableComponent implements OnInit {
   public rowData: any[] = []; 
   private geoJsonSubscription: Subscription | undefined;
   private clickEventSubscription: Subscription | undefined;
+  private isEditing: boolean = false;
 
   defaultColDef = {
     flex: 1,
@@ -43,6 +44,7 @@ export class CblTableComponent implements OnInit {
   
 
   ngOnInit(): void {
+    
       this.geoJsonSubscription = this.geoJsonService.getGeoJson().subscribe(data => {
       this.geoJson = data;
       this.updateTable();
@@ -169,6 +171,22 @@ export class CblTableComponent implements OnInit {
       console.log(latitude)
       this.geoJsonService.emitSelectedFeature(latitude, longitude);
     }
+
+  }
+
+  onCellEditingStarted(event: any) {
+    this.isEditing = true;
+  }
+  
+  // Event handler for editing stop
+  onCellEditingStopped(event: any) {
+    this.isEditing = false;
+  }
+
+  handleDelete() {
+      const selectedData = this.gridApi.getSelectedRows();
+      const res = this.gridApi.applyTransaction({ remove: selectedData })!;
+      console.log(res);
   }
 
 }
