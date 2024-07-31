@@ -29,6 +29,7 @@
               "src/assets/nrel.ico"
             ],
             "styles": [
+              "node_modules/mapbox-gl/dist/mapbox-gl.css",
               "src/styles.css"
             ],
             "scripts": []

@@ -1,9 +1,11 @@
-import { Component, ChangeDetectorRef, OnInit, OnDestroy } from '@angular/core';
+import { Component, ChangeDetectorRef, OnInit, OnDestroy,ViewEncapsulation } from '@angular/core';
 import { GeoJsonService } from '../services/geojson.service';
 import * as mapboxgl from 'mapbox-gl';
+import MapboxDraw from "@mapbox/mapbox-gl-draw";
 import { CommonModule } from '@angular/common';
 import { environment } from '../../environments/environment';
 import { Subscription } from 'rxjs';
+
 
 @Component({
   selector: 'app-mapbox-map',
@@ -85,7 +87,7 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
     this.map.on('load', () => {
       if (!this.map) return; // if map not initialized, exit load
 
-      if (geoJsonObject.features.length > 0){
+  
       this.map.addSource('features', {
         type: 'geojson',
         data: geoJsonObject
@@ -98,14 +100,14 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
         source: 'features',
         paint: {
           'fill-color': '#0B5E90',
-          'fill-opacity': 0.8
+          'fill-opacity': 0.6
         }
       });
 
       this.map.on('click', 'features', (e) => {
         if (e.features && e.features.length > 0) {
-          const longitude = e.features[0].properties.longitude;
-          const latitude = e.features[0].properties.latitude;
+          const longitude = e.features[0]?.properties?.['longitude'];
+          const latitude = e.features[0]?.properties?.['latitude'];
           if (this.map) {
             this.map.flyTo({
               center: new mapboxgl.LngLat(longitude, latitude),
@@ -115,10 +117,33 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
           }
         }
       });
-    }
+
+      const draw = new MapboxDraw({
+        displayControlsDefault: false,
+        controls: {
+          polygon: true,
+          trash: true
+        },
+      });
+      this.map.addControl(draw, 'top-right');
+  
+      // Optional: Add event listeners for drawing and editing polygons
+      this.map.on('draw.create', this.handleDrawEvent.bind(this));
+      this.map.on('draw.delete', this.handleDrawEvent.bind(this));
+      this.map.on('draw.update', this.handleDrawEvent.bind(this));
+      
     });
+
+  
   }
   }
+
+
+  handleDrawEvent(e: any) {
+    console.log('Draw event:', e);
+    // Handle the draw event if needed
+  }
+
 
   flyToCoordinates(longitude: number, latitude: number) {
     if (this.map) {
