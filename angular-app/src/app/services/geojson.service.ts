@@ -13,6 +13,11 @@ export class GeoJsonService {
   private selectedFeatureSubject = new BehaviorSubject<{ latitude: number, longitude: number } | null>(null);
   public selectedFeature$: Observable<{ latitude: number, longitude: number } | null> = this.selectedFeatureSubject.asObservable();
 
+  private mapCoordinatesSubject = new BehaviorSubject<{ latitude: number, longitude: number } | null>(null);
+  public mapCoordinates$: Observable<{ latitude: number, longitude: number } | null> = this.mapCoordinatesSubject.asObservable();
+
+
+
   constructor() { }
 
   private getGeoJsonFromSessionStorage(): any {
@@ -39,19 +44,18 @@ export class GeoJsonService {
 
 
     const currentGeoJson = this.geoJsonSubject.getValue();
-    console.log(currentGeoJson)
+    console.log("b4r",currentGeoJson)
 
     const updatedGeoJson = currentGeoJson.features.filter((feature: any) => {
       return feature.properties.latitude !== latitude || feature.properties.longitude !== longitude;
     });
    
     currentGeoJson.features = updatedGeoJson;
+    console.log("aftr", currentGeoJson)
     this.geoJsonSubject.next(currentGeoJson);
-   
+    this.setGeoJson(currentGeoJson);
+    this.mapCoordinatesSubject.next({latitude, longitude});
   }
-
-
-
 
   emitClickEvent(latitude: number, longitude: number): void {
     this.clickEventSubject.next({ latitude, longitude });
@@ -59,5 +63,9 @@ export class GeoJsonService {
   
   emitSelectedFeature(latitude: number, longitude: number): void {
     this.selectedFeatureSubject.next({ latitude, longitude });
+  }
+
+  setMapCoordinates(latitude: number, longitude:number): void{
+    this.mapCoordinatesSubject.next({latitude, longitude});
   }
 }

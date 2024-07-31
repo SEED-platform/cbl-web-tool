@@ -1,33 +1,30 @@
-import { Component, ChangeDetectorRef, OnInit} from '@angular/core';
+import { Component, ChangeDetectorRef, OnInit, OnDestroy } from '@angular/core';
 import { GeoJsonService } from '../services/geojson.service';
 import * as mapboxgl from 'mapbox-gl';
-import { CommonModule } from '@angular/common'; 
-import { environment } from '../../environments/environment';  // Import environment
-import { Subscription } from 'rxjs';  // Import Subscription
-
-
+import { CommonModule } from '@angular/common';
+import { environment } from '../../environments/environment';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-mapbox-map',
   standalone: true,
   imports: [CommonModule],
   templateUrl: './mapbox-map.component.html',
-  styleUrl: './mapbox-map.component.css'
+  styleUrls: ['./mapbox-map.component.css']
 })
-
-
-export class MapboxMapComponent implements OnInit {
+export class MapboxMapComponent implements OnInit, OnDestroy {
   map: mapboxgl.Map | undefined;
   style = 'mapbox://styles/mapbox/streets-v11';
   lat: number = 30.2672;
   lng: number = -97.7431;
-  buildingArray: any[] =[];
+  buildingArray: any[] = [];
+  private zoomLevel: number = 15;
   private geoJsonSubscription: Subscription | undefined;
   private featureClickSubscription: Subscription | undefined;
+  private mapCoordinatesSubscription: Subscription | undefined;
 
   constructor(private cdr: ChangeDetectorRef, private geoJsonService: GeoJsonService) {}
 
-  
   ngOnInit() {
     this.geoJsonSubscription = this.geoJsonService.getGeoJson().subscribe(geoJsonObject => {
       this.initializeMapWithGeoJson(geoJsonObject);
@@ -38,15 +35,19 @@ export class MapboxMapComponent implements OnInit {
         this.flyToCoordinates(feature.longitude, feature.latitude);
       }
     });
+
+    this.mapCoordinatesSubscription = this.geoJsonService.mapCoordinates$.subscribe(feature => {
+      if (feature) {
+        this.updateZoomLevelForDeletion();
+        this.setMapCenterAndZoom(feature.longitude, feature.latitude); // Update map view based on new coordinates
+      }
+    });
   }
 
   ngOnDestroy() {
-    if (this.geoJsonSubscription) {
-      this.geoJsonSubscription.unsubscribe();
-    }
-    if (this.featureClickSubscription) {
-      this.featureClickSubscription.unsubscribe();
-    }
+    this.geoJsonSubscription?.unsubscribe();
+    this.featureClickSubscription?.unsubscribe();
+    this.mapCoordinatesSubscription?.unsubscribe();
   }
 
   initializeMapWithGeoJson(geoJsonObject: any) {
@@ -55,34 +56,33 @@ export class MapboxMapComponent implements OnInit {
       return;
     }
 
-     
+    this.buildingArray = geoJsonObject.features;
+    this.cdr.detectChanges();
+    const firstBuilding = this.buildingArray[0];
+    const firstBuildingLongitude = firstBuilding.properties.longitude;
+    const firstBuildingLatitude = firstBuilding.properties.latitude;
+    this.geoJsonService.setMapCoordinates(firstBuildingLatitude, firstBuildingLongitude);
+
+    this.map = new mapboxgl.Map({
+      accessToken: environment.mapboxToken,
+      container: 'map', // map is id of div in html
+      style: this.style,
+      attributionControl: false,
+      zoom: this.zoomLevel,
+      center: [firstBuildingLongitude, firstBuildingLatitude] // [longitude, latitude]
+    });
 
     
-      this.buildingArray = geoJsonObject.features;
-      this.cdr.detectChanges();
-      const firstBuildingLongitude = this.buildingArray[0].properties.longitude;
-      const firstBuildingLatitude = this.buildingArray[0].properties.latitude;
-      const firstBuildingCoordinates = new mapboxgl.LngLat(firstBuildingLongitude, firstBuildingLatitude);
-     
-      this.map = new mapboxgl.Map({
-        accessToken: environment.mapboxToken,
-        container: 'map', // map is id of div in html
-        style: this.style,
-        attributionControl: false,
-        zoom: 15,
-        center: firstBuildingCoordinates
-      });
-  
-     
-      this.map.on('load', () => {
 
-      if (!this.map) return; //if map not intialized exit load
+    this.map.on('load', () => {
+      if (!this.map) return; // if map not initialized, exit load
 
+    
       this.map.addSource('features', {
         type: 'geojson',
         data: geoJsonObject
       });
-  
+
       this.map.addLayer({
         id: 'features',
         type: 'fill',
@@ -95,31 +95,40 @@ export class MapboxMapComponent implements OnInit {
 
       this.map.on('click', 'features', (e) => {
         if (e.features && e.features.length > 0) {
-       
-            const longitude =  e.features[0].properties.longitude;
-            const latitude = e.features[0].properties.latitude;
-            if (this.map) {
-                // Fly to the clicked feature's coordinates
-                this.map.flyTo({
-                    center: new mapboxgl.LngLat(longitude,latitude),
-                    zoom: 17.5 // Optionally adjust zoom level when flying to the feature
-                });
-                this.geoJsonService.emitClickEvent(latitude, longitude);
-            }
+          const longitude = e.features[0].properties.longitude;
+          const latitude = e.features[0].properties.latitude;
+          if (this.map) {
+            this.map.flyTo({
+              center: new mapboxgl.LngLat(longitude, latitude),
+              zoom: 17.5
+            });
+            this.geoJsonService.emitClickEvent(latitude, longitude);
+          }
         }
+      });
     });
-      });   
   }
-  
 
-  flyToCoordinates(clickedBuildingLong: number, clickedBuildingLat: number) {
-     console.log(clickedBuildingLat);
+  flyToCoordinates(longitude: number, latitude: number) {
     if (this.map) {
-       this.map.flyTo({
-        center:  new mapboxgl.LngLat(clickedBuildingLong, clickedBuildingLat),
-        zoom:17.5,
-        essential: true 
-       });
+      this.map.flyTo({
+        center: new mapboxgl.LngLat(longitude, latitude),
+        zoom: this.zoomLevel,
+        essential: true
+      });
+    }
+  }
+
+
+  updateZoomLevelForDeletion(): void {
+    this.zoomLevel = 17.5; // Set zoom level to 17.5 on feature deletion
+  }
+
+  setMapCenterAndZoom(longitude: number, latitude: number) {
+    if (this.map) {
+      // Set map center and zoom level directly
+      this.map.setCenter([longitude, latitude]);
+      this.map.setZoom(this.zoomLevel);
     }
   }
 
