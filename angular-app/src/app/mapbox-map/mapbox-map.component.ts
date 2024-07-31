@@ -5,6 +5,7 @@ import MapboxDraw from "@mapbox/mapbox-gl-draw";
 import { CommonModule } from '@angular/common';
 import { environment } from '../../environments/environment';
 import { Subscription } from 'rxjs';
+import '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css';
 
 
 @Component({
