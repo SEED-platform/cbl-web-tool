@@ -264,7 +264,7 @@ def export_geojson():
     json_string = request.json.get('value')
     geojson_data = json.loads(json_string)
 
-    list_of_geojson = []
+    list_of_features = []
     
     for data in geojson_data:
         coords = data['coordinates'].split(',')
@@ -272,23 +272,20 @@ def export_geojson():
         properties = data
         properties.pop('coordinates', None)
 
-        geojson = {
-            "type": "FeatureCollection",
-            "features": [
-                {
-                    "type": "Feature",
-                    "properties": properties,
-                    "geometry": {
-                        "type": "Polygon",
-                        "coordinates": [coords]
-                    }
-                }
-            ]
-        }
-        list_of_geojson.append(geojson)
+        feature = {}
+        feature["type"] = "Feature"
+        feature["properties"] = properties
+        feature["geometry"] = {}
+        feature["geometry"]["type"] = "Polygon"
+        feature["geometry"]["coordinates"] = [coords]
+        list_of_features.append(feature)
 
-    print(list_of_geojson)
-    final_geojson = json.dumps(list_of_geojson)
+    geojson = {
+            "type": "FeatureCollection",
+            "features": list_of_features
+            }
+
+    final_geojson = json.dumps(geojson)
     return jsonify({"message": "success", "user_data": final_geojson}), 200
 
 if __name__ == '__main__':
