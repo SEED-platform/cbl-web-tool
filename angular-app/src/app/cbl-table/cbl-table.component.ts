@@ -80,10 +80,12 @@ export class CblTableComponent implements OnInit {
       console.error('Invalid GeoJSON data');
       return;
     }
-
+    console.log('table', this.geoJson);
+   if(this.geoJson.features.length > 0){
     this.featuresArray = this.geoJson.features;
     this.rowData = this.featuresArray;
     this.setColumnDefs();
+   }
   }
 
 
@@ -163,14 +165,14 @@ export class CblTableComponent implements OnInit {
   }
 
   onRowSelected(event: any) {
-  
+
     if (event.node.isSelected()) {
       const data = event.node.data;
       const latitude = data.properties.latitude;
       const longitude = data.properties.longitude;
       this.geoJsonService.emitSelectedFeature(latitude, longitude);
     }
-
+     
   }
 
   onCellEditingStarted(event: any) {

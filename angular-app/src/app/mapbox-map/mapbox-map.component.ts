@@ -14,7 +14,7 @@ import { Subscription } from 'rxjs';
 })
 export class MapboxMapComponent implements OnInit, OnDestroy {
   map: mapboxgl.Map | undefined;
-  style = 'mapbox://styles/mapbox/streets-v11';
+  style = 'mapbox://styles/mapbox/streets-v12';
   lat: number = 30.2672;
   lng: number = -97.7431;
   buildingArray: any[] = [];
@@ -51,10 +51,18 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
   }
 
   initializeMapWithGeoJson(geoJsonObject: any) {
-    if (!geoJsonObject || !geoJsonObject.features || geoJsonObject.features.length === 0) {
+    if (!geoJsonObject || geoJsonObject.features.length === 1 && geoJsonObject.features[0].properties["street_address"] === '') {
       console.error("Invalid GeoJSON data or no features found");
-      return;
-    }
+      this.map = new mapboxgl.Map({
+        accessToken: environment.mapboxToken,
+        container: 'map', // map is id of div in html
+        style: this.style,
+        attributionControl: false,
+        zoom: 4,
+        center: [-98.5795,39.8283] // [longitude, latitude]
+      });  
+
+    }else{
 
     this.buildingArray = geoJsonObject.features;
     this.cdr.detectChanges();
@@ -77,11 +85,12 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
     this.map.on('load', () => {
       if (!this.map) return; // if map not initialized, exit load
 
-    
+      if (geoJsonObject.features.length > 0){
       this.map.addSource('features', {
         type: 'geojson',
         data: geoJsonObject
       });
+
 
       this.map.addLayer({
         id: 'features',
@@ -106,7 +115,9 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
           }
         }
       });
+    }
     });
+  }
   }
 
   flyToCoordinates(longitude: number, latitude: number) {

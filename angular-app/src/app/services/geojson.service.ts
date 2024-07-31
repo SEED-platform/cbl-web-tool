@@ -44,14 +44,27 @@ export class GeoJsonService {
 
 
     const currentGeoJson = this.geoJsonSubject.getValue();
-    console.log("b4r",currentGeoJson)
-
-    const updatedGeoJson = currentGeoJson.features.filter((feature: any) => {
+    let updatedGeoJson: any;
+    
+    if(currentGeoJson.features.length === 1){
+       updatedGeoJson = currentGeoJson.features.map((feature: any) => {
+        const updatedProperties = Object.keys(feature.properties).reduce((acc: any, key: string) => {
+          acc[key] = ''; // Set each property to an empty string
+          return acc;
+        }, {});
+       return {
+        ...updatedGeoJson,
+        properties: updatedProperties
+       }
+    });
+    }else{
+       updatedGeoJson = currentGeoJson.features.filter((feature: any) => {
       return feature.properties.latitude !== latitude || feature.properties.longitude !== longitude;
     });
+    }
    
     currentGeoJson.features = updatedGeoJson;
-    console.log("aftr", currentGeoJson)
+  
     this.geoJsonSubject.next(currentGeoJson);
     this.setGeoJson(currentGeoJson);
     this.mapCoordinatesSubject.next({latitude, longitude});
