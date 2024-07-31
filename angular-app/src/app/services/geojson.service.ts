@@ -29,6 +29,30 @@ export class GeoJsonService {
     return this.geoJsonSubject.asObservable();
   }
 
+  updateGeoJsonFromMap(mapRemovedObject: any): void{
+
+    if (!mapRemovedObject || mapRemovedObject.properties.latitude === undefined || mapRemovedObject.properties.longitude === undefined) {
+      console.error('Invalid object to remove');
+      return;
+    }
+    const { latitude, longitude } = mapRemovedObject.properties;
+
+
+    const currentGeoJson = this.geoJsonSubject.getValue();
+    console.log(currentGeoJson)
+
+    const updatedGeoJson = currentGeoJson.features.filter((feature: any) => {
+      return feature.properties.latitude !== latitude || feature.properties.longitude !== longitude;
+    });
+   
+    currentGeoJson.features = updatedGeoJson;
+    this.geoJsonSubject.next(currentGeoJson);
+   
+  }
+
+
+
+
   emitClickEvent(latitude: number, longitude: number): void {
     this.clickEventSubject.next({ latitude, longitude });
   }

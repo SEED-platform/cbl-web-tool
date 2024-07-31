@@ -168,7 +168,6 @@ export class CblTableComponent implements OnInit {
       const data = event.node.data;
       const latitude = data.properties.latitude;
       const longitude = data.properties.longitude;
-      console.log(latitude)
       this.geoJsonService.emitSelectedFeature(latitude, longitude);
     }
 
@@ -186,7 +185,8 @@ export class CblTableComponent implements OnInit {
   handleDelete() {
       const selectedData = this.gridApi.getSelectedRows();
       const res = this.gridApi.applyTransaction({ remove: selectedData })!;
-      console.log(res);
+      this.geoJsonService.updateGeoJsonFromMap(res.remove[0].data);
+
   }
 
 }
