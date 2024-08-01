@@ -81,4 +81,8 @@ export class GeoJsonService {
   setMapCoordinates(latitude: number, longitude:number): void{
     this.mapCoordinatesSubject.next({latitude, longitude});
   }
+
+  getCurrentCoordinates(): { latitude: number, longitude: number } | null {
+    return this.mapCoordinatesSubject.getValue();
+  }
 }
