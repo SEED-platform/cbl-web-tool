@@ -30,6 +30,7 @@ export class CblTableComponent implements OnInit {
   public rowData: any[] = []; 
   private geoJsonSubscription: Subscription | undefined;
   private clickEventSubscription: Subscription | undefined;
+  private newBuilingSubscription: Subscription | undefined;
   private isEditing: boolean = false;
 
   defaultColDef = {
@@ -56,6 +57,14 @@ export class CblTableComponent implements OnInit {
         this.scrollToFeature(clickEvent.latitude, clickEvent.longitude);
       }
     });
+
+    this.newBuilingSubscription = this.geoJsonService.newBulding$.subscribe(newBuilding => {
+      if (newBuilding){
+         this.gridApi.applyTransaction({ add: [newBuilding], addIndex: 0 });
+         console.log(newBuilding);
+         this.geoJsonService.insertNewBuildingInGeoJson(newBuilding);
+      }
+    })
   }
 
   ngOnDestroy(): void {
@@ -76,6 +85,7 @@ export class CblTableComponent implements OnInit {
   
  
   updateTable() {
+   
     if (!this.geoJson || !this.geoJson.features) {
       console.error('Invalid GeoJSON data');
       return;
@@ -188,7 +198,6 @@ export class CblTableComponent implements OnInit {
       const selectedData = this.gridApi.getSelectedRows();
       const res = this.gridApi.applyTransaction({ remove: selectedData })!;
       this.geoJsonService.updateGeoJsonFromMap(res.remove[0].data);
-
   }
 
 }

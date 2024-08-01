@@ -1,9 +1,22 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 
+interface GeoJsonFeature {
+  type: 'Feature';
+  geometry: {
+    type: string;
+    coordinates: any[]; // Adjust based on the expected coordinate structure
+  };
+  properties: {
+    [key: string]: any; // Allows for any property
+  };
+}
+
 @Injectable({
   providedIn: 'root'
 })
+
+
 export class GeoJsonService {
   private geoJsonSubject: BehaviorSubject<any> = new BehaviorSubject<any>(this.getGeoJsonFromSessionStorage());
 
@@ -15,6 +28,10 @@ export class GeoJsonService {
 
   private mapCoordinatesSubject = new BehaviorSubject<{ latitude: number, longitude: number } | null>(null);
   public mapCoordinates$: Observable<{ latitude: number, longitude: number } | null> = this.mapCoordinatesSubject.asObservable();
+
+  private newBulidingSubject = new BehaviorSubject<GeoJsonFeature | null>(null);
+  public newBulding$: Observable<GeoJsonFeature | null> = this.newBulidingSubject.asObservable();
+
 
 
 
@@ -70,6 +87,18 @@ export class GeoJsonService {
     this.mapCoordinatesSubject.next({latitude, longitude});
   }
 
+  insertNewBuildingInTable(buildingObject: GeoJsonFeature): void {
+    console.log('Emitting new building:', buildingObject);
+    this.newBulidingSubject.next(buildingObject);
+  }
+
+  insertNewBuildingInGeoJson(buildingObject: GeoJsonFeature): void{
+    const currentGeoJson = this.geoJsonSubject.getValue();
+    currentGeoJson.features.unshift(buildingObject);
+    this.setGeoJson(currentGeoJson);
+  
+  }
+
   emitClickEvent(latitude: number, longitude: number): void {
     this.clickEventSubject.next({ latitude, longitude });
   }
@@ -85,4 +114,6 @@ export class GeoJsonService {
   getCurrentCoordinates(): { latitude: number, longitude: number } | null {
     return this.mapCoordinatesSubject.getValue();
   }
+
+
 }
