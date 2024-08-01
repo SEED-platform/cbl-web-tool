@@ -251,7 +251,7 @@ def reverse_geocode():
         features = result["features"]
         context = features[0]["context"]
         for item in context:
-            if "locality" in item["id"]:
+            if "place" in item["id"]:
                 properties["city"] = item["text"]
             if "region" in item["id"]:
                 properties["state"] = item["text"]
@@ -277,6 +277,7 @@ def reverse_geocode():
                     }
                 }
     
+    print(returned_feature)
     return jsonify({"message": "success", "user_data": json.dumps(returned_feature)}), 200
 
 
