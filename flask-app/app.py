@@ -213,13 +213,21 @@ def run_cbl_workflow():
 
 @app.route('/api/reverse_geocode',  methods=['POST'])
 def reverse_geocode():  
-    coords = [[-3.70497,40.59092],[-3.71467,40.59672],[-3.71977,40.6058]]      # coordinates will come from user in the future
+    json_string = request.json.get('value')
+    json_data = json.loads(json_string)
+
+    coords = json_data["coordinates"]   
+    coords = coords[:-1]   
+    properties = {}
+    for key in json_data["propertyNames"]:
+        properties[key] = " "
+
     polygon = Polygon(coords)
     centroid = polygon.centroid
 
     # calculate lat, long (center of polygon)
-    lat = centroid.x       
-    lon = centroid.y
+    lat = centroid.y       
+    lon = centroid.x
 
     # encode ubid from coordinates 
     ubid = encode_ubid(polygon)
@@ -235,15 +243,17 @@ def reverse_geocode():
         return jsonify({"message": "Error: Could not reverse geocode using the mapbox API."}), 400
     
     result = response.json()
-    properties = {}
+    print(result)
     try:
         properties["ubid"] = ubid
+        properties["latitude"] = lat
+        properties["longitude"] = lon
         data = result["features"][0]["place_name"]
         data = data.split(",")
         properties["street_address"] = data[0]
         properties["city"] = data[1]
         properties["state"] = data[2].split(" ")[0]
-        properties["postal_code"] = data[2].split(" ")[1]
+        properties["postal_code"] = data[2].split(" ")[-1]
         properties["country"] = data[3]
     except Exception:
         print("missing data from reverse geocoding")
@@ -259,11 +269,13 @@ def reverse_geocode():
                     "properties": properties,
                     "geometry": {
                         "type": "Polygon",
-                        "coordinates": [coords]
+                        "coordinates": coords
                     }
                 }
             ]
         }
+    
+    print(geojson)
     return jsonify({"message": "success", "user_data": geojson}), 200
 
 
@@ -292,7 +304,7 @@ def export_geojson():
             "type": "FeatureCollection",
             "features": list_of_features
             }
-
+    
     final_geojson = json.dumps(geojson)
     return jsonify({"message": "success", "user_data": final_geojson}), 200
 
