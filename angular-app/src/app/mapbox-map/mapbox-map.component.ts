@@ -60,15 +60,28 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
 
   initializeMapWithGeoJson(geoJsonObject: any) {
     console.log(geoJsonObject);
+
+    let emptyLat: number = 0;
+    let emptyLong: number = 0;
     if (!geoJsonObject || geoJsonObject.features.length === 1 && geoJsonObject.features[0].properties["street_address"] === '') {
       console.error("Invalid GeoJSON data or no features found");
+
+      const coords = this.geoJsonService.getCurrentCoordinates();
+      if (coords) {
+        emptyLong= coords.longitude;
+        emptyLat = coords.latitude;
+      }else {
+      emptyLat = -98.5795; // Default longitude
+      emptyLong = 39.8283;  // Default latitude
+      }
+
       this.map = new mapboxgl.Map({
         accessToken: environment.mapboxToken,
         container: 'map', // map is id of div in html
         style: this.style,
         attributionControl: false,
         zoom: 4,
-        center: [-98.5795,39.8283] // [longitude, latitude]
+        center: [emptyLong, emptyLat] // [longitude, latitude]
       });  
       this.addDrawFeatures(this.map, geoJsonObject);
       return;
