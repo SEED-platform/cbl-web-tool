@@ -238,8 +238,9 @@ def reverse_geocode():
         'access_token': "pk.eyJ1Ijoicm1pYW4tbnJlbCIsImEiOiJjbHlvc2lkNm8wbG1uMmlwcHR1aDZlMTR0In0.dZtyvX6DjlnEF8FVL7FV4Q",  
         'limit': 1  
     }
-
-    response = requests.get(url, params=params)
+    
+    #TODO: remove verify 
+    response = requests.get(url, params=params, verify=False)
     if response.status_code == 403 or response.status_code == 401:
         return jsonify({"message": "Error: Could not reverse geocode using the mapbox API."}), 400
     
@@ -289,7 +290,6 @@ def reverse_geocode():
 def export_geojson():
     json_string = request.json.get('value')
     geojson_data = json.loads(json_string)
-
     list_of_features = []
     
     for data in geojson_data:

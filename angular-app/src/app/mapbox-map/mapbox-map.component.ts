@@ -69,7 +69,9 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
         zoom: 4,
         center: [-98.5795,39.8283] // [longitude, latitude]
       });  
+      this.addDrawFeatures(this.map);
       return;
+      
     }
 
    
@@ -135,32 +137,48 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
           if (this.map) {
             this.map.flyTo({
               center: new mapboxgl.LngLat(longitude, latitude),
-              zoom: 17.5
+              zoom: 17.25
             });
             this.geoJsonService.emitClickEvent(latitude, longitude);
           }
         }
       });
-
-      const draw = new MapboxDraw({
-        displayControlsDefault: false,
-        controls: {
-          polygon: true,
-          trash: true
-        },
-      });
-      this.map.addControl(draw, 'top-right');
+         
+      this.addDrawFeatures(this.map)
+      // const draw = new MapboxDraw({
+      //   displayControlsDefault: false,
+      //   controls: {
+      //     polygon: true,
+      //     trash: true
+      //   },
+      // });
+      // this.map.addControl(draw, 'top-right');
   
-      // Optional: Add event listeners for drawing and editing polygons
-      this.map.on('draw.create', (e) => this.handleDrawEvent(e, draw));
-      this.map.on('draw.delete', (e) => this.handleDrawEvent(e, draw));
-      this.map.on('draw.update', (e) => this.handleDrawEvent(e, draw));
+      // // Optional: Add event listeners for drawing and editing polygons
+      // this.map.on('draw.create', (e) => this.handleDrawEvent(e, draw));
+    
     });
 
   
   
   }
 
+
+
+    
+   addDrawFeatures(map: mapboxgl.Map){
+    const draw = new MapboxDraw({
+      displayControlsDefault: false,
+      controls: {
+        polygon: true,
+        trash: true
+      },
+    });
+    map.addControl(draw, 'top-right');
+
+    // Optional: Add event listeners for drawing and editing polygons
+    map.on('draw.create', (e) => this.handleDrawEvent(e, draw));
+   }
 
   handleDrawEvent(e: any, draw: any) {
     console.log('Draw event:', e);
@@ -177,11 +195,12 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
         console.log(response.message); // Handle successful response
         this.newGeoJson = JSON.parse(response.user_data)
         console.log(this.newGeoJson);
-    },
-    (errorResponse) => {
+        this.geoJsonService.insertNewBuildingInTable(this.newGeoJson);
+      },
+      (errorResponse) => {
         console.error(errorResponse.error.message); // Handle error response
-    });
-    
+      });
+
   }
 
 
@@ -197,7 +216,7 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
 
 
   updateZoomLevelForDeletion(): void {
-    this.zoomLevel = 17.5; // Set zoom level to 17.5 on feature deletion
+    this.zoomLevel = 17.25; 
   }
 
   setMapCenterAndZoom(longitude: number, latitude: number) {
