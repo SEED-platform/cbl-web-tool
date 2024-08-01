@@ -17,13 +17,13 @@ from shapely.geometry import Point, Polygon
 
 from utils.common import Location
 from utils.location_error import LocationError
+from utils.normalize_state import normalize_state
 from utils.check_data_quality import check_data_quality
 from utils.generate_locations_list import generate_locations_list
 from utils.convert_file_to_dicts import convert_file_to_dicts
 from utils.merge_dicts import merge_dicts
-from utils.geocode_addresses import geocode_addresses
 from utils.normalize_address import normalize_address
-from utils.ubid import bounding_box, centroid, encode_ubid
+from utils.ubid import encode_ubid
 from utils.update_dataset_links import update_dataset_links
 from utils.update_quadkeys import update_quadkeys
 
@@ -253,15 +253,18 @@ def reverse_geocode():
         for item in context:
             if "place" in item["id"]:
                 properties["city"] = item["text"]
+
             if "region" in item["id"]:
-                properties["state"] = item["text"]
+                state_name = item["text"]
+                properties["state"] = normalize_state(state_name)
+
             if "postcode" in item["id"]:
                 properties["postal_code"] = item["text"]
+
             if "country" in item["id"]:
                 properties["country"] = item["text"]
 
         properties["street_address"] = normalize_address(features[0]["place_name"])
-
     except Exception:
         print("missing data from reverse geocoding")
 
