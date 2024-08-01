@@ -207,7 +207,7 @@ def run_cbl_workflow():
     # Convert covered building list as GeoJSON
     gdf = gpd.GeoDataFrame(data=merged_data, columns=columns)
     final_geojson = gdf.to_json()
-    
+    print(final_geojson)
     return jsonify({"message": "success", "user_data": final_geojson}), 200
 
 
@@ -221,7 +221,7 @@ def reverse_geocode():
     properties = {}
     for key in json_data["propertyNames"]:
         properties[key] = " "
-    newId = json_data["id"]
+    newId = str(json_data["featuresLength"])
 
     polygon = Polygon(coords)
     centroid = polygon.centroid

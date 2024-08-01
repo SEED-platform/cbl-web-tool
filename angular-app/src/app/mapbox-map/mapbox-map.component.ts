@@ -59,6 +59,7 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
   }
 
   initializeMapWithGeoJson(geoJsonObject: any) {
+    console.log(geoJsonObject);
     if (!geoJsonObject || geoJsonObject.features.length === 1 && geoJsonObject.features[0].properties["street_address"] === '') {
       console.error("Invalid GeoJSON data or no features found");
       this.map = new mapboxgl.Map({
@@ -69,7 +70,7 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
         zoom: 4,
         center: [-98.5795,39.8283] // [longitude, latitude]
       });  
-      this.addDrawFeatures(this.map);
+      this.addDrawFeatures(this.map, geoJsonObject);
       return;
       
     }
@@ -144,19 +145,7 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
         }
       });
          
-      this.addDrawFeatures(this.map)
-      // const draw = new MapboxDraw({
-      //   displayControlsDefault: false,
-      //   controls: {
-      //     polygon: true,
-      //     trash: true
-      //   },
-      // });
-      // this.map.addControl(draw, 'top-right');
-  
-      // // Optional: Add event listeners for drawing and editing polygons
-      // this.map.on('draw.create', (e) => this.handleDrawEvent(e, draw));
-    
+      this.addDrawFeatures(this.map, geoJsonObject)
     });
 
   
@@ -166,7 +155,7 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
 
 
     
-   addDrawFeatures(map: mapboxgl.Map){
+   addDrawFeatures(map: mapboxgl.Map, geoJsonObject: any){
     const draw = new MapboxDraw({
       displayControlsDefault: false,
       controls: {
@@ -177,16 +166,17 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
     map.addControl(draw, 'top-right');
 
     // Optional: Add event listeners for drawing and editing polygons
-    map.on('draw.create', (e) => this.handleDrawEvent(e, draw));
+    map.on('draw.create', (e) => this.handleDrawEvent(e, draw, geoJsonObject));
    }
 
-  handleDrawEvent(e: any, draw: any) {
+  handleDrawEvent(e: any, draw: any, geoJsonObject: any) {
     console.log('Draw event:', e);
     console.log(draw.getAll().features[0].geometry.coordinates[0])
     console.log(this.geoJsonPropertyNames)
     const jsonData = {
       "coordinates": draw.getAll().features[0].geometry.coordinates[0],
-      "propertyNames": this.geoJsonPropertyNames
+      "propertyNames": this.geoJsonPropertyNames,
+      "featuresLength": geoJsonObject.features.length
     }
 
     const jsonDataString = JSON.stringify(jsonData);
@@ -202,6 +192,8 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
       });
 
   }
+
+
 
 
   flyToCoordinates(longitude: number, latitude: number) {
