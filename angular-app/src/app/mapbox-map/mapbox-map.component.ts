@@ -1,8 +1,9 @@
 import { Component, ChangeDetectorRef, OnInit, OnDestroy,ViewEncapsulation } from '@angular/core';
 import { GeoJsonService } from '../services/geojson.service';
+import { FlaskRequests } from '../services/server.service';
 import * as mapboxgl from 'mapbox-gl';
 import MapboxDraw from "@mapbox/mapbox-gl-draw";
-import { CommonModule } from '@angular/common';
+import { CommonModule, JsonPipe } from '@angular/common';
 import { environment } from '../../environments/environment';
 import { Subscription } from 'rxjs';
 import '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css';
@@ -25,8 +26,11 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
   private geoJsonSubscription: Subscription | undefined;
   private featureClickSubscription: Subscription | undefined;
   private mapCoordinatesSubscription: Subscription | undefined;
+  private contextMenu: HTMLElement | undefined;
+  private geoJsonPropertyNames: any;
+  private newGeoJson: any;
 
-  constructor(private cdr: ChangeDetectorRef, private geoJsonService: GeoJsonService) {}
+  constructor(private cdr: ChangeDetectorRef, private geoJsonService: GeoJsonService, private apiHandler: FlaskRequests) {}
 
   ngOnInit() {
     this.geoJsonSubscription = this.geoJsonService.getGeoJson().subscribe(geoJsonObject => {
@@ -66,7 +70,7 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
       });  
 
     }else{
-
+    this.geoJsonPropertyNames = Object.keys(geoJsonObject.features[0].properties);
     this.buildingArray = geoJsonObject.features;
     this.cdr.detectChanges();
     const firstBuilding = this.buildingArray[0];
@@ -129,10 +133,9 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
       this.map.addControl(draw, 'top-right');
   
       // Optional: Add event listeners for drawing and editing polygons
-      this.map.on('draw.create', this.handleDrawEvent.bind(this));
-      this.map.on('draw.delete', this.handleDrawEvent.bind(this));
-      this.map.on('draw.update', this.handleDrawEvent.bind(this));
-      
+      this.map.on('draw.create', (e) => this.handleDrawEvent(e, draw));
+      this.map.on('draw.delete', (e) => this.handleDrawEvent(e, draw));
+      this.map.on('draw.update', (e) => this.handleDrawEvent(e, draw));
     });
 
   
@@ -140,9 +143,26 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
   }
 
 
-  handleDrawEvent(e: any) {
+  handleDrawEvent(e: any, draw: any) {
     console.log('Draw event:', e);
-    // Handle the draw event if needed
+    console.log(draw.getAll().features[0].geometry.coordinates[0])
+    console.log(this.geoJsonPropertyNames)
+    const jsonData = {
+      "coordinates": draw.getAll().features[0].geometry.coordinates[0],
+      "propertyNames": this.geoJsonPropertyNames
+    }
+
+    const jsonDataString = JSON.stringify(jsonData);
+    this.apiHandler.sendReverseGeoCodeData(jsonDataString).subscribe(
+      (response) => {
+        console.log(response.message); // Handle successful response
+        this.newGeoJson = JSON.parse(response.user_data)
+        console.log(this.newGeoJson);
+    },
+    (errorResponse) => {
+        console.error(errorResponse.error.message); // Handle error response
+    });
+    
   }
 
 

@@ -35,4 +35,9 @@ export class FlaskRequests {
   return this.http.post<any>('http://127.0.0.1:5001/api/export_geojson', { value: jsonString }, // Send JSON object with 'value' key
     { headers: { 'Content-Type': 'application/json'}});
   }
+
+  sendReverseGeoCodeData(jsonString: string): Observable<any> {
+    return this.http.post<any>('http://127.0.0.1:5001/api/reverse_geocode', { value: jsonString }, // Send JSON object with 'value' key
+      { headers: { 'Content-Type': 'application/json'}});
+    }
 }
