@@ -9,7 +9,6 @@ from pathlib import Path
 from typing import Any
 import warnings
 import requests
-import pyap
 
 import geopandas as gpd
 import mercantile
@@ -269,10 +268,7 @@ def reverse_geocode():
     if not properties or len(properties) == 0:
         return jsonify({"message": "Error: Reverse geocoding returned poor data."}), 400
     
-    geojson = {
-            "type": "FeatureCollection",
-            "features": [
-                {
+    returned_feature = {
                     "type": "Feature",
                     "properties": properties,
                     "geometry": {
@@ -280,11 +276,8 @@ def reverse_geocode():
                         "coordinates": coords
                     }
                 }
-            ]
-        }
     
-    print(geojson)
-    return jsonify({"message": "success", "user_data": geojson}), 200
+    return jsonify({"message": "success", "user_data": json.dumps(returned_feature)}), 200
 
 
 @app.route('/api/export_geojson',  methods=['POST'])
