@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import Any
 import warnings
 import requests
+import pyap
 
 import geopandas as gpd
 import mercantile
@@ -243,18 +244,25 @@ def reverse_geocode():
         return jsonify({"message": "Error: Could not reverse geocode using the mapbox API."}), 400
     
     result = response.json()
-    print(result)
     try:
         properties["ubid"] = ubid
         properties["latitude"] = lat
         properties["longitude"] = lon
-        data = result["features"][0]["place_name"]
-        data = data.split(",")
-        properties["street_address"] = data[0]
-        properties["city"] = data[1]
-        properties["state"] = data[2].split(" ")[0]
-        properties["postal_code"] = data[2].split(" ")[-1]
-        properties["country"] = data[3]
+
+        features = result["features"]
+        context = features[0]["context"]
+        for item in context:
+            if "locality" in item["id"]:
+                properties["city"] = item["text"]
+            if "region" in item["id"]:
+                properties["state"] = item["text"]
+            if "postcode" in item["id"]:
+                properties["postal_code"] = item["text"]
+            if "country" in item["id"]:
+                properties["country"] = item["text"]
+
+        properties["street_address"] = normalize_address(features[0]["place_name"])
+
     except Exception:
         print("missing data from reverse geocoding")
 
