@@ -221,6 +221,7 @@ def reverse_geocode():
     properties = {}
     for key in json_data["propertyNames"]:
         properties[key] = " "
+    newId = json_data["id"]
 
     polygon = Polygon(coords)
     centroid = polygon.centroid
@@ -247,7 +248,6 @@ def reverse_geocode():
         properties["ubid"] = ubid
         properties["latitude"] = lat
         properties["longitude"] = lon
-
         features = result["features"]
         context = features[0]["context"]
         for item in context:
@@ -264,7 +264,7 @@ def reverse_geocode():
             if "country" in item["id"]:
                 properties["country"] = item["text"]
 
-        properties["street_address"] = normalize_address(features[0]["place_name"])
+        properties["street_address"] = normalize_address(features[0]["place_name"]) 
     except Exception:
         print("missing data from reverse geocoding")
 
@@ -272,6 +272,7 @@ def reverse_geocode():
         return jsonify({"message": "Error: Reverse geocoding returned poor data."}), 400
     
     returned_feature = {
+                    "id": newId,
                     "type": "Feature",
                     "properties": properties,
                     "geometry": {
