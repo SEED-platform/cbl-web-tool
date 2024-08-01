@@ -278,7 +278,7 @@ def reverse_geocode():
                     "properties": properties,
                     "geometry": {
                         "type": "Polygon",
-                        "coordinates": coords
+                        "coordinates": [coords]
                     }
                 }
     
