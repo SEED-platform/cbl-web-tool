@@ -23,10 +23,10 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
   lng: number = -97.7431;
   buildingArray: any[] = [];
   private zoomLevel: number = 15;
+  private isFirstLoad: boolean = true;
   private geoJsonSubscription: Subscription | undefined;
   private featureClickSubscription: Subscription | undefined;
   private mapCoordinatesSubscription: Subscription | undefined;
-  private contextMenu: HTMLElement | undefined;
   private geoJsonPropertyNames: any;
   private newGeoJson: any;
 
@@ -35,6 +35,7 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.geoJsonSubscription = this.geoJsonService.getGeoJson().subscribe(geoJsonObject => {
       this.initializeMapWithGeoJson(geoJsonObject);
+      this.geoJsonPropertyNames = Object.keys(geoJsonObject.features[0].properties);
     });
 
     this.featureClickSubscription = this.geoJsonService.selectedFeature$.subscribe(feature => {
@@ -68,15 +69,33 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
         zoom: 4,
         center: [-98.5795,39.8283] // [longitude, latitude]
       });  
+      return;
+    }
 
-    }else{
-    this.geoJsonPropertyNames = Object.keys(geoJsonObject.features[0].properties);
+   
     this.buildingArray = geoJsonObject.features;
     this.cdr.detectChanges();
+
+    let firstBuildingLatitude:number;
+    let firstBuildingLongitude:number;
+
+
+    if (this.isFirstLoad){
     const firstBuilding = this.buildingArray[0];
-    const firstBuildingLongitude = firstBuilding.properties.longitude;
-    const firstBuildingLatitude = firstBuilding.properties.latitude;
+    firstBuildingLongitude = firstBuilding.properties.longitude;
+    firstBuildingLatitude = firstBuilding.properties.latitude;
     this.geoJsonService.setMapCoordinates(firstBuildingLatitude, firstBuildingLongitude);
+    this.isFirstLoad = false;
+    }else{
+      const coords = this.geoJsonService.getCurrentCoordinates();
+      if (coords) {
+      firstBuildingLongitude = coords.longitude;
+      firstBuildingLatitude = coords.latitude;
+      }else {
+      firstBuildingLongitude = -98.5795; // Default longitude
+      firstBuildingLatitude = 39.8283;  // Default latitude
+      }
+    }
 
     this.map = new mapboxgl.Map({
       accessToken: environment.mapboxToken,
@@ -139,7 +158,7 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
     });
 
   
-  }
+  
   }
 
 
