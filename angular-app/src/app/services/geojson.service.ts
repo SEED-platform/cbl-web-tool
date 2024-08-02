@@ -90,6 +90,7 @@ export class GeoJsonService {
 
   emitClickEvent(latitude: number, longitude: number): void {
     this.clickEventSubject.next({ latitude, longitude });
+    console.log(latitude)
   }
   
   emitSelectedFeature(latitude: number, longitude: number): void {

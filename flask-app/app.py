@@ -221,7 +221,7 @@ def reverse_geocode():
     json_data = json.loads(json_string)
 
     coords = json_data["coordinates"]   
-    coords = coords[:-1]   
+     
     properties = {}
     for key in json_data["propertyNames"]:
         properties[key] = " "
@@ -251,8 +251,8 @@ def reverse_geocode():
     result = response.json()
     try:
         properties["ubid"] = ubid
-        properties["latitude"] = str(truncate_float(lat,5))
-        properties["longitude"] = str(truncate_float(lon,5))
+        properties["latitude"] = lat
+        properties["longitude"] = lon
         features = result["features"]
         context = features[0]["context"]
         for item in context:

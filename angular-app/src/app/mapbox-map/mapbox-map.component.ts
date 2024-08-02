@@ -61,6 +61,8 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
   initializeMapWithGeoJson(geoJsonObject: any) {
     console.log(geoJsonObject);
 
+
+    if(!this.map){
     let emptyLat: number = 0;
     let emptyLong: number = 0;
     if (geoJsonObject.features.length === 0) {
@@ -126,43 +128,60 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
 
     this.map.on('load', () => {
       if (!this.map) return; // if map not initialized, exit load
-
-  
-      this.map.addSource('features', {
-        type: 'geojson',
-        data: geoJsonObject
-      });
-
-
-      this.map.addLayer({
-        id: 'features',
-        type: 'fill',
-        source: 'features',
-        paint: {
-          'fill-color': '#0B5E90',
-          'fill-opacity': 0.6
-        }
-      });
-
-      this.map.on('click', 'features', (e) => {
-        if (e.features && e.features.length > 0) {
-          const longitude = e.features[0]?.properties?.['longitude'];
-          const latitude = e.features[0]?.properties?.['latitude'];
-          if (this.map) {
-            this.map.flyTo({
-              center: new mapboxgl.LngLat(longitude, latitude),
-              zoom: 17.25
-            });
-            this.geoJsonService.emitClickEvent(latitude, longitude);
-          }
-        }
-      });
          
+     
+    
+      if (this.map) {
+        const source = this.map.getSource('features');
+      
+      if (source) {
+        (source as mapboxgl.GeoJSONSource).setData(geoJsonObject);
+      } else {
+        this.map.addSource('features', {
+          type: 'geojson',
+          data: geoJsonObject
+        });
+
+        this.map.addLayer({
+          id: 'features',
+          type: 'fill',
+          source: 'features',
+          paint: {
+            'fill-color': '#0B5E90',
+            'fill-opacity': 0.6
+          }
+        });
+      }
+    }    
       this.addDrawFeatures(this.map, geoJsonObject)
     });
 
+  }else{
+    this.updateSource(geoJsonObject);
+  }
+
   
+  this.map.on('click', 'features', (e) => {
+    console.log(e.features)
+    if (e.features && e.features.length > 0) {
+      const longitude = e.features[0]?.properties?.['longitude'];
+      const latitude = e.features[0]?.properties?.['latitude'];
+      if (this.map) {
+        this.map.flyTo({
+          center: new mapboxgl.LngLat(longitude, latitude),
+          zoom: 17.25
+        });
+        this.geoJsonService.emitClickEvent(latitude, longitude);
+      }
+    }
+  });
   
+  }
+
+  updateSource(geoJsonObject: any) {
+    if (this.map && this.map.getSource('features')) {
+      (this.map.getSource('features') as mapboxgl.GeoJSONSource).setData(geoJsonObject);
+    }
   }
 
 
@@ -179,12 +198,12 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
     map.addControl(draw, 'top-right');
 
     // Optional: Add event listeners for drawing and editing polygons
-    map.on('draw.create', (e) => this.handleDrawEvent(e, draw, geoJsonObject));
+    map.on('draw.create', (e) => this.handleDrawEvent(e, draw, geoJsonObject));   
    }
 
   handleDrawEvent(e: any, draw: any, geoJsonObject: any) {
     console.log('Draw event:', e);
-    console.log(draw.getAll().features[0].geometry.coordinates[0])
+  
     console.log(this.geoJsonPropertyNames)
     const jsonData = {
       "coordinates": draw.getAll().features[0].geometry.coordinates[0],
@@ -197,7 +216,6 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
       (response) => {
         console.log(response.message); // Handle successful response
         this.newGeoJson = JSON.parse(response.user_data)
-        console.log("erwr",this.newGeoJson);
         const newBuildinglongitude = this.newGeoJson.properties.longitude;
         const newBuildingLatitude = this.newGeoJson.properties.latitude;
      
