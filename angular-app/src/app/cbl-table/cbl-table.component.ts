@@ -61,7 +61,6 @@ export class CblTableComponent implements OnInit {
     this.newBuilingSubscription = this.geoJsonService.newBulding$.subscribe(newBuilding => {
       if (newBuilding){
          this.gridApi.applyTransaction({ add: [newBuilding], addIndex: 0 });
-         console.log(newBuilding);
          this.geoJsonService.insertNewBuildingInGeoJson(newBuilding);
       }
     })
@@ -90,7 +89,7 @@ export class CblTableComponent implements OnInit {
       console.error('Invalid GeoJSON data');
       return;
     }
-    console.log('table', this.geoJson);
+    
    if(this.geoJson.features.length > 0){
     this.featuresArray = this.geoJson.features;
     this.rowData = this.featuresArray;
@@ -101,31 +100,32 @@ export class CblTableComponent implements OnInit {
 
 
   setColumnDefs() {
-        if(!this.geoJson || (Object.keys(this.geoJson).length === 0 && this.geoJson.constructor === Object)){
-          return;
-        }
+     
 
         let keys:any;
-        keys = Object.keys(this.featuresArray[0].properties);     
-        
+        keys = JSON.parse(sessionStorage.getItem("GEOJSONPROPERTYNAMES")|| '[]');     
         keys.push('coordinates');      
      
       this.colDefs = keys.map((key:any) => ({
         field: key,
         headerName: key, 
         valueGetter: (params: ValueGetterParams) => {
+          if(this.geoJson.features.length > 0){
           if (key === 'coordinates') {
             return params.data.geometry?.coordinates;
           }
           return params.data.properties[key];
+        }
         },   valueSetter: (params: any) => {
+          if(this.geoJson.features.length > 0){
           if (key === 'coordinates') {
             params.data.geometry = params.data.geometry || {};
             params.data.geometry.coordinates = params.newValue;
           } else {
             params.data.properties[key] = params.newValue;
           }
-          return true;
+        }
+        return true;
         },
       }));
     sessionStorage.setItem("COL", JSON.stringify(this.colDefs));

@@ -41,7 +41,8 @@ export class GeoJsonService {
     return JSON.parse(sessionStorage.getItem("GEOJSONDATA") || '{}');
   }
 
-  setGeoJson(serverGeoJson: Object): void {
+  setGeoJson(serverGeoJson: any): void {
+    
     this.geoJsonSubject.next(serverGeoJson);
     sessionStorage.setItem("GEOJSONDATA", JSON.stringify(serverGeoJson));
     console.log("set", serverGeoJson);
@@ -63,23 +64,11 @@ export class GeoJsonService {
     const currentGeoJson = this.geoJsonSubject.getValue();
     let updatedGeoJson: any;
     
-    if(currentGeoJson.features.length === 1){
-       updatedGeoJson = currentGeoJson.features.map((feature: any) => {
-        const updatedProperties = Object.keys(feature.properties).reduce((acc: any, key: string) => {
-          acc[key] = ''; // Set each property to an empty string
-          return acc;
-        }, {});
-       return {
-        ...updatedGeoJson,
-        properties: updatedProperties
-       }
-    });
-    }else{
+    
        updatedGeoJson = currentGeoJson.features.filter((feature: any) => {
-      return feature.properties.latitude !== latitude || feature.properties.longitude !== longitude;
-    });
-    }
-   
+         return feature.properties.latitude !== latitude || feature.properties.longitude !== longitude;
+         });
+    
     currentGeoJson.features = updatedGeoJson;
   
     this.geoJsonSubject.next(currentGeoJson);

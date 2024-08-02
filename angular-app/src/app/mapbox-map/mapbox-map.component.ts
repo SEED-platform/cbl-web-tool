@@ -35,7 +35,7 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.geoJsonSubscription = this.geoJsonService.getGeoJson().subscribe(geoJsonObject => {
       this.initializeMapWithGeoJson(geoJsonObject);
-      this.geoJsonPropertyNames = Object.keys(geoJsonObject.features[0].properties);
+      this.geoJsonPropertyNames = JSON.parse(sessionStorage.getItem("GEOJSONPROPERTYNAMES") || "[]");
     });
 
     this.featureClickSubscription = this.geoJsonService.selectedFeature$.subscribe(feature => {
@@ -63,8 +63,8 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
 
     let emptyLat: number = 0;
     let emptyLong: number = 0;
-    if (!geoJsonObject || geoJsonObject.features.length === 1 && geoJsonObject.features[0].properties["street_address"] === '') {
-      console.error("Invalid GeoJSON data or no features found");
+    if (geoJsonObject.features.length === 0) {
+      console.error("no features found");
 
       const coords = this.geoJsonService.getCurrentCoordinates();
       if (coords) {

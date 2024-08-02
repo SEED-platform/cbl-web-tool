@@ -33,7 +33,13 @@ export class HomeComponent{
     ngOnInit(): void {
       this.geoJsonSubscription = this.geoJsonService.getGeoJson().subscribe(data => {
         this.jsonData = data;
-        console.log("GeoJSON data updated in HomeComponent", this.jsonData);
+        if (this.jsonData && 
+          this.jsonData.features && 
+          this.jsonData.features.length > 0 && 
+          this.jsonData.features[0].properties) {
+          const geoJsonPropertyNames = Object.keys(this.jsonData.features[0].properties);
+          sessionStorage.setItem("GEOJSONPROPERTYNAMES", JSON.stringify(geoJsonPropertyNames));
+      }
       });
     }
 
