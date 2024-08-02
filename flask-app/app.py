@@ -210,6 +210,10 @@ def run_cbl_workflow():
     print(final_geojson)
     return jsonify({"message": "success", "user_data": final_geojson}), 200
 
+def truncate_float(value, decimal_places):
+    format_string = '{:.' + str(decimal_places) + 'f}'
+    return float(format_string.format(value))
+
 
 @app.route('/api/reverse_geocode',  methods=['POST'])
 def reverse_geocode():  
@@ -247,8 +251,8 @@ def reverse_geocode():
     result = response.json()
     try:
         properties["ubid"] = ubid
-        properties["latitude"] = lat
-        properties["longitude"] = lon
+        properties["latitude"] = str(truncate_float(lat,5))
+        properties["longitude"] = str(truncate_float(lon,5))
         features = result["features"]
         context = features[0]["context"]
         for item in context:
@@ -284,7 +288,6 @@ def reverse_geocode():
     
     print(returned_feature)
     return jsonify({"message": "success", "user_data": json.dumps(returned_feature)}), 200
-
 
 @app.route('/api/export_geojson',  methods=['POST'])
 def export_geojson():

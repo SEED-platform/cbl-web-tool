@@ -197,8 +197,13 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
       (response) => {
         console.log(response.message); // Handle successful response
         this.newGeoJson = JSON.parse(response.user_data)
-        console.log(this.newGeoJson);
+        console.log("erwr",this.newGeoJson);
+        const newBuildinglongitude = this.newGeoJson.properties.longitude;
+        const newBuildingLatitude = this.newGeoJson.properties.latitude;
+     
+        this.geoJsonService.setMapCoordinates(newBuildingLatitude, newBuildinglongitude);
         this.geoJsonService.insertNewBuildingInTable(this.newGeoJson);
+    
       },
       (errorResponse) => {
         console.error(errorResponse.error.message); // Handle error response
