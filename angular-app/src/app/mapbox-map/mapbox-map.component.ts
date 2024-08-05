@@ -73,8 +73,8 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
         emptyLong= coords.longitude;
         emptyLat = coords.latitude;
       }else {
-      emptyLat = -98.5795; // Default longitude
-      emptyLong = 39.8283;  // Default latitude
+      emptyLat = 39.8283;
+      emptyLong =  -98.5795;  
       }
 
       this.map = new mapboxgl.Map({
@@ -82,7 +82,7 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
         container: 'map', // map is id of div in html
         style: this.style,
         attributionControl: false,
-        zoom: 4,
+        zoom: 15,
         center: [emptyLong, emptyLat] // [longitude, latitude]
       });  
       this.addDrawFeatures(this.map, geoJsonObject);
@@ -169,7 +169,7 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
       if (this.map) {
         this.map.flyTo({
           center: new mapboxgl.LngLat(longitude, latitude),
-          zoom: 17.25
+          zoom: 17.5
         });
         this.geoJsonService.emitClickEvent(latitude, longitude);
       }
@@ -221,7 +221,7 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
      
         this.geoJsonService.setMapCoordinates(newBuildingLatitude, newBuildinglongitude);
         this.geoJsonService.insertNewBuildingInTable(this.newGeoJson);
-    
+        draw.deleteAll();
       },
       (errorResponse) => {
         console.error(errorResponse.error.message); // Handle error response

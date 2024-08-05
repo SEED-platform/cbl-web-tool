@@ -195,9 +195,11 @@ export class CblTableComponent implements OnInit {
   }
 
   handleDelete() {
+     if(this.rowData.length !== 0){
       const selectedData = this.gridApi.getSelectedRows();
       const res = this.gridApi.applyTransaction({ remove: selectedData })!;
       this.geoJsonService.updateGeoJsonFromMap(res.remove[0].data);
+     }
   }
 
 }
