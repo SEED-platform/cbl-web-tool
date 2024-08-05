@@ -59,63 +59,60 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
   }
 
   initializeMapWithGeoJson(geoJsonObject: any) {
-    console.log(geoJsonObject);
-
-
+   
     if(!this.map){
     let emptyLat: number = 0;
     let emptyLong: number = 0;
-    if (geoJsonObject.features.length === 0) {
-      console.error("no features found");
 
-      const coords = this.geoJsonService.getCurrentCoordinates();
-      if (coords) {
-        emptyLong= coords.longitude;
-        emptyLat = coords.latitude;
-      }else {
-      emptyLat = 39.8283;
-      emptyLong =  -98.5795;  
-      }
+     if (geoJsonObject.features.length === 0) {
+        console.log("no features found");
 
-      this.map = new mapboxgl.Map({
+        const coords = this.geoJsonService.getCurrentCoordinates();
+       
+        if (coords) {
+          emptyLong= coords.longitude;
+          emptyLat = coords.latitude;
+        }else {
+         emptyLat = 39.8283;
+         emptyLong =  -98.5795;  
+        }
+
+       this.map = new mapboxgl.Map({
         accessToken: environment.mapboxToken,
         container: 'map', // map is id of div in html
         style: this.style,
         attributionControl: false,
         zoom: 15,
         center: [emptyLong, emptyLat] // [longitude, latitude]
-      });  
-      this.addDrawFeatures(this.map, geoJsonObject);
-      return;
-      
-    }
+       });  
 
-   
-    this.buildingArray = geoJsonObject.features;
-    this.cdr.detectChanges();
-
-    let firstBuildingLatitude:number;
-    let firstBuildingLongitude:number;
-
-
-    if (this.isFirstLoad){
-    const firstBuilding = this.buildingArray[0];
-    firstBuildingLongitude = firstBuilding.properties.longitude;
-    firstBuildingLatitude = firstBuilding.properties.latitude;
-    this.geoJsonService.setMapCoordinates(firstBuildingLatitude, firstBuildingLongitude);
-    this.isFirstLoad = false;
     }else{
-      const coords = this.geoJsonService.getCurrentCoordinates();
-      if (coords) {
-      firstBuildingLongitude = coords.longitude;
-      firstBuildingLatitude = coords.latitude;
-      }else {
-      firstBuildingLongitude = -98.5795; // Default longitude
-      firstBuildingLatitude = 39.8283;  // Default latitude
-      }
-    }
+    // if map has polygons
+      this.buildingArray = geoJsonObject.features;
+      this.cdr.detectChanges();
 
-    this.map = new mapboxgl.Map({
+      let firstBuildingLatitude:number;
+      let firstBuildingLongitude:number;
+
+    
+      if (this.isFirstLoad){
+          const firstBuilding = this.buildingArray[0];
+          firstBuildingLongitude = firstBuilding.properties.longitude;
+          firstBuildingLatitude = firstBuilding.properties.latitude;
+          this.geoJsonService.setMapCoordinates(firstBuildingLatitude, firstBuildingLongitude);
+          this.isFirstLoad = false;
+      }else{
+          const coords = this.geoJsonService.getCurrentCoordinates();
+          if (coords) {
+              firstBuildingLongitude = coords.longitude;
+              firstBuildingLatitude = coords.latitude;
+          }else{
+              firstBuildingLongitude = -98.5795; // Default longitude
+              firstBuildingLatitude = 39.8283;  // Default latitude
+          }
+      }
+
+      this.map = new mapboxgl.Map({
       accessToken: environment.mapboxToken,
       container: 'map', // map is id of div in html
       style: this.style,
@@ -123,13 +120,9 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
       zoom: this.zoomLevel,
       center: [firstBuildingLongitude, firstBuildingLatitude] // [longitude, latitude]
     });
-
-    
+  }
 
     this.map.on('load', () => {
-      if (!this.map) return; // if map not initialized, exit load
-         
-     
     
       if (this.map) {
         const source = this.map.getSource('features');
@@ -151,9 +144,9 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
             'fill-opacity': 0.6
           }
         });
+        this.addDrawFeatures(this.map, geoJsonObject);
       }
     }    
-      this.addDrawFeatures(this.map, geoJsonObject)
     });
 
   }else{
@@ -184,9 +177,7 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
     }
   }
 
-
-
-    
+ 
    addDrawFeatures(map: mapboxgl.Map, geoJsonObject: any){
     const draw = new MapboxDraw({
       displayControlsDefault: false,
@@ -198,13 +189,13 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
     map.addControl(draw, 'top-right');
 
     // Optional: Add event listeners for drawing and editing polygons
-    map.on('draw.create', (e) => this.handleDrawEvent(e, draw, geoJsonObject));   
+    map.on('draw.create', (e) => this.handleDrawEvent(e, draw, geoJsonObject));  
    }
 
   handleDrawEvent(e: any, draw: any, geoJsonObject: any) {
     console.log('Draw event:', e);
   
-    console.log(this.geoJsonPropertyNames)
+  
     const jsonData = {
       "coordinates": draw.getAll().features[0].geometry.coordinates[0],
       "propertyNames": this.geoJsonPropertyNames,
@@ -228,8 +219,6 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
       });
 
   }
-
-
 
 
   flyToCoordinates(longitude: number, latitude: number) {

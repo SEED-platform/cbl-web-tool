@@ -93,11 +93,17 @@ export class CblTableComponent implements OnInit {
    if(this.geoJson.features.length > 0){
     this.featuresArray = this.geoJson.features;
     this.rowData = this.featuresArray;
-    this.setColumnDefs();
    }
+   this.setColumnDefs();
   }
 
 
+
+  capitalizeFirstLetter = (string: string) => {
+    if (string.length === 0) return string;
+    return string.charAt(0).toUpperCase() + string.slice(1);
+  };
+  
 
   setColumnDefs() {
      
@@ -108,7 +114,7 @@ export class CblTableComponent implements OnInit {
      
       this.colDefs = keys.map((key:any) => ({
         field: key,
-        headerName: key, 
+        headerName: this.capitalizeFirstLetter(key), 
         valueGetter: (params: ValueGetterParams) => {
           if(this.geoJson.features.length > 0){
           if (key === 'coordinates') {
