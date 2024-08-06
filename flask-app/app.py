@@ -23,6 +23,7 @@ from utils.generate_locations_list import generate_locations_list
 from utils.convert_file_to_dicts import convert_file_to_dicts
 from utils.merge_dicts import merge_dicts
 from utils.normalize_address import normalize_address
+from utils.geocode_addresses import geocode_addresses
 from utils.ubid import encode_ubid
 from utils.update_dataset_links import update_dataset_links
 from utils.update_quadkeys import update_quadkeys
@@ -124,7 +125,10 @@ def run_cbl_workflow():
     with open('testing.json', 'r') as fr:
         data = json.load(fr)
 
-    poorQualityCodes = ["Ambiguous", "P1CAA", "B1CAA", "B1ACA"]
+    # with open('testing.json', 'w') as fr:
+    #     json.dump(data, fr, indent=2)
+
+    poorQualityCodes = ["Ambiguous", "P1CAA", "B1CAA", "B1ACA", "A5XAX"]
 
     # Find all quadkeys that the coordinates fall within
     quadkeys = set()
@@ -181,7 +185,7 @@ def run_cbl_workflow():
             datum["country"] = "Poor Data"
             datum["latitude"] = "Poor Data"
             datum["longitude"] = "Poor Data"
-            datum["quality"] = "Poor Data"
+            datum["quality"] = "Ambiguous"
             datum["footprint_match"] = "Poor Data"
             datum["height"] = None
             datum["geometry"] = None
@@ -192,13 +196,13 @@ def run_cbl_workflow():
     # dict and the data dict to display all information
     merged_data = []
     for i in range(len(data)):
-        dict1 = file_data[i]
-        dict2 = data[i]
-        if (dict1 != dict2):
-            merged_dict = merge_dicts(dict1, dict2)
+        file_dict = file_data[i]
+        data_dict = data[i]
+        if (file_dict != data_dict):
+            merged_dict = merge_dicts(file_dict, data_dict)
             merged_data.append(merged_dict)
         else:
-            merged_data.append(dict1)
+            merged_data.append(file_dict)
 
     columns = []
     for key in merged_data[0].keys():
@@ -207,12 +211,8 @@ def run_cbl_workflow():
     # Convert covered building list as GeoJSON
     gdf = gpd.GeoDataFrame(data=merged_data, columns=columns)
     final_geojson = gdf.to_json()
-    print(final_geojson)
     return jsonify({"message": "success", "user_data": final_geojson}), 200
 
-def truncate_float(value, decimal_places):
-    format_string = '{:.' + str(decimal_places) + 'f}'
-    return float(format_string.format(value))
 
 
 @app.route('/api/reverse_geocode',  methods=['POST'])
@@ -235,8 +235,12 @@ def reverse_geocode():
     lon = centroid.x
 
     # encode ubid from coordinates 
-    ubid = encode_ubid(polygon)
-
+    ubid = ""
+    try:
+        ubid = encode_ubid(polygon)
+    except AssertionError:
+        return jsonify({'message': "Invalid longitude coordinates"}), 400
+        
     url = f"https://api.mapbox.com/geocoding/v5/mapbox.places/{lon},{lat}.json"
     params = {
         'access_token': "pk.eyJ1Ijoicm1pYW4tbnJlbCIsImEiOiJjbHlvc2lkNm8wbG1uMmlwcHR1aDZlMTR0In0.dZtyvX6DjlnEF8FVL7FV4Q",  
@@ -276,6 +280,8 @@ def reverse_geocode():
     if not properties or len(properties) == 0:
         return jsonify({"message": "Error: Reverse geocoding returned poor data."}), 400
     
+    properties["quality"] = "reverseGeocode"
+    
     returned_feature = {
                     "id": newId,
                     "type": "Feature",
@@ -286,7 +292,6 @@ def reverse_geocode():
                     }
                 }
     
-    print(returned_feature)
     return jsonify({"message": "success", "user_data": json.dumps(returned_feature)}), 200
 
 @app.route('/api/export_geojson',  methods=['POST'])

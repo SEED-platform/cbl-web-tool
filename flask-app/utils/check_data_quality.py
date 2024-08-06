@@ -6,7 +6,7 @@ def check_data_quality(json_dict_list):
         dict1 = json_dict_list[i]
 
         # Enforcing the required unique column names 
-        if "Street_Address" not in dict1 and "Street_address" not in dict1 and "street_address" not in dict1:
+        if "Street_Address" not in dict1 and "Street_address" not in dict1 and "street_address" not in dict1 and "street_Address" not in dict1:
             return LocationError("Missing unique 'Street_Address' column")
         if "City" not in dict1 and "city" not in dict1:
             return LocationError("Missing unique 'City' column")
