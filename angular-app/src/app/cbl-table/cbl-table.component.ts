@@ -111,9 +111,12 @@ export class CblTableComponent implements OnInit {
         let keys:any;
         keys = JSON.parse(sessionStorage.getItem("GEOJSONPROPERTYNAMES")|| '[]');     
         keys.push('coordinates');      
+
+        const nonEditableKeys = ['ubid', 'longitude', 'latitude'];
      
       this.colDefs = keys.map((key:any) => ({
         field: key,
+        editable: !nonEditableKeys.includes(key),
         headerName: this.capitalizeFirstLetter(key), 
         valueGetter: (params: ValueGetterParams) => {
           if(this.geoJson.features.length > 0){
@@ -184,6 +187,7 @@ export class CblTableComponent implements OnInit {
 
     if (event.node.isSelected()) {
       const data = event.node.data;
+      const ubid =  data.properties.ubid;
       const latitude = data.properties.latitude;
       const longitude = data.properties.longitude;
       this.geoJsonService.emitSelectedFeature(latitude, longitude);

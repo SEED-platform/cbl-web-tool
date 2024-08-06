@@ -45,7 +45,6 @@ export class GeoJsonService {
     
     this.geoJsonSubject.next(serverGeoJson);
     sessionStorage.setItem("GEOJSONDATA", JSON.stringify(serverGeoJson));
-    console.log("set", serverGeoJson);
   }
 
   getGeoJson(): Observable<any> {
@@ -77,7 +76,6 @@ export class GeoJsonService {
   }
 
   insertNewBuildingInTable(buildingObject: GeoJsonFeature): void {
-    console.log('Emitting new building:', buildingObject);
     this.newBulidingSubject.next(buildingObject);
   }
 
@@ -90,7 +88,6 @@ export class GeoJsonService {
 
   emitClickEvent(latitude: number, longitude: number): void {
     this.clickEventSubject.next({ latitude, longitude });
-    console.log(latitude)
   }
   
   emitSelectedFeature(latitude: number, longitude: number): void {

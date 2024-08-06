@@ -82,7 +82,7 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
         container: 'map', // map is id of div in html
         style: this.style,
         attributionControl: false,
-        zoom: 15,
+        zoom: this.zoomLevel,
         center: [emptyLong, emptyLat] // [longitude, latitude]
        });  
 
@@ -155,7 +155,7 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
 
   
   this.map.on('click', 'features', (e) => {
-    console.log(e.features)
+    
     if (e.features && e.features.length > 0) {
       const longitude = e.features[0]?.properties?.['longitude'];
       const latitude = e.features[0]?.properties?.['latitude'];
@@ -193,9 +193,7 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
    }
 
   handleDrawEvent(e: any, draw: any, geoJsonObject: any) {
-    console.log('Draw event:', e);
-  
-  
+
     const jsonData = {
       "coordinates": draw.getAll().features[0].geometry.coordinates[0],
       "propertyNames": this.geoJsonPropertyNames,
