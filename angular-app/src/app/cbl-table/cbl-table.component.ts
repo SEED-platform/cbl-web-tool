@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, ViewEncapsulation } from '@angular/core';
 import {ColDef} from 'ag-grid-community';
 import { CommonModule } from '@angular/common'; 
 import { AgGridAngular } from 'ag-grid-angular';
@@ -19,7 +19,8 @@ import { Subscription } from 'rxjs';
   standalone: true,
   imports: [AgGridAngular, CommonModule],
   templateUrl: './cbl-table.component.html',
-  styleUrl: './cbl-table.component.css'
+  styleUrl: './cbl-table.component.css',
+  encapsulation: ViewEncapsulation.None
 })
 
 export class CblTableComponent implements OnInit {
@@ -39,6 +40,7 @@ export class CblTableComponent implements OnInit {
     sortable: false,
     filter: true,
     editable: true,
+    cellEditor: 'agTextCellEditor' 
   };
 
   constructor(private apiHandler: FlaskRequests, private router: Router, private cdr: ChangeDetectorRef, private geoJsonService: GeoJsonService) { }

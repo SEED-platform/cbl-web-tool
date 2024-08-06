@@ -19,6 +19,7 @@ import '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css';
 export class MapboxMapComponent implements OnInit, OnDestroy {
   map: mapboxgl.Map | undefined;
   style = 'mapbox://styles/mapbox/streets-v12';
+  satelliteStyle = 'mapbox://styles/mapbox/satellite-v12';
   lat: number = 30.2672;
   lng: number = -97.7431;
   buildingArray: any[] = [];
@@ -29,7 +30,7 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
   private mapCoordinatesSubscription: Subscription | undefined;
   private geoJsonPropertyNames: any;
   private newGeoJson: any;
-
+  private satelliteView: boolean = false; 
   constructor(private cdr: ChangeDetectorRef, private geoJsonService: GeoJsonService, private apiHandler: FlaskRequests) {}
 
   ngOnInit() {
@@ -187,6 +188,7 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
       },
     });
     map.addControl(draw, 'top-right');
+    map.addControl(new mapboxgl.NavigationControl(), 'bottom-left');
 
     // Optional: Add event listeners for drawing and editing polygons
     map.on('draw.create', (e) => this.handleDrawEvent(e, draw, geoJsonObject));  
@@ -241,5 +243,6 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
       this.map.setZoom(this.zoomLevel);
     }
   }
+
 
 }

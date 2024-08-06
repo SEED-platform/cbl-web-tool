@@ -53,11 +53,11 @@ export class GeoJsonService {
 
   updateGeoJsonFromMap(mapRemovedObject: any): void{
 
-    if (!mapRemovedObject || mapRemovedObject.properties.latitude === undefined || mapRemovedObject.properties.longitude === undefined) {
+    if (!mapRemovedObject || mapRemovedObject.properties.ubid === undefined ) {
       console.error('Invalid object to remove');
       return;
     }
-    const { latitude, longitude } = mapRemovedObject.properties;
+    const { ubid, latitude, longitude} = mapRemovedObject.properties;
 
 
     const currentGeoJson = this.geoJsonSubject.getValue();
@@ -65,7 +65,7 @@ export class GeoJsonService {
     
     
        updatedGeoJson = currentGeoJson.features.filter((feature: any) => {
-         return feature.properties.latitude !== latitude || feature.properties.longitude !== longitude;
+         return feature.properties.ubid !== ubid;
          });
     
     currentGeoJson.features = updatedGeoJson;
