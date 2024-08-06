@@ -51,29 +51,42 @@ export class GeoJsonService {
     return this.geoJsonSubject.asObservable();
   }
 
-  updateGeoJsonFromMap(mapRemovedObject: any): void{
-
-    if (!mapRemovedObject || mapRemovedObject.properties.ubid === undefined ) {
+  updateGeoJsonFromMap(mapRemovedObject: any): void {
+    if (!mapRemovedObject || mapRemovedObject.properties.ubid === undefined) {
       console.error('Invalid object to remove');
       return;
     }
-    const { ubid, latitude, longitude} = mapRemovedObject.properties;
-
-
-    const currentGeoJson = this.geoJsonSubject.getValue();
-    let updatedGeoJson: any;
     
-    
-       updatedGeoJson = currentGeoJson.features.filter((feature: any) => {
-         return feature.properties.ubid !== ubid;
-         });
-    
-    currentGeoJson.features = updatedGeoJson;
+    const { ubid, latitude, longitude } = mapRemovedObject.properties;
   
-    this.geoJsonSubject.next(currentGeoJson);
-    this.setGeoJson(currentGeoJson);
-    this.mapCoordinatesSubject.next({latitude, longitude});
+    // Get the current GeoJSON from the subject
+    const currentGeoJson = this.geoJsonSubject.getValue();
+    
+    // Clone the features array to avoid modifying the original array directly
+    const features = [...currentGeoJson.features];
+    
+    // Find the index of the feature to remove
+    const indexToRemove = features.findIndex((feature: any) => feature.properties.ubid === ubid);
+    
+    // Remove the feature at the found index if it exists
+    if (indexToRemove !== -1) {
+      features.splice(indexToRemove, 1); // Remove the feature at the found index
+    }
+    
+    // Update the GeoJSON with the modified features array
+    const updatedGeoJson = {
+      ...currentGeoJson,
+      features: features
+    };
+    
+    // Update the subject with the new GeoJSON
+    this.geoJsonSubject.next(updatedGeoJson);
+    
+    // Optionally call additional methods or emit values as needed
+    this.setGeoJson(updatedGeoJson);
+    this.mapCoordinatesSubject.next({ latitude, longitude });
   }
+  
 
   insertNewBuildingInTable(buildingObject: GeoJsonFeature): void {
     this.newBulidingSubject.next(buildingObject);

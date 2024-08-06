@@ -27,6 +27,7 @@ export class CblTableComponent implements OnInit {
   featuresArray: any[] = [];
   colDefs: ColDef[] = [];
   geoJson: any;
+  public duplicateSet: Set<string> = new Set<string>();
   private gridApi: any;
   public rowData: any[] = []; 
   private geoJsonSubscription: Subscription | undefined;
@@ -49,7 +50,9 @@ export class CblTableComponent implements OnInit {
     
       this.geoJsonSubscription = this.geoJsonService.getGeoJson().subscribe(data => {
       this.geoJson = data;
+      this.findDuplicates(this.geoJson);
       this.updateTable();
+    
     });
 
 
@@ -137,6 +140,20 @@ export class CblTableComponent implements OnInit {
         }
         return true;
         },
+        cellStyle: (params: any) => {
+          const field1 = params.data.properties['ubid'];
+          const field2 = params.data.properties['street_address'];
+          const uniqueString = `${field1}-${field2}`;
+          const isDuplicate = this.duplicateSet.has(uniqueString);
+          
+          // Apply custom styles based on conditions
+          if (isDuplicate) {
+            return {
+              backgroundColor: 'yellow',
+            };
+          }
+          return {};  // Return an empty object for default styling
+        }
       }));
     sessionStorage.setItem("COL", JSON.stringify(this.colDefs));
   }
@@ -208,33 +225,32 @@ export class CblTableComponent implements OnInit {
   handleDelete() {
      if(this.rowData.length !== 0){
       const selectedData = this.gridApi.getSelectedRows();
+      
       const res = this.gridApi.applyTransaction({ remove: selectedData })!;
       this.geoJsonService.updateGeoJsonFromMap(res.remove[0].data);
      }
   }
 
-  getRowClassRules(): RowClassRules {
-    return {
-      'highlight-row': (params: any) => {
-        // Extract the values for duplicate check
-        const ubid = params.data.properties.ubid;
-        const streetAddress = params.data.properties.street_address;
-        
-        // Collect all row data
-        const allRowData = this.gridApi ? this.gridApi.getRenderedNodes().map((node: any) => node.data) : [];
-        
-        // Create a unique identifier based on ubid and street_address
-        const getIdentifier = (row: any) => `${row.properties.ubid}-${row.properties.street_address}`;
-        
-        // Find duplicates
-        const identifiers = allRowData.map((row: any) => getIdentifier(row));
-        const duplicates = identifiers.filter((value: any, index: number, self: any) => self.indexOf(value) !== index);
-        
-        // Check if current row's identifier is a duplicate
-        const currentIdentifier = getIdentifier(params.data);
-        return duplicates.includes(currentIdentifier);
-      }
-    };
-  } 
+  findDuplicates(geoJson : any){
+    const seenSet: Set<string> = new Set<string>();
+   
+    geoJson.features.forEach((feature: any) => {
+
+    const ubid = feature.properties.ubid;
+    const streetAddress = feature.properties.street_address;
+    const uniqueString = `${ubid}-${streetAddress}`;
+    
+
+    if (seenSet.has(uniqueString)) {
+      this.duplicateSet.add(uniqueString);
+    } else {
+      seenSet.add(uniqueString);
+    }
+  });
+  }
+
+  
+
+
 
 }
