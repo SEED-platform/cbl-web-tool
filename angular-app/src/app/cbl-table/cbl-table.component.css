@@ -10,3 +10,7 @@
     -ms-user-select: text !important;
      user-select: text !important;
 }
+
+.highlight-row {
+    background-color: red !important;
+  }

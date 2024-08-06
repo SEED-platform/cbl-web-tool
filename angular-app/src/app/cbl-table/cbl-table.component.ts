@@ -1,5 +1,5 @@
 import { Component, OnInit, ChangeDetectorRef, ViewEncapsulation } from '@angular/core';
-import {ColDef} from 'ag-grid-community';
+import {ColDef, RowClassRules } from 'ag-grid-community';
 import { CommonModule } from '@angular/common'; 
 import { AgGridAngular } from 'ag-grid-angular';
 import "ag-grid-community/styles/ag-grid.css";
@@ -40,7 +40,6 @@ export class CblTableComponent implements OnInit {
     sortable: false,
     filter: true,
     editable: true,
-    cellEditor: 'agTextCellEditor' 
   };
 
   constructor(private apiHandler: FlaskRequests, private router: Router, private cdr: ChangeDetectorRef, private geoJsonService: GeoJsonService) { }
@@ -213,5 +212,29 @@ export class CblTableComponent implements OnInit {
       this.geoJsonService.updateGeoJsonFromMap(res.remove[0].data);
      }
   }
+
+  getRowClassRules(): RowClassRules {
+    return {
+      'highlight-row': (params: any) => {
+        // Extract the values for duplicate check
+        const ubid = params.data.properties.ubid;
+        const streetAddress = params.data.properties.street_address;
+        
+        // Collect all row data
+        const allRowData = this.gridApi ? this.gridApi.getRenderedNodes().map((node: any) => node.data) : [];
+        
+        // Create a unique identifier based on ubid and street_address
+        const getIdentifier = (row: any) => `${row.properties.ubid}-${row.properties.street_address}`;
+        
+        // Find duplicates
+        const identifiers = allRowData.map((row: any) => getIdentifier(row));
+        const duplicates = identifiers.filter((value: any, index: number, self: any) => self.indexOf(value) !== index);
+        
+        // Check if current row's identifier is a duplicate
+        const currentIdentifier = getIdentifier(params.data);
+        return duplicates.includes(currentIdentifier);
+      }
+    };
+  } 
 
 }
