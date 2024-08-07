@@ -20,3 +20,4 @@ locations.json
 main.py
 tester.py
 tester.json
+output.geojson

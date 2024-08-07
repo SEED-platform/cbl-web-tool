@@ -210,7 +210,15 @@ def run_cbl_workflow():
 
     # Convert covered building list as GeoJSON
     gdf = gpd.GeoDataFrame(data=merged_data, columns=columns)
-    final_geojson = gdf.to_json()
+    geojson_str = gdf.to_json()
+    geojson_obj = json.loads(geojson_str)
+
+    geojson_obj['features'].sort(key=lambda feature: feature['properties'].get('street_address', ''))
+
+    final_geojson = json.dumps(geojson_obj)
+    with open('output.geojson', 'w') as f:
+        f.write(final_geojson)
+
     return jsonify({"message": "success", "user_data": final_geojson}), 200
 
 
@@ -281,7 +289,6 @@ def reverse_geocode():
         return jsonify({"message": "Error: Reverse geocoding returned poor data."}), 400
     
     properties["quality"] = "reverseGeocode"
-    
     returned_feature = {
                     "id": newId,
                     "type": "Feature",
