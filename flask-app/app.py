@@ -174,6 +174,7 @@ def run_cbl_workflow():
 
             # Determine UBIDs from footprints
             datum["ubid"] = encode_ubid(datum["geometry"])
+            datum["quality"] = "Good"
         else:
             datum["address"] = normalize_address(locations[index]["street"])
             datum["city"] = locations[index]["city"]
@@ -204,9 +205,11 @@ def run_cbl_workflow():
         else:
             merged_data.append(file_dict)
 
-    columns = []
+
+    columns = ["street_address", "city", "state"]
     for key in merged_data[0].keys():
-        columns.append(key)
+        if key.lower() not in columns:
+            columns.append(key)
 
     # Convert covered building list as GeoJSON
     gdf = gpd.GeoDataFrame(data=merged_data, columns=columns)

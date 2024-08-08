@@ -3,7 +3,7 @@ def merge_dicts(file_dict, data_dict):
     for key, value in data_dict.items():
         if "address" == key.lower():
             merged_dict["street_address"] = value
-        else:
+        elif key != "side_of_street" and key != "footprint_match" and key != "neighborhood" and key != "height" and key != "quadkey":      # want to exclude this useless data
             merged_dict[key.lower()] = value
 
     for key, value in file_dict.items():
@@ -13,6 +13,7 @@ def merge_dicts(file_dict, data_dict):
     merged_dict = remove_duplicate_vals(merged_dict)     
     
     return merged_dict
+
 
 # removes different keys that have the same value
 def remove_duplicate_vals(d):
