@@ -27,7 +27,7 @@ export class CblTableComponent implements OnInit {
   featuresArray: any[] = [];
   colDefs: ColDef[] = [];
   geoJson: any;
-  public duplicateSet: Set<string> = new Set<string>();
+  public duplicateMap: { [key: string]: number } = {};
   private gridApi: any;
   public rowData: any[] = []; 
   private geoJsonSubscription: Subscription | undefined;
@@ -144,7 +144,7 @@ export class CblTableComponent implements OnInit {
           const field1 = params.data.properties['ubid'];
           const field2 = params.data.properties['street_address'];
           const uniqueString = `${field1}-${field2}`;
-          const isDuplicate = this.duplicateSet.has(uniqueString);
+          const isDuplicate = (this.duplicateMap[uniqueString] || 0) > 1
           
           // Apply custom styles based on conditions
           if (isDuplicate) {
@@ -205,10 +205,12 @@ export class CblTableComponent implements OnInit {
 
     if (event.node.isSelected()) {
       const data = event.node.data;
-      const ubid =  data.properties.ubid;
+      const id =  data.id;
+      console.log(data.id)
+      console.log(data);
       const latitude = data.properties.latitude;
       const longitude = data.properties.longitude;
-      this.geoJsonService.emitSelectedFeature(latitude, longitude);
+      this.geoJsonService.emitSelectedFeature(latitude, longitude, id);
     }
      
   }
@@ -228,25 +230,35 @@ export class CblTableComponent implements OnInit {
       
       const res = this.gridApi.applyTransaction({ remove: selectedData })!;
       this.geoJsonService.updateGeoJsonFromMap(res.remove[0].data);
+
+      selectedData.forEach((row: any) => {
+        const ubid = row.properties.ubid;
+        const streetAddress = row.properties.street_address;
+        const uniqueString = `${ubid}-${streetAddress}`;
+        
+        this.decrementCount(uniqueString);
+      });
      }
   }
 
   findDuplicates(geoJson : any){
-    const seenSet: Set<string> = new Set<string>();
-   
     geoJson.features.forEach((feature: any) => {
+      const ubid = feature.properties.ubid;
+      const streetAddress = feature.properties.street_address;
+      const uniqueString = `${ubid}-${streetAddress}`;
+  
+      this.duplicateMap[uniqueString] = (this.duplicateMap[uniqueString] || 0) + 1;
+    });
+  }
 
-    const ubid = feature.properties.ubid;
-    const streetAddress = feature.properties.street_address;
-    const uniqueString = `${ubid}-${streetAddress}`;
-    
-
-    if (seenSet.has(uniqueString)) {
-      this.duplicateSet.add(uniqueString);
-    } else {
-      seenSet.add(uniqueString);
+  decrementCount(uniqueString: string) {
+    if (this.duplicateMap[uniqueString]) {
+      this.duplicateMap[uniqueString]--;
+      // Optionally remove the entry if the count reaches zero
+      if (this.duplicateMap[uniqueString] <= 0) {
+        this.duplicateMap[uniqueString];
+      }
     }
-  });
   }
 
   

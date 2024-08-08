@@ -23,8 +23,8 @@ export class GeoJsonService {
   private clickEventSubject = new BehaviorSubject<{ latitude: number, longitude: number } | null>(null);
   public clickEvent$: Observable<{ latitude: number, longitude: number } | null> = this.clickEventSubject.asObservable();
   
-  private selectedFeatureSubject = new BehaviorSubject<{ latitude: number, longitude: number } | null>(null);
-  public selectedFeature$: Observable<{ latitude: number, longitude: number } | null> = this.selectedFeatureSubject.asObservable();
+  private selectedFeatureSubject = new BehaviorSubject<{ latitude: number, longitude: number, id: number } | null>(null);
+  public selectedFeature$: Observable<{ latitude: number, longitude: number, id: number } | null> = this.selectedFeatureSubject.asObservable();
 
   private mapCoordinatesSubject = new BehaviorSubject<{ latitude: number, longitude: number } | null>(null);
   public mapCoordinates$: Observable<{ latitude: number, longitude: number } | null> = this.mapCoordinatesSubject.asObservable();
@@ -103,8 +103,8 @@ export class GeoJsonService {
     this.clickEventSubject.next({ latitude, longitude });
   }
   
-  emitSelectedFeature(latitude: number, longitude: number): void {
-    this.selectedFeatureSubject.next({ latitude, longitude });
+  emitSelectedFeature(latitude: number, longitude: number, id: number): void {
+    this.selectedFeatureSubject.next({ latitude, longitude, id });
   }
 
   setMapCoordinates(latitude: number, longitude:number): void{

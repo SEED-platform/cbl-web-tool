@@ -31,6 +31,7 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
   private geoJsonPropertyNames: any;
   private newGeoJson: any;
   private satelliteView: boolean = false; 
+  private draw: MapboxDraw | undefined;
   constructor(private cdr: ChangeDetectorRef, private geoJsonService: GeoJsonService, private apiHandler: FlaskRequests) {}
 
   ngOnInit() {
@@ -41,7 +42,13 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
 
     this.featureClickSubscription = this.geoJsonService.selectedFeature$.subscribe(feature => {
       if (feature) {
-        this.flyToCoordinates(feature.longitude, feature.latitude);
+        const { latitude, longitude, id } = feature;
+        
+        // Check if id is defined
+        if (id !== undefined) {
+          this.flyToCoordinates(longitude, latitude);
+          //this.highlightFeature(id);
+        }
       }
     });
 
@@ -136,41 +143,57 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
           data: geoJsonObject
         });
 
-        this.map.addLayer({
-          id: 'features',
-          type: 'fill',
-          source: 'features',
-          paint: {
-            'fill-color': '#0B5E90',
-            'fill-opacity': 0.6
-          }
-        });
+        // this.map.addLayer({
+        //   id: 'features',
+        //   type: 'fill',
+        //   source: 'features',
+        //   paint: {
+        //     'fill-color': '#0B5E90',
+        //     'fill-opacity': 0.4
+        //   }
+        // });
+
         this.addDrawFeatures(this.map, geoJsonObject);
       }
     }    
     });
-
   }else{
     this.updateSource(geoJsonObject);
   }
 
-  
-  this.map.on('click', 'features', (e) => {
-    
-    if (e.features && e.features.length > 0) {
-      const longitude = e.features[0]?.properties?.['longitude'];
-      const latitude = e.features[0]?.properties?.['latitude'];
-      if (this.map) {
-        this.map.flyTo({
-          center: new mapboxgl.LngLat(longitude, latitude),
-          zoom: 17.5
-        });
-        this.geoJsonService.emitClickEvent(latitude, longitude);
-      }
-    }
-  });
+  this.map.on("click", (event) => this.handleClick(event, geoJsonObject));
   
   }
+
+
+  handleClick = (event: any, geoJsonObject: any) => {
+    if (!this.map || !this.draw) return;
+
+    // Get the feature IDs under the click point
+    const featureIds = this.draw.getFeatureIdsAt(event.point);
+
+    if (featureIds && featureIds.length > 0) {
+        // Assuming featureIds[0] is the ID of the clicked feature
+        const clickedFeatureId = featureIds[0];
+           console.log(geoJsonObject)
+
+        // Find the corresponding feature in geoJsonObject
+        const clickedFeature = geoJsonObject.features.find((feature: any) => feature.id === String(clickedFeatureId));
+
+        if (clickedFeature) {
+            const { latitude, longitude } = clickedFeature.properties;
+
+            // Emit the click event with the latitude and longitude
+            this.geoJsonService.emitClickEvent(latitude, longitude);
+        } else {
+            console.error(`Feature with ID ${clickedFeatureId} not found in geoJsonObject.`);
+        }
+    } else {
+        console.warn('No features found at the click point.');
+    }
+};
+
+
 
   updateSource(geoJsonObject: any) {
     if (this.map && this.map.getSource('features')) {
@@ -180,18 +203,34 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
 
  
    addDrawFeatures(map: mapboxgl.Map, geoJsonObject: any){
-    const draw = new MapboxDraw({
+    this.draw = new MapboxDraw({
       displayControlsDefault: false,
       controls: {
         polygon: true,
-        trash: true
+        trash: true,
       },
+      defaultMode: 'simple_select' 
     });
-    map.addControl(draw, 'top-right');
+    map.addControl(this.draw, 'top-right');
     map.addControl(new mapboxgl.NavigationControl(), 'bottom-left');
-
+    geoJsonObject.features.forEach((feature: any) => {
+  
+      if (feature.geometry && feature.geometry.type === 'Polygon') {
+        this.draw?.add({
+          id: Number(feature.id),
+          type: 'Feature',
+          properties: feature.properties,
+          geometry: {
+            type: 'Polygon',
+            coordinates: feature.geometry.coordinates
+          }
+        });
+      }
+    })
+    
     // Optional: Add event listeners for drawing and editing polygons
-    map.on('draw.create', (e) => this.handleDrawEvent(e, draw, geoJsonObject));  
+    // map.on('draw.create', (e) => this.handleDrawEvent(e, this.draw, geoJsonObject));  
+    // map.on('draw.update', (e) => this.handleDrawEvent(e, this.draw, geoJsonObject));
    }
 
   handleDrawEvent(e: any, draw: any, geoJsonObject: any) {
@@ -243,6 +282,27 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
       this.map.setZoom(this.zoomLevel);
     }
   }
+
+  highlightFeature(featureId: string | number) {
+    if (this.map) {
+      // Reset previous selections
+      this.map.querySourceFeatures('features').forEach(f => {
+        if (f.id !== undefined) {
+          this.map?.setFeatureState(
+            { source: 'features', id: f.id },
+            { selected: false }
+          );
+        }
+      });
+  
+      // Highlight the clicked feature
+      this.map.setFeatureState(
+        { source: 'features', id: featureId },
+        { selected: true }
+      );
+    }
+  }
+  
 
 
 }
