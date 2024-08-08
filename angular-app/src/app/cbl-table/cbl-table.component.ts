@@ -33,6 +33,7 @@ export class CblTableComponent implements OnInit {
   private geoJsonSubscription: Subscription | undefined;
   private clickEventSubscription: Subscription | undefined;
   private newBuilingSubscription: Subscription | undefined;
+  private modifyBuildingSubscription: Subscription | undefined;
   private isEditing: boolean = false;
 
   defaultColDef = {
@@ -41,6 +42,7 @@ export class CblTableComponent implements OnInit {
     sortable: false,
     filter: true,
     editable: true,
+    enableCellChangeFlash: true,
   };
 
   constructor(private apiHandler: FlaskRequests, private router: Router, private cdr: ChangeDetectorRef, private geoJsonService: GeoJsonService) { }
@@ -68,7 +70,15 @@ export class CblTableComponent implements OnInit {
          this.geoJsonService.insertNewBuildingInGeoJson(newBuilding);
       }
     })
-  }
+
+    this.modifyBuildingSubscription = this.geoJsonService.modifyBuilding$.subscribe(modBuilding => {
+      if (modBuilding) {
+ 
+       this.updateModifiedRow(modBuilding);
+     
+    }
+  })
+}
 
   ngOnDestroy(): void {
     if (this.geoJsonSubscription) {
@@ -144,6 +154,7 @@ export class CblTableComponent implements OnInit {
           const field1 = params.data.properties['ubid'];
           const field2 = params.data.properties['street_address'];
           const uniqueString = `${field1}-${field2}`;
+   
           const isDuplicate = (this.duplicateMap[uniqueString] || 0) > 1
           
           // Apply custom styles based on conditions
@@ -241,6 +252,29 @@ export class CblTableComponent implements OnInit {
      }
   }
 
+  updateModifiedRow(modBuilding: any) {
+    if(this.rowData.length !== 0){
+      const rowNode = this.rowData.find(row => row.id === modBuilding.id.toString());
+      
+       
+     if (rowNode) {
+      // Update the row data
+      const data = rowNode;
+      console.log(rowNode)
+      data.properties.coordinates = modBuilding.coordinates;
+      data.properties.latitude = modBuilding.latitude;
+      data.properties.longitude = modBuilding.longitude;
+      data.properties.ubid = modBuilding.ubid;
+
+      // Apply the update transaction
+      const res = this.gridApi.applyTransaction({
+        update: [data] // Use `update` key to modify existing rows
+      });
+      console.log(res);
+     }
+   }
+  }
+
   findDuplicates(geoJson : any){
     geoJson.features.forEach((feature: any) => {
       const ubid = feature.properties.ubid;
@@ -260,9 +294,6 @@ export class CblTableComponent implements OnInit {
       }
     }
   }
-
-  
-
 
 
 }

@@ -31,8 +31,10 @@ export class GeoJsonService {
 
   private newBulidingSubject = new BehaviorSubject<GeoJsonFeature | null>(null);
   public newBulding$: Observable<GeoJsonFeature | null> = this.newBulidingSubject.asObservable();
-
-
+  
+  private modifyBuildingSubject = new BehaviorSubject<{ coordinates: number[], latitude: number, longitude: number, ubid: string, id: number } | null>(null);
+  public modifyBuilding$: Observable<{ coordinates: number[], latitude: number, longitude: number, ubid: string, id: number } | null> = this.modifyBuildingSubject.asObservable();
+  
 
 
   constructor() { }
@@ -92,6 +94,36 @@ export class GeoJsonService {
     this.newBulidingSubject.next(buildingObject);
   }
 
+  modifyBuildingInGeoJson(modBuilding: any){
+    if (!modBuilding) {
+      console.error('Invalid object to modify');
+      return;
+    }
+    const { coordinates, latitude, longitude, ubid, id } = modBuilding.properties;
+
+    const currentGeoJson = this.geoJsonSubject.getValue();
+    
+    // Clone the features array to avoid modifying the original array directly
+    const features = [...currentGeoJson.features];
+    
+    // Find the index of the feature to remove
+    const index = features.findIndex((feature: any) => feature.id === id.toString());
+
+    currentGeoJson.features[index].properties.ubid = ubid;
+    currentGeoJson.features[index].properties.coordinates = coordinates;
+    currentGeoJson.features[index].properties.latitude = latitude;
+    currentGeoJson.features[index].properties.longitude = longitude;
+    
+  }
+
+  modifyBuildingInTable(coordinates: number[], latitude: number, longitude: number, ubid: string, id: number): void {
+    const updatedBuilding = { coordinates, latitude, longitude, ubid, id };
+
+    // Update the BehaviorSubject with the new building data
+    this.modifyBuildingSubject.next(updatedBuilding);
+  }
+
+
   insertNewBuildingInGeoJson(buildingObject: GeoJsonFeature): void{
     const currentGeoJson = this.geoJsonSubject.getValue();
     currentGeoJson.features.unshift(buildingObject);
@@ -114,6 +146,8 @@ export class GeoJsonService {
   getCurrentCoordinates(): { latitude: number, longitude: number } | null {
     return this.mapCoordinatesSubject.getValue();
   }
+
+  
 
 
 }

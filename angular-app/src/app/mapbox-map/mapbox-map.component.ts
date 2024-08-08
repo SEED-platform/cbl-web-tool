@@ -32,6 +32,7 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
   private newGeoJson: any;
   private satelliteView: boolean = false; 
   private draw: MapboxDraw | undefined;
+  private clickedBuildingId: number = 0;
   constructor(private cdr: ChangeDetectorRef, private geoJsonService: GeoJsonService, private apiHandler: FlaskRequests) {}
 
   ngOnInit() {
@@ -175,12 +176,13 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
     if (featureIds && featureIds.length > 0) {
         // Assuming featureIds[0] is the ID of the clicked feature
         const clickedFeatureId = featureIds[0];
-           console.log(geoJsonObject)
+          
 
         // Find the corresponding feature in geoJsonObject
         const clickedFeature = geoJsonObject.features.find((feature: any) => feature.id === String(clickedFeatureId));
 
         if (clickedFeature) {
+            this.clickedBuildingId = clickedFeature.id;
             const { latitude, longitude } = clickedFeature.properties;
 
             // Emit the click event with the latitude and longitude
@@ -230,28 +232,49 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
     
     // Optional: Add event listeners for drawing and editing polygons
     // map.on('draw.create', (e) => this.handleDrawEvent(e, this.draw, geoJsonObject));  
-    // map.on('draw.update', (e) => this.handleDrawEvent(e, this.draw, geoJsonObject));
+    map.on('draw.update', (e) => this.handleEditEvent(e, this.draw, geoJsonObject));
    }
 
-  handleDrawEvent(e: any, draw: any, geoJsonObject: any) {
+  handleEditEvent(e: any, draw: any, geoJsonObject: any) {
 
+    const newBuildingCoordinates =  e.features[0].geometry.coordinates[0];
+    const newBuildingId =  e.features[0].id;
+    console.log(newBuildingId);
     const jsonData = {
-      "coordinates": draw.getAll().features[0].geometry.coordinates[0],
+      "coordinates": newBuildingCoordinates,
       "propertyNames": this.geoJsonPropertyNames,
-      "featuresLength": geoJsonObject.features.length
+     // "featuresLength": geoJsonObject.features.length
     }
 
     const jsonDataString = JSON.stringify(jsonData);
-    this.apiHandler.sendReverseGeoCodeData(jsonDataString).subscribe(
+    // this.apiHandler.sendReverseGeoCodeData(jsonDataString).subscribe(
+    //   (response) => {
+    //     console.log(response.message); // Handle successful response
+    //     this.newGeoJson = JSON.parse(response.user_data)
+    //     const newBuildinglongitude = this.newGeoJson.properties.longitude;
+    //     const newBuildingLatitude = this.newGeoJson.properties.latitude;
+     
+    //     this.geoJsonService.setMapCoordinates(newBuildingLatitude, newBuildinglongitude);
+    //     this.geoJsonService.insertNewBuildingInTable(this.newGeoJson);
+    //     draw.deleteAll();
+    //   },
+    //   (errorResponse) => {
+    //     console.error(errorResponse.error.message); // Handle error response
+    //   });
+      this.apiHandler.sendEditedPolygonData(jsonDataString).subscribe(
       (response) => {
         console.log(response.message); // Handle successful response
         this.newGeoJson = JSON.parse(response.user_data)
-        const newBuildinglongitude = this.newGeoJson.properties.longitude;
-        const newBuildingLatitude = this.newGeoJson.properties.latitude;
-     
-        this.geoJsonService.setMapCoordinates(newBuildingLatitude, newBuildinglongitude);
-        this.geoJsonService.insertNewBuildingInTable(this.newGeoJson);
-        draw.deleteAll();
+        console.log(this.newGeoJson)
+        const newBuildingLongitude = this.newGeoJson.lon;
+        const newBuildingLatitude = this.newGeoJson.lat;
+        const newBuildingUbid = this.newGeoJson.ubid;
+        this.geoJsonService.setMapCoordinates(newBuildingLatitude, newBuildingLongitude);
+        console.log(newBuildingLatitude);
+        console.log(newBuildingLongitude);
+        console.log("yurr");
+       // this.geoJsonService.insertNewBuildingInTable(this.newGeoJson);
+       this.geoJsonService.modifyBuildingInTable(newBuildingCoordinates, newBuildingLatitude, newBuildingLongitude, newBuildingUbid, newBuildingId);
       },
       (errorResponse) => {
         console.error(errorResponse.error.message); // Handle error response
