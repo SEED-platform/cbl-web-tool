@@ -174,23 +174,18 @@ def run_cbl_workflow():
 
             # Determine UBIDs from footprints
             datum["ubid"] = encode_ubid(datum["geometry"])
-            datum["quality"] = "Good"
         else:
             datum["address"] = normalize_address(locations[index]["street"])
             datum["city"] = locations[index]["city"]
             datum["state"] = locations[index]["state"]
-            datum["postal_code"] = "Poor Data"
-            datum["side_of_street"] = "Poor Data"
-            datum["neighborhood"] = "Poor Data"
-            datum["county"] = "Poor Data"
-            datum["country"] = "Poor Data"
-            datum["latitude"] = "Poor Data"
-            datum["longitude"] = "Poor Data"
+            datum["postal_code"] = None
+            datum["county"] = None
+            datum["country"] = None
+            datum["latitude"] = None
+            datum["longitude"] = None
             datum["quality"] = "Ambiguous"
-            datum["footprint_match"] = "Poor Data"
-            datum["height"] = None
             datum["geometry"] = None
-            datum["ubid"] = "Poor Data"
+            datum["ubid"] = None
         index = index + 1
 
     # since the data dict contains information only from mapquest, need to merge original 
@@ -199,6 +194,14 @@ def run_cbl_workflow():
     for i in range(len(data)):
         file_dict = file_data[i]
         data_dict = data[i]
+
+        if "P1AAA" == data_dict["quality"]:
+            data_dict["quality"] = "Very Good"
+        elif "L1AAA" == data_dict["quality"]:
+            data_dict["quality"] = "Good"
+        elif data_dict["quality"] in poorQualityCodes:
+            data_dict["quality"] = "Very Poor"
+
         if (file_dict != data_dict):
             merged_dict = merge_dicts(file_dict, data_dict)
             merged_data.append(merged_dict)
@@ -219,9 +222,6 @@ def run_cbl_workflow():
     geojson_obj['features'].sort(key=lambda feature: feature['properties'].get('street_address', ''))
 
     final_geojson = json.dumps(geojson_obj)
-    with open('output.geojson', 'w') as f:
-        f.write(final_geojson)
-
     return jsonify({"message": "success", "user_data": final_geojson}), 200
 
 
