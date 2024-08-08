@@ -1,12 +1,12 @@
-def merge_dicts(dict1, dict2):
+def merge_dicts(file_dict, data_dict):
     merged_dict = {}
-    for key, value in dict2.items():
+    for key, value in data_dict.items():
         if "address" == key.lower():
             merged_dict["street_address"] = value
         else:
             merged_dict[key.lower()] = value
 
-    for key, value in dict1.items():
+    for key, value in file_dict.items():
         if "street_address" != key.lower():     # don't want to overwrite normalized address from data dict
             merged_dict[key.lower()] = value
 

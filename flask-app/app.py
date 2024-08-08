@@ -301,6 +301,32 @@ def reverse_geocode():
     
     return jsonify({"message": "success", "user_data": json.dumps(returned_feature)}), 200
 
+
+@app.route('/api/edit_footprint',  methods=['POST'])
+def edit_footprint():
+    json_string = request.json.get('value')
+    json_data = json.loads(json_string)
+    coords = json_data["coordinates"] 
+
+    polygon = Polygon(coords)
+    centroid = polygon.centroid
+
+    # calculate lat, long (center of polygon)
+    lat = centroid.y       
+    lon = centroid.x
+
+    # encode ubid from coordinates 
+    ubid = ""
+    try:
+        ubid = encode_ubid(polygon)
+    except AssertionError:
+        return jsonify({'message': "Invalid longitude coordinates"}), 400
+    
+    newPolygonData = {"lat": lat, "lon": lon, "ubid": ubid}
+    return jsonify({"message": "success", "user_data": json.dumps(newPolygonData)}), 200
+
+
+
 @app.route('/api/export_geojson',  methods=['POST'])
 def export_geojson():
     json_string = request.json.get('value')
