@@ -75,7 +75,7 @@ export class CblTableComponent implements OnInit {
       if (modBuilding) {
  
        this.updateModifiedRow(modBuilding);
-     
+       setTimeout(()=>{this.geoJsonService.modifyBuildingInGeoJson(modBuilding)}, 1000);
     }
   })
 }
@@ -149,22 +149,23 @@ export class CblTableComponent implements OnInit {
           }
         }
         return true;
-        },
-        cellStyle: (params: any) => {
-          const field1 = params.data.properties['ubid'];
-          const field2 = params.data.properties['street_address'];
-          const uniqueString = `${field1}-${field2}`;
-   
-          const isDuplicate = (this.duplicateMap[uniqueString] || 0) > 1
-          
-          // Apply custom styles based on conditions
-          if (isDuplicate) {
-            return {
-              backgroundColor: 'yellow',
-            };
-          }
-          return {};  // Return an empty object for default styling
         }
+        // ,
+        // cellStyle: (params: any) => {
+        //   const field1 = params.data.properties['ubid'];
+        //   const field2 = params.data.properties['street_address'];
+        //   const uniqueString = `${field1}-${field2}`;
+   
+        //   const isDuplicate = (this.duplicateMap[uniqueString] || 0) > 1
+          
+        //   // Apply custom styles based on conditions
+        //   if (isDuplicate) {
+        //     return {
+        //       backgroundColor: 'yellow',
+        //     };
+        //   }
+        //   return {};  // Return an empty object for default styling
+        // }
       }));
     sessionStorage.setItem("COL", JSON.stringify(this.colDefs));
   }
@@ -260,8 +261,9 @@ export class CblTableComponent implements OnInit {
      if (rowNode) {
       // Update the row data
       const data = rowNode;
-      console.log(rowNode)
-      data.properties.coordinates = modBuilding.coordinates;
+      console.log(rowNode.properties.coordinates)
+      console.log(modBuilding.coordinates)
+      data.geometry.coordinates = modBuilding.coordinates;
       data.properties.latitude = modBuilding.latitude;
       data.properties.longitude = modBuilding.longitude;
       data.properties.ubid = modBuilding.ubid;

@@ -59,7 +59,7 @@ export class GeoJsonService {
       return;
     }
     
-    const { ubid, latitude, longitude } = mapRemovedObject.properties;
+    const { id, latitude, longitude } = mapRemovedObject.properties;
   
     // Get the current GeoJSON from the subject
     const currentGeoJson = this.geoJsonSubject.getValue();
@@ -68,7 +68,7 @@ export class GeoJsonService {
     const features = [...currentGeoJson.features];
     
     // Find the index of the feature to remove
-    const indexToRemove = features.findIndex((feature: any) => feature.properties.ubid === ubid);
+    const indexToRemove = features.findIndex((feature: any) => feature.properties.id === id);
     
     // Remove the feature at the found index if it exists
     if (indexToRemove !== -1) {
@@ -99,7 +99,7 @@ export class GeoJsonService {
       console.error('Invalid object to modify');
       return;
     }
-    const { coordinates, latitude, longitude, ubid, id } = modBuilding.properties;
+    const { coordinates, latitude, longitude, ubid, id } = modBuilding;
 
     const currentGeoJson = this.geoJsonSubject.getValue();
     
@@ -109,11 +109,23 @@ export class GeoJsonService {
     // Find the index of the feature to remove
     const index = features.findIndex((feature: any) => feature.id === id.toString());
 
-    currentGeoJson.features[index].properties.ubid = ubid;
-    currentGeoJson.features[index].properties.coordinates = coordinates;
-    currentGeoJson.features[index].properties.latitude = latitude;
-    currentGeoJson.features[index].properties.longitude = longitude;
+    features[index].properties.ubid = ubid;
+    features[index].geometry.coordinates = [coordinates];
+    features[index].properties.latitude = latitude.toString();
+    features[index].properties.longitude = longitude.toString();
+
+    const updatedGeoJson = {
+      ...currentGeoJson,
+      features: features
+    };
+    console.log(updatedGeoJson)
+    this.geoJsonSubject.next(updatedGeoJson);
     
+    // Optionally call additional methods or emit values as needed
+    this.setGeoJson(updatedGeoJson);
+    this.mapCoordinatesSubject.next({ latitude, longitude });
+    
+    console.log(updatedGeoJson);
   }
 
   modifyBuildingInTable(coordinates: number[], latitude: number, longitude: number, ubid: string, id: number): void {

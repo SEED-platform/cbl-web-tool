@@ -143,17 +143,6 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
           type: 'geojson',
           data: geoJsonObject
         });
-
-        // this.map.addLayer({
-        //   id: 'features',
-        //   type: 'fill',
-        //   source: 'features',
-        //   paint: {
-        //     'fill-color': '#0B5E90',
-        //     'fill-opacity': 0.4
-        //   }
-        // });
-
         this.addDrawFeatures(this.map, geoJsonObject);
       }
     }    
@@ -215,6 +204,7 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
     });
     map.addControl(this.draw, 'top-right');
     map.addControl(new mapboxgl.NavigationControl(), 'bottom-left');
+
     geoJsonObject.features.forEach((feature: any) => {
   
       if (feature.geometry && feature.geometry.type === 'Polygon') {
@@ -270,9 +260,7 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
         const newBuildingLatitude = this.newGeoJson.lat;
         const newBuildingUbid = this.newGeoJson.ubid;
         this.geoJsonService.setMapCoordinates(newBuildingLatitude, newBuildingLongitude);
-        console.log(newBuildingLatitude);
-        console.log(newBuildingLongitude);
-        console.log("yurr");
+    
        // this.geoJsonService.insertNewBuildingInTable(this.newGeoJson);
        this.geoJsonService.modifyBuildingInTable(newBuildingCoordinates, newBuildingLatitude, newBuildingLongitude, newBuildingUbid, newBuildingId);
       },
@@ -305,27 +293,5 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
       this.map.setZoom(this.zoomLevel);
     }
   }
-
-  highlightFeature(featureId: string | number) {
-    if (this.map) {
-      // Reset previous selections
-      this.map.querySourceFeatures('features').forEach(f => {
-        if (f.id !== undefined) {
-          this.map?.setFeatureState(
-            { source: 'features', id: f.id },
-            { selected: false }
-          );
-        }
-      });
-  
-      // Highlight the clicked feature
-      this.map.setFeatureState(
-        { source: 'features', id: featureId },
-        { selected: true }
-      );
-    }
-  }
-  
-
 
 }
