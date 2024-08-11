@@ -47,7 +47,7 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
         
         
         if (id !== undefined) {
-          this.flyToCoordinates(longitude, latitude);
+          this.flyToCoordinatesWithZoom(longitude, latitude);
           this.setActivePolygon(id.toString());
         }
       }
@@ -182,6 +182,7 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
            
    
             // Emit the click event with the latitude and longitude
+            this.geoJsonService.setIsDataSentFromTable(true);
             this.geoJsonService.emitClickEvent(latitude, longitude);     
             //this.geoJsonService.setMapCoordinates(latitude, longitude);
         } else {
@@ -273,6 +274,7 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
          
        // this.geoJsonService.insertNewBuildingInTable(this.newGeoJson);
        
+       this.geoJsonService.setIsDataSentFromTable(true);
        this.geoJsonService.modifyBuildingInTable(newBuildingCoordinates, newBuildingLatitude, newBuildingLongitude, newBuildingUbid, newBuildingId);
       },
       (errorResponse) => {
@@ -285,7 +287,8 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
     if (!this.draw) return;
     // Deselect all features
 
-
+    this.draw.changeMode('simple_select')
+    this.draw.changeMode('simple_select', { featureIds: [polygonId] })
    
   }
   
@@ -296,6 +299,17 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
       this.map.flyTo({
         center: new mapboxgl.LngLat(longitude, latitude),
         zoom: this.map.getZoom(),
+        essential: true
+      });
+    }
+  }
+
+
+  flyToCoordinatesWithZoom(longitude: number, latitude: number) {
+    if (this.map) {
+      this.map.flyTo({
+        center: new mapboxgl.LngLat(longitude, latitude),
+        zoom: 17.25,
         essential: true
       });
     }
@@ -315,5 +329,7 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
       this.map.setZoom(this.zoomLevel);
     }
   }
+
+  
 
 }

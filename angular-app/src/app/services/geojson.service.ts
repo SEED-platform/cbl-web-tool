@@ -18,6 +18,8 @@ interface GeoJsonFeature {
 
 
 export class GeoJsonService {
+
+  private isSentFromTable: boolean = false; // Flag to track selection source
   private geoJsonSubject: BehaviorSubject<any> = new BehaviorSubject<any>(this.getGeoJsonFromSessionStorage());
 
   private clickEventSubject = new BehaviorSubject<{ latitude: number, longitude: number } | null>(null);
@@ -155,6 +157,14 @@ export class GeoJsonService {
 
   getCurrentCoordinates(): { latitude: number, longitude: number } | null {
     return this.mapCoordinatesSubject.getValue();
+  }
+
+  setIsDataSentFromTable(isTable: boolean): void {
+    this.isSentFromTable = isTable;
+  }
+
+  isDataSentFromTable(): boolean {
+    return this.isSentFromTable;
   }
 
 }

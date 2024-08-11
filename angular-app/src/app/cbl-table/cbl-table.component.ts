@@ -112,7 +112,6 @@ export class CblTableComponent implements OnInit {
    this.setColumnDefs();
    setTimeout(()=>{   this.selectedRowIdStorage = JSON.parse(sessionStorage.getItem("SELECTEDROW") || "undefined")
     if(this.selectedRowIdStorage){
-   
       this.scrollToFeatureById(this.selectedRowIdStorage);
     }})
 
@@ -256,9 +255,14 @@ export class CblTableComponent implements OnInit {
 
   }
   
+  onRowClicked(event: any){
+    this.geoJsonService.setIsDataSentFromTable(false);
+    this.onRowSelected(event);
+  }
+
 
   onRowSelected(event: any) {
-      
+       
     if (event.node.isSelected()) {
       const data = event.node.data;
       const id =  data.id;
@@ -266,7 +270,9 @@ export class CblTableComponent implements OnInit {
       sessionStorage.setItem("SELECTEDROW", JSON.stringify(this.selectedRowIdStorage));
       const latitude = data.properties.latitude;
       const longitude = data.properties.longitude;
+      if(!this.geoJsonService.isDataSentFromTable()){
       this.geoJsonService.emitSelectedFeature(latitude, longitude, id);
+      }
     }
      
   }
