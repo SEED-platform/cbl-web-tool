@@ -9,7 +9,8 @@ import { GeoJsonService } from '../services/geojson.service';
 import { Router } from '@angular/router';
 import { ValueGetterParams } from "@ag-grid-community/core";
 import Papa from 'papaparse';
-import { Subscription } from 'rxjs';
+import { timer, Subscription } from 'rxjs';
+
 
 
 
@@ -35,6 +36,8 @@ export class CblTableComponent implements OnInit {
   private newBuilingSubscription: Subscription | undefined;
   private modifyBuildingSubscription: Subscription | undefined;
   private isEditing: boolean = false;
+  private selectedRowIdStorage: number  | undefined = undefined;
+
 
   defaultColDef = {
     flex: 1,
@@ -54,7 +57,6 @@ export class CblTableComponent implements OnInit {
       this.geoJson = data;
       this.findDuplicates(this.geoJson);
       this.updateTable();
-    
     });
 
 
@@ -73,9 +75,8 @@ export class CblTableComponent implements OnInit {
 
     this.modifyBuildingSubscription = this.geoJsonService.modifyBuilding$.subscribe(modBuilding => {
       if (modBuilding) {
- 
-       this.updateModifiedRow(modBuilding);
-       setTimeout(()=>{this.geoJsonService.modifyBuildingInGeoJson(modBuilding)}, 1000);
+          this.updateModifiedRow(modBuilding);
+          setTimeout(()=>{this.geoJsonService.modifyBuildingInGeoJson(modBuilding)}, 300);
     }
   })
 }
@@ -109,6 +110,12 @@ export class CblTableComponent implements OnInit {
     this.rowData = this.featuresArray;
    }
    this.setColumnDefs();
+   setTimeout(()=>{   this.selectedRowIdStorage = JSON.parse(sessionStorage.getItem("SELECTEDROW") || "undefined")
+    if(this.selectedRowIdStorage){
+   
+      this.scrollToFeatureById(this.selectedRowIdStorage);
+    }})
+
   }
 
 
@@ -209,17 +216,54 @@ export class CblTableComponent implements OnInit {
       if (rowNode) {
         rowNode.setSelected(true);
       }
-      
     }
   }
 
-  onRowSelected(event: any) {
+  scrollToFeatureById(id: number) {
+    // Find the feature in rowData'
+     if (!this.gridApi) return;
+    this.gridApi!.setGridOption("loading", true);
+  
+ 
+    const feature = this.rowData.find((f: any) => f.id === id.toString());
 
+
+    if (!feature) {
+      console.error(`Feature with ID ${id} not found.`);
+      return;
+    }
+  
+    if (!this.gridApi) {
+      console.error('Grid API is not initialized.');
+      return;
+    }
+  
+    if (feature && this.gridApi) {
+      this.gridApi.ensureIndexVisible(this.rowData.indexOf(feature), 'top');
+      const index = this.rowData.indexOf(feature);
+
+      const rowNode = this.gridApi.getDisplayedRowAtIndex(index);
+
+      if (rowNode) {
+        rowNode.setSelected(true);
+      }
+    }
+
+    timer(200).subscribe(() => {
+      this.gridApi!.setGridOption("loading", false);
+    });
+
+
+  }
+  
+
+  onRowSelected(event: any) {
+      
     if (event.node.isSelected()) {
       const data = event.node.data;
       const id =  data.id;
-      console.log(data.id)
-      console.log(data);
+      this.selectedRowIdStorage = id;
+      sessionStorage.setItem("SELECTEDROW", JSON.stringify(this.selectedRowIdStorage));
       const latitude = data.properties.latitude;
       const longitude = data.properties.longitude;
       this.geoJsonService.emitSelectedFeature(latitude, longitude, id);
@@ -261,8 +305,7 @@ export class CblTableComponent implements OnInit {
      if (rowNode) {
       // Update the row data
       const data = rowNode;
-      console.log(rowNode.properties.coordinates)
-      console.log(modBuilding.coordinates)
+
       data.geometry.coordinates = modBuilding.coordinates;
       data.properties.latitude = modBuilding.latitude;
       data.properties.longitude = modBuilding.longitude;
@@ -272,7 +315,7 @@ export class CblTableComponent implements OnInit {
       const res = this.gridApi.applyTransaction({
         update: [data] // Use `update` key to modify existing rows
       });
-      console.log(res);
+
      }
    }
   }

@@ -118,14 +118,12 @@ export class GeoJsonService {
       ...currentGeoJson,
       features: features
     };
-    console.log(updatedGeoJson)
     this.geoJsonSubject.next(updatedGeoJson);
     
     // Optionally call additional methods or emit values as needed
     this.setGeoJson(updatedGeoJson);
     this.mapCoordinatesSubject.next({ latitude, longitude });
     
-    console.log(updatedGeoJson);
   }
 
   modifyBuildingInTable(coordinates: number[], latitude: number, longitude: number, ubid: string, id: number): void {
@@ -158,8 +156,5 @@ export class GeoJsonService {
   getCurrentCoordinates(): { latitude: number, longitude: number } | null {
     return this.mapCoordinatesSubject.getValue();
   }
-
-  
-
 
 }
