@@ -43,11 +43,10 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
 
     this.featureClickSubscription = this.geoJsonService.selectedFeature$.subscribe(feature => {
       if (feature) {
-        const { latitude, longitude, id } = feature;
-        
-        
-        if (id !== undefined) {
-          this.flyToCoordinatesWithZoom(longitude, latitude);
+        const { id } = feature;
+         console.log(feature)
+        if (id !== undefined && (feature.latitude.toString() !== '0' && feature.latitude.toString()  !== '0')) {
+          this.flyToCoordinatesWithZoom(feature.longitude, feature.latitude);
           this.setActivePolygon(id.toString());
         }
       }
@@ -163,18 +162,17 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
 
     // Get the feature IDs under the click point
     const featureIds = this.draw.getFeatureIdsAt(event.point);
-    console.log(featureIds)
-    console.log(this.map.queryRenderedFeatures(event.point));
+  
 
     if (featureIds && featureIds.length > 0) {
         // Assuming featureIds[0] is the ID of the clicked feature
         const clickedFeatureId = featureIds[0];
 
-        console.log(featureIds)
+  
 
         // Find the corresponding feature in geoJsonObject
         const clickedFeature = geoJsonObject.features.find((feature: any) => feature.id === String(clickedFeatureId));
-
+        console.log(clickedFeature)
         if (clickedFeature) {
             this.clickedBuildingId = clickedFeature.id;
             const { latitude, longitude } = clickedFeature.properties;
@@ -288,7 +286,8 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
   handleDeleteEvent(e: any, draw: any, geoJsonObject: any) {
    
     const newBuildingCoordinates =  e.features[0].geometry.coordinates[0];
-    const newBuildingId =  e.features[0].id;
+    const newBuildingId =  e.features[0].id
+    console.log("in map", e.features[0].id)
     
    
         const newBuildingLongitude = 0;

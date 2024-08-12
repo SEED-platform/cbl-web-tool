@@ -77,6 +77,7 @@ export class CblTableComponent implements OnInit {
 
     this.modifyBuildingSubscription = this.geoJsonService.modifyBuilding$.subscribe(modBuilding => {
       if (modBuilding) {
+        console.log("in table" ,modBuilding)
           this.updateModifiedRow(modBuilding);
           setTimeout(()=>{this.geoJsonService.modifyBuildingInGeoJson(modBuilding)}, 300);
     }
