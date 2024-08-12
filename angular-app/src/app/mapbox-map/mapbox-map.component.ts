@@ -47,7 +47,7 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
          console.log(feature)
         if (id !== undefined && (feature.latitude.toString() !== '0' && feature.latitude.toString()  !== '0')) {
           this.flyToCoordinatesWithZoom(feature.longitude, feature.latitude);
-          this.setActivePolygon(id.toString());
+          //this.setActivePolygon(id.toString());
         }
       }
     });
@@ -142,7 +142,9 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
           type: 'geojson',
           data: geoJsonObject
         });
+       
         this.addDrawFeatures(this.map, geoJsonObject);
+        
       }
     }    
     });
@@ -269,7 +271,7 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
         const newBuildingUbid = this.newGeoJson.ubid;
         
         
-     //   this.geoJsonService.setMapCoordinates(newBuildingLatitude, newBuildingLongitude);
+      this.geoJsonService.setMapCoordinates(newBuildingLatitude, newBuildingLongitude);
          
        // this.geoJsonService.insertNewBuildingInTable(this.newGeoJson);
        
@@ -287,7 +289,7 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
    
     const newBuildingCoordinates =  e.features[0].geometry.coordinates[0];
     const newBuildingId =  e.features[0].id
-    console.log("in map", e.features[0].id)
+    console.log("in map", e.features[0])
     
    
         const newBuildingLongitude = 0;

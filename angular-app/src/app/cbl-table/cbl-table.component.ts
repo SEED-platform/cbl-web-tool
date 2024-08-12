@@ -37,6 +37,7 @@ export class CblTableComponent implements OnInit {
   private modifyBuildingSubscription: Subscription | undefined;
   private isEditing: boolean = false;
   private selectedRowIdStorage: number  | undefined = undefined;
+  private initialLoad: boolean = true; // Flag to track initial load
 
 
   defaultColDef = {
@@ -56,7 +57,10 @@ export class CblTableComponent implements OnInit {
       this.geoJsonSubscription = this.geoJsonService.getGeoJson().subscribe(data => {
       this.geoJson = data;
       this.findDuplicates(this.geoJson);
-      this.updateTable();
+      if (this.initialLoad) {
+        this.updateTable(); // Update table only on initial load
+        this.initialLoad = false; // Set the flag to false after the initial load
+      }
     });
 
 
