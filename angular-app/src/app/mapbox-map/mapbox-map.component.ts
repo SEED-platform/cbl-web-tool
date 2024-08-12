@@ -47,7 +47,7 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
          console.log(feature)
         if (id !== undefined && (feature.latitude.toString() !== '0' && feature.latitude.toString()  !== '0')) {
           this.flyToCoordinatesWithZoom(feature.longitude, feature.latitude);
-          //this.setActivePolygon(id.toString());
+          this.setActivePolygon(id.toString());
         }
       }
     });
@@ -133,20 +133,8 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
     this.map.on('load', () => {
     
       if (this.map) {
-        const source = this.map.getSource('features');
-      
-      if (source) {
-        (source as mapboxgl.GeoJSONSource).setData(geoJsonObject);
-      } else {
-        this.map.addSource('features', {
-          type: 'geojson',
-          data: geoJsonObject
-        });
-       
         this.addDrawFeatures(this.map, geoJsonObject);
-        
-      }
-    }    
+      }    
     });
   }else{
     
@@ -209,14 +197,15 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
         polygon: true,
         trash: true,
       },
-      defaultMode: 'simple_select' 
+      defaultMode: 'simple_select' ,
+
     });
     map.addControl(this.draw, 'top-right');
     map.addControl(new mapboxgl.NavigationControl(), 'bottom-left');
 
     geoJsonObject.features.forEach((feature: any) => {
   
-      if (feature.geometry && feature.geometry.type === 'Polygon') {
+      if (feature.geometry && feature.geometry.type === 'Polygon' && feature.properties.latitude !== '0' && feature.properties.longitude !== "0" && feature.properties.ubid !== "0") {
         this.draw?.add({
           id: Number(feature.id),
           type: 'Feature',
@@ -306,15 +295,9 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
 
   }
 
-   setActivePolygon(polygonId: string) {
-    if (!this.draw) return;
-    // Deselect all features
-
-    this.draw.changeMode('simple_select')
-    this.draw.changeMode('simple_select', { featureIds: [polygonId] })
-   
+  setActivePolygon(polygonId: string) {
+    
   }
-  
 
 
   flyToCoordinates(longitude: number, latitude: number) {
