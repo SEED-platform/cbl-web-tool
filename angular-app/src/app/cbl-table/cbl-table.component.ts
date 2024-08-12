@@ -63,6 +63,8 @@ export class CblTableComponent implements OnInit {
     this.clickEventSubscription = this.geoJsonService.clickEvent$.subscribe(clickEvent => {
       if (clickEvent) {
         this.scrollToFeature(clickEvent.latitude, clickEvent.longitude);
+        this.selectedRowIdStorage = clickEvent.id;
+        sessionStorage.setItem("SELECTEDROW", JSON.stringify(this.selectedRowIdStorage));
       }
     });
 

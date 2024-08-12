@@ -22,8 +22,8 @@ export class GeoJsonService {
   private isSentFromTable: boolean = false; // Flag to track selection source
   private geoJsonSubject: BehaviorSubject<any> = new BehaviorSubject<any>(this.getGeoJsonFromSessionStorage());
 
-  private clickEventSubject = new BehaviorSubject<{ latitude: number, longitude: number } | null>(null);
-  public clickEvent$: Observable<{ latitude: number, longitude: number } | null> = this.clickEventSubject.asObservable();
+  private clickEventSubject = new BehaviorSubject<{ latitude: number, longitude: number, id:number } | null>(null);
+  public clickEvent$: Observable<{ latitude: number, longitude: number, id:number  } | null> = this.clickEventSubject.asObservable();
   
   private selectedFeatureSubject = new BehaviorSubject<{ latitude: number, longitude: number, id: number } | null>(null);
   public selectedFeature$: Observable<{ latitude: number, longitude: number, id: number } | null> = this.selectedFeatureSubject.asObservable();
@@ -143,8 +143,8 @@ export class GeoJsonService {
   
   }
 
-  emitClickEvent(latitude: number, longitude: number): void {
-    this.clickEventSubject.next({ latitude, longitude });
+  emitClickEvent(latitude: number, longitude: number, id: number): void {
+    this.clickEventSubject.next({ latitude, longitude, id });
   }
   
   emitSelectedFeature(latitude: number, longitude: number, id: number): void {

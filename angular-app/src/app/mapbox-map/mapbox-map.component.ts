@@ -183,7 +183,7 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
    
             // Emit the click event with the latitude and longitude
             this.geoJsonService.setIsDataSentFromTable(true);
-            this.geoJsonService.emitClickEvent(latitude, longitude);     
+            this.geoJsonService.emitClickEvent(latitude, longitude, this.clickedBuildingId);     
             //this.geoJsonService.setMapCoordinates(latitude, longitude);
         } else {
             console.error(`Feature with ID ${clickedFeatureId} not found in geoJsonObject.`);
@@ -232,6 +232,7 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
     // Optional: Add event listeners for drawing and editing polygons
     // map.on('draw.create', (e) => this.handleDrawEvent(e, this.draw, geoJsonObject));  
     map.on('draw.update', (e) => this.handleEditEvent(e, this.draw, geoJsonObject));
+    map.on('draw.delete', (e) => this.handleDeleteEvent(e, this.draw, geoJsonObject));
    }
 
   handleEditEvent(e: any, draw: any, geoJsonObject: any) {
@@ -280,6 +281,27 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
       (errorResponse) => {
         console.error(errorResponse.error.message); // Handle error response
       });
+
+  }
+
+
+  handleDeleteEvent(e: any, draw: any, geoJsonObject: any) {
+   
+    const newBuildingCoordinates =  e.features[0].geometry.coordinates[0];
+    const newBuildingId =  e.features[0].id;
+    
+   
+        const newBuildingLongitude = 0;
+        const newBuildingLatitude = 0;
+        const newBuildingUbid: any = 0;
+        
+        
+     //   this.geoJsonService.setMapCoordinates(newBuildingLatitude, newBuildingLongitude);
+         
+       // this.geoJsonService.insertNewBuildingInTable(this.newGeoJson);
+       
+       this.geoJsonService.setIsDataSentFromTable(true);
+       this.geoJsonService.modifyBuildingInTable(newBuildingCoordinates, newBuildingLatitude, newBuildingLongitude, newBuildingUbid, newBuildingId);
 
   }
 
