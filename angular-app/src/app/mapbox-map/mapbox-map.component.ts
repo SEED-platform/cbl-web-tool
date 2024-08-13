@@ -158,14 +158,13 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
     if (featureIds && featureIds.length > 0) {
         // Assuming featureIds[0] is the ID of the clicked feature
         const clickedFeatureId = featureIds[0];
-        this.resetPolygonColor(clickedFeatureId);
-
-  
+     
 
         // Find the corresponding feature in geoJsonObject
         const clickedFeature = geoJsonObject.features.find((feature: any) => feature.id === String(clickedFeatureId));
         console.log(clickedFeature)
         if (clickedFeature) {
+            this.resetPolygonColor(this.clickedBuildingId);
             this.clickedBuildingId = clickedFeature.id;
             const { latitude, longitude } = clickedFeature.properties;
             //reset any clicked polygon outline
@@ -173,7 +172,6 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
    
             // Emit the click event with the latitude and longitude
             this.geoJsonService.setIsDataSentFromTable(true);
-            const parsedClickId = Number(this.clickedBuildingId);
             this.geoJsonService.emitClickEvent(latitude, longitude, Number(this.clickedBuildingId));     
             //this.geoJsonService.setMapCoordinates(latitude, longitude);
         } else {
@@ -561,7 +559,7 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
   }
 
   setActivePolygon(polygonId: any) {
-  
+     
       if (this.draw) {
         // Reset color of the previously selected polygon, if any
         if (!(this.selectedPolygonId === "")) {
@@ -571,6 +569,7 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
         // Update the current selected polygon ID
         this.selectedPolygonId = polygonId;
          console.log("comingin", this.draw.get(polygonId))
+         this.clickedBuildingId = polygonId;
          
          const polygon = this.draw.get(polygonId);
          
@@ -585,7 +584,7 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
             this.draw?.add(feat)
 
          console.log(feat, "new added")
-}
+        }
         
         
     }
@@ -595,9 +594,7 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
   resetPolygonColor(polygonId: any) {
     if (this.draw) {
       // Retrieve the feature
-     
-  
-      console.log("being reset", this.draw.get(polygonId))
+
         // Reset the color to the default or another color
         const polygon = this.draw.get(polygonId);
         if(polygon?.properties?.['portColor'] !== '#3bb2d0'){
@@ -612,25 +609,7 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
     }
   }
 
-  resetPolygonColorOnClick(polygonId: string) {
-
-    
-    if (this.draw) {
-      // Retrieve the feature
-      console.log("being reset", this.draw.get(polygonId))
-        // Reset the color to the default or another color
-        const polygon = this.draw.get(polygonId);
-        if(polygon?.properties?.['portColor'] !== '#3bb2d0'){
-        this.draw.setFeatureProperty(polygonId, 'portColor', '#3bb2d0'); // Default color
-        this.draw?.setFeatureProperty(polygonId, 'portOpacity', 0.0);
-        const feature = this.draw.get(polygonId);
-        if (feature !== undefined)
-        this.draw.add(feature); // Update the feature style
-        console.log("reset", feature)
-      }
-
-    }
-  }
+ 
 
 
   flyToCoordinates(longitude: number, latitude: number) {
