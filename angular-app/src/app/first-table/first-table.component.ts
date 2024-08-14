@@ -13,7 +13,6 @@ import Papa from 'papaparse';
   selector: 'app-first-table',
   standalone: true,
   templateUrl: './first-table.component.html',
-  styleUrl: './first-table.component.css',
   imports: [AgGridAngular, FormsModule, CommonModule]
 })
 
