@@ -97,6 +97,9 @@ export class GeoJsonService {
   }
 
   modifyBuildingInGeoJson(modBuilding: any){
+
+
+    console.log(modBuilding);
     if (!modBuilding) {
       console.error('Invalid object to modify');
       return;
@@ -129,6 +132,7 @@ export class GeoJsonService {
   }
 
   modifyBuildingInTable(coordinates: number[], latitude: number, longitude: number, ubid: string, id: number): void {
+
     const updatedBuilding = { coordinates, latitude, longitude, ubid, id };
 
     // Update the BehaviorSubject with the new building data
@@ -140,7 +144,7 @@ export class GeoJsonService {
     const currentGeoJson = this.geoJsonSubject.getValue();
     currentGeoJson.features.unshift(buildingObject);
     this.setGeoJson(currentGeoJson);
-  
+    console.log("NEW geojson", currentGeoJson);
   }
 
   emitClickEvent(latitude: number, longitude: number, id: number): void {

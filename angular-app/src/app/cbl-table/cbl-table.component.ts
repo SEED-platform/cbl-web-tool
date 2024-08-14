@@ -74,6 +74,7 @@ export class CblTableComponent implements OnInit {
 
     this.newBuilingSubscription = this.geoJsonService.newBulding$.subscribe(newBuilding => {
       if (newBuilding){
+        console.log("new building", newBuilding)
          this.gridApi.applyTransaction({ add: [newBuilding], addIndex: 0 });
          this.geoJsonService.insertNewBuildingInGeoJson(newBuilding);
       }
@@ -211,18 +212,35 @@ export class CblTableComponent implements OnInit {
   }
 
   scrollToFeature(latitude: number, longitude: number) {
+     
+    if(longitude === -1 && latitude === -1){
+      this.scrollToTop()
+      this.gridApi.deselectAll();
+      return;
+    }
+
+
+
     const feature = this.rowData.find((f: any) => 
       f.properties.latitude === latitude && f.properties.longitude === longitude
     );
   
     if (feature && this.gridApi) {
-      this.gridApi.ensureIndexVisible(this.rowData.indexOf(feature), 'top');
+      this.gridApi.ensureIndexVisible(this.rowData.indexOf(feature), 'middle');
       const index = this.rowData.indexOf(feature);
       const rowNode = this.gridApi.getDisplayedRowAtIndex(index);
       if (rowNode) {
         rowNode.setSelected(true);
       }
     }
+  }
+
+
+  scrollToTop(){
+   console.log("yo")
+    this.gridApi.ensureIndexVisible(0, 'top');
+    var rowNode1 = this.gridApi!.getDisplayedRowAtIndex(0)!;
+    this.gridApi!.flashCells({ rowNodes: [rowNode1] });
   }
 
   scrollToFeatureById(id: number) {

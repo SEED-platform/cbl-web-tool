@@ -6,6 +6,7 @@ import MapboxDraw from "@mapbox/mapbox-gl-draw";
 import { CommonModule, JsonPipe } from '@angular/common';
 import { environment } from '../../environments/environment';
 import { Subscription } from 'rxjs';
+import { NewBuildingButton } from './new-buliding-button';
 import '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css';
 
 
@@ -153,7 +154,9 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
 
     // Get the feature IDs under the click point
     const featureIds = this.draw.getFeatureIdsAt(event.point);
-     
+
+    console.log(featureIds)
+  
 
     if (featureIds && featureIds.length > 0) {
         // Assuming featureIds[0] is the ID of the clicked feature
@@ -162,7 +165,6 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
 
         // Find the corresponding feature in geoJsonObject
         const clickedFeature = geoJsonObject.features.find((feature: any) => feature.id === String(clickedFeatureId));
-        console.log(clickedFeature)
         if (clickedFeature) {
             this.resetPolygonColor(this.clickedBuildingId);
             this.clickedBuildingId = clickedFeature.id;
@@ -187,7 +189,7 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
     this.draw = new MapboxDraw({
       displayControlsDefault: false,
       controls: {
-        polygon: true,
+        //polygon: true,
         trash: true,
       },
       defaultMode: 'simple_select' ,
@@ -464,12 +466,15 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
       ]
 
     });
+    const addNewBuildingButton = new NewBuildingButton(() => this.createNewBuilding());
+
+    map.addControl(addNewBuildingButton, "top-right");
     map.addControl(this.draw, 'top-right');
     map.addControl(new mapboxgl.NavigationControl(), 'bottom-left');
 
     geoJsonObject.features.forEach((feature: any) => {
   
-      if (feature.geometry && feature.geometry.type === 'Polygon' && feature.properties.latitude !== '0' && feature.properties.longitude !== "0" && feature.properties.ubid !== "0") {
+      if (feature.geometry && feature.geometry.type === 'Polygon' && feature.properties.latitude !== '0' && feature.properties.longitude !== "0" && (feature.properties.ubid !== 0 ||  feature.properties.ubid !== '0')) {
         this.draw?.add({
           id: feature.id,
           type: 'Feature',
@@ -483,50 +488,40 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
     })
     
     
-    // map.on('draw.create', (e) => this.handleDrawEvent(e, this.draw, geoJsonObject));  
+     map.on('draw.create', (e) => this.handleDrawEvent(e, this.draw, geoJsonObject)); 
+     map.on('draw.delete', (e) => this.handleDeleteEvent(e, this.draw, geoJsonObject)); 
      map.on('draw.update', (e) => this.handleEditEvent(e, this.draw, geoJsonObject));
-     map.on('draw.delete', (e) => this.handleDeleteEvent(e, this.draw, geoJsonObject));
    }
 
   handleEditEvent(e: any, draw: any, geoJsonObject: any) {
    
     const newBuildingCoordinates =  e.features[0].geometry.coordinates[0];
-    const newBuildingId =  e.features[0].id;
+    let newBuildingId = 0;
+    console.log("edit", geoJsonObject);
+    if(this.clickedBuildingId === "New Building"){
+       newBuildingId = geoJsonObject.features.length - 1;
+       console.log("selected Buidlign id", newBuildingId);
+     } else{
+       newBuildingId =  e.features[0].id;
+    }
     const jsonData = {
       "coordinates": newBuildingCoordinates,
       "propertyNames": this.geoJsonPropertyNames,
-     // "featuresLength": geoJsonObject.features.length
     }
 
     const jsonDataString = JSON.stringify(jsonData);
-    // this.apiHandler.sendReverseGeoCodeData(jsonDataString).subscribe(
-    //   (response) => {
-    //     console.log(response.message); // Handle successful response
-    //     this.newGeoJson = JSON.parse(response.user_data)
-    //     const newBuildinglongitude = this.newGeoJson.properties.longitude;
-    //     const newBuildingLatitude = this.newGeoJson.properties.latitude;
-     
-    //     this.geoJsonService.setMapCoordinates(newBuildingLatitude, newBuildinglongitude);
-    //     this.geoJsonService.insertNewBuildingInTable(this.newGeoJson);
-    //     draw.deleteAll();
-    //   },
-    //   (errorResponse) => {
-    //     console.error(errorResponse.error.message); // Handle error response
-    //   });
+   
       this.apiHandler.sendEditedPolygonData(jsonDataString).subscribe(
       (response) => {
         console.log(response.message); // Handle successful response
         this.newGeoJson = JSON.parse(response.user_data)
-        console.log(this.newGeoJson)
+  
         const newBuildingLongitude = this.newGeoJson.lon;
         const newBuildingLatitude = this.newGeoJson.lat;
         const newBuildingUbid = this.newGeoJson.ubid;
         
         
-      this.geoJsonService.setMapCoordinates(newBuildingLatitude, newBuildingLongitude);
-         
-       // this.geoJsonService.insertNewBuildingInTable(this.newGeoJson);
-       
+      this.geoJsonService.setMapCoordinates(newBuildingLatitude, newBuildingLongitude); 
        this.geoJsonService.setIsDataSentFromTable(true);
        this.geoJsonService.modifyBuildingInTable(newBuildingCoordinates, newBuildingLatitude, newBuildingLongitude, newBuildingUbid, newBuildingId);
       },
@@ -558,10 +553,54 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
 
   }
 
+  createNewBuilding(){
+    console.log(this.draw?.getAll())
+    if(this.clickedBuildingId !== ""){
+    this.resetPolygonColor(this.clickedBuildingId);
+    }
+    this.clickedBuildingId = "New Building"
+    this.draw?.changeMode('draw_polygon');
+    this.geoJsonService.emitClickEvent(-1, -1, -1);     
+  }
+
+
+  handleDrawEvent(e: any, draw: any, geoJsonObject: any) {
+   
+    const newBuildingCoordinates =  e.features[0].geometry.coordinates[0];
+    const newBuildingId =  geoJsonObject.features.length.toString();
+    const jsonData = {
+      "coordinates": newBuildingCoordinates,
+      "propertyNames": this.geoJsonPropertyNames,
+      "featuresLength": geoJsonObject.features.length
+    }
+
+    const jsonDataString = JSON.stringify(jsonData);
+    this.apiHandler.sendReverseGeoCodeData(jsonDataString).subscribe(
+      (response) => {
+        console.log(response.message); // Handle successful response
+        this.newGeoJson = JSON.parse(response.user_data)
+        const newBuildinglongitude = this.newGeoJson.properties.longitude;
+        const newBuildingLatitude = this.newGeoJson.properties.latitude;
+        this.geoJsonService.setMapCoordinates(newBuildingLatitude, newBuildinglongitude);
+        this.geoJsonService.insertNewBuildingInTable(this.newGeoJson);
+       
+      },
+      (errorResponse) => {
+        console.error(errorResponse.error.message); // Handle error response
+      });
+  }
+
   setActivePolygon(polygonId: any) {
+
+
      
       if (this.draw) {
+
+        const polygon = this.draw.get(polygonId);
         // Reset color of the previously selected polygon, if any
+        console.log("trying to set properties", polygon)
+
+       if(polygon?.properties !== undefined){
         if (!(this.selectedPolygonId === "")) {
           this.resetPolygonColor(this.selectedPolygonId);
         }
@@ -571,9 +610,8 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
          console.log("comingin", this.draw.get(polygonId))
          this.clickedBuildingId = polygonId;
          
-         const polygon = this.draw.get(polygonId);
          
-         if(polygon?.properties?.['portColor'] !== 'yellow'){
+         if(polygon?.properties !== undefined && polygon?.properties?.['portColor'] !== 'yellow'){
           console.log(polygon?.properties?.['portColor'])
          this.draw?.setFeatureProperty(polygonId, 'portColor', 'yellow');
          this.draw?.setFeatureProperty(polygonId, 'portOpacity', 0.3);
@@ -585,18 +623,21 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
 
          console.log(feat, "new added")
         }
-        
-        
+      }
     }
   }
 
 
   resetPolygonColor(polygonId: any) {
-    if (this.draw) {
+    console.log(this.clickedBuildingId)
+    if (this.draw && this.clickedBuildingId !== 'New Building') {
       // Retrieve the feature
 
         // Reset the color to the default or another color
         const polygon = this.draw.get(polygonId);
+        console.log("checking polygon", polygon)
+        
+       if(polygon?.properties !== undefined){
         if(polygon?.properties?.['portColor'] !== '#3bb2d0'){
         this.draw.setFeatureProperty(polygonId, 'portColor', '#3bb2d0'); // Default color
         this.draw?.setFeatureProperty(polygonId, 'portOpacity', 0.0);
@@ -605,6 +646,7 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
         this.draw.add(feature); // Update the feature style
         console.log("reset", feature)
       }
+     }
 
     }
   }
@@ -648,4 +690,7 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
     }
   }
 
+
+
+   
 }
