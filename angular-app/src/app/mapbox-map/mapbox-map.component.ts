@@ -8,6 +8,7 @@ import { environment } from '../../environments/environment';
 import { Subscription } from 'rxjs';
 import { NewBuildingButton } from './new-buliding-button';
 import { TrashButton } from './custom-trash-button';
+import { EditButton } from './custom-draw-button';
 import '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css';
 
 
@@ -37,6 +38,7 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
   private clickedBuildingId: string = "";
   private selectedPolygonId: string ="";
   private globalGeoJsonObject: any;
+  private emptyBuildingId: string = "none selected";
   constructor(private cdr: ChangeDetectorRef, private geoJsonService: GeoJsonService, private apiHandler: FlaskRequests) {}
 
   ngOnInit() {
@@ -54,6 +56,8 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
           this.flyToCoordinatesWithZoom(feature.longitude, feature.latitude);
           this.setActivePolygon(id);
           this.draw?.changeMode('simple_select')
+        }else{
+          this.emptyBuildingId = id.toString();
         }
       }
     });
@@ -140,14 +144,6 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
   
       if (this.map) {
         this.addDrawFeatures(this.map, geoJsonObject);
-
-         // Add tooltip to Mapbox Draw control button
-         setTimeout(() => {
-          const drawControlBtn = document.querySelector(".mapbox-gl-draw_ctrl-draw-btn.mapbox-gl-draw_polygon");
-          if (drawControlBtn) {
-            drawControlBtn.setAttribute("title", "Edit/Add polygon for existing data"); // Customize this as needed
-          }
-        }, 200); // Adjust delay if necessary
       }    
     });
   }else{
@@ -180,6 +176,7 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
         if (clickedFeature) {
             this.resetPolygonColor(this.clickedBuildingId);
             this.clickedBuildingId = clickedFeature.id;
+            this.emptyBuildingId = "none selected"
             const { latitude, longitude } = clickedFeature.properties;
             //reset any clicked polygon outline
            
@@ -197,12 +194,11 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
 };
 
 
+
    addDrawFeatures(map: mapboxgl.Map, geoJsonObject: any){
     this.draw = new MapboxDraw({
       displayControlsDefault: false,
       controls: {
-        polygon: true,
-        //trash: true,
       },
       defaultMode: 'simple_select' ,
       userProperties: true,
@@ -480,9 +476,10 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
     });
     const addNewBuildingButton = new NewBuildingButton(() => this.createNewBuilding());
     const addTrashButton = new TrashButton(() => this.deletePolygon());
-
+    const addEditButton = new EditButton(() => this.editEmptyData())
+    map.addControl(this.draw, "top-right")
     map.addControl(addNewBuildingButton, "top-right");
-    map.addControl(this.draw, 'top-right');
+    map.addControl(addEditButton, "top-right");
     map.addControl(addTrashButton, "top-right");
     map.addControl(new mapboxgl.NavigationControl(), 'bottom-left');
 
@@ -576,10 +573,14 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
 
   deletePolygon(){
     console.log("DELETE EVENT BEING CALLED");
+
+   
     const deletePolygonId = this.clickedBuildingId;
-    const clickedFeature = this.globalGeoJsonObject.features.find((feature: any) => feature.id === deletePolygonId);
+    const clickedFeature = this.globalGeoJsonObject.features.find((feature: any) => feature.id === deletePolygonId); 
+    console.log(clickedFeature)
     const newBuildingCoordinates =  clickedFeature.geometry.coordinates[0];
     const newBuildingId =  clickedFeature.id
+    this.emptyBuildingId = newBuildingId;
     console.log("in map", clickedFeature)
     
    
@@ -590,7 +591,6 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
         
        this.geoJsonService.setMapCoordinates(newBuildingLatitude, newBuildingLongitude);
          
-       this.geoJsonService.insertNewBuildingInTable(this.newGeoJson);
        this.selectedPolygonId = "";
        this.geoJsonService.setIsDataSentFromTable(true);
        this.geoJsonService.modifyBuildingInTable(newBuildingCoordinates, newBuildingLatitude, newBuildingLongitude, newBuildingUbid, newBuildingId);
@@ -598,9 +598,20 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
        this.draw?.delete(deletePolygonId)
   }
 
+  editEmptyData(){
+    if(this.emptyBuildingId === "none selected"){
+      alert("Please Select a Row with Empty Data");
+      return;
+    }
+
+    this.draw?.changeMode('draw_polygon');
+  }
+
 
   handleDrawEvent(e: any, draw: any) {
-   
+    
+
+    if (this.clickedBuildingId === "New Building"){
     const newBuildingCoordinates =  e.features[0].geometry.coordinates[0];
     const newBuildingId =  this.globalGeoJsonObject.features.length.toString();
     const jsonData = {
@@ -608,6 +619,7 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
       "propertyNames": this.geoJsonPropertyNames,
       "featuresLength": this.globalGeoJsonObject.features.length
     }
+
 
     const jsonDataString = JSON.stringify(jsonData);
     this.apiHandler.sendReverseGeoCodeData(jsonDataString).subscribe(
@@ -627,6 +639,45 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
       (errorResponse) => {
         console.error(errorResponse.error.message); // Handle error response
       });
+    }else{ 
+      console.log("clicked" , this.emptyBuildingId)
+      const existingBuildingCoordinates =  e.features[0].geometry.coordinates[0];
+      const existingBuildingId = this.emptyBuildingId; 
+      const jsonData = {
+      "coordinates":  existingBuildingCoordinates,
+      "propertyNames": this.geoJsonPropertyNames,
+      "featuresLength": this.globalGeoJsonObject.features.length
+    }
+
+    const jsonDataString = JSON.stringify(jsonData);
+    this.apiHandler.sendReverseGeoCodeData(jsonDataString).subscribe(
+      (response) => {
+        console.log(response.message); // Handle successful response
+        this.newGeoJson = JSON.parse(response.user_data)
+        const existingBuildingLongitude = this.newGeoJson.properties.longitude;
+        const existingBuildingLatitude = this.newGeoJson.properties.latitude;
+        const existingBuildingUbid = this.newGeoJson.properties.ubid;
+        
+
+        const clickedFeature = this.globalGeoJsonObject.features.find((feature: any) => feature.id === existingBuildingId);
+        clickedFeature.properties.longitude =existingBuildingLatitude;
+        clickedFeature.properties.latitude = existingBuildingLongitude;
+        clickedFeature.properties.ubid = existingBuildingUbid;
+        clickedFeature.geometry.coordinates = [existingBuildingCoordinates]
+
+        const featureId = e.features[0].id;
+        draw.delete(featureId);
+        draw.add(clickedFeature);
+        draw.changeMode('simple_select')
+        this.geoJsonService.setMapCoordinates(existingBuildingLatitude, existingBuildingLongitude);
+        this.geoJsonService.modifyBuildingInTable(existingBuildingCoordinates,  existingBuildingLatitude, existingBuildingLongitude, existingBuildingUbid, Number(existingBuildingId));
+        console.log("clicked feature", clickedFeature)
+      },
+      (errorResponse) => {
+        console.error(errorResponse.error.message); // Handle error response
+      });    
+    }
+     this.emptyBuildingId = "none selected";
      
   }
 
@@ -649,6 +700,8 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
         this.selectedPolygonId = polygonId;
          console.log("comingin", this.draw.get(polygonId))
          this.clickedBuildingId = polygonId;
+         this.emptyBuildingId = "none selected"
+         console.log(this.clickedBuildingId, "cccccccccc")
          
          
          if(polygon?.properties !== undefined && polygon?.properties?.['portColor'] !== 'yellow'){

@@ -80,7 +80,7 @@ export class CblTableComponent implements OnInit {
         console.log("new building", newBuilding)
          this.gridApi.applyTransaction({ add: [newBuilding], addIndex: 0 });
          this.geoJsonService.insertNewBuildingInGeoJson(newBuilding); //updates the original geojson
-         this.updateTable(); //needed to keep in sync with map
+         setTimeout(()=>{this.updateTable(), 10}); //needed to keep in sync with map
       }
     })
     
@@ -129,10 +129,9 @@ export class CblTableComponent implements OnInit {
                    
                    this.gridApi.deselectAll();
                    this.scrollToTop()
-              })
-            }
-  
+              }, 100)
   }
+}
 
 
 
