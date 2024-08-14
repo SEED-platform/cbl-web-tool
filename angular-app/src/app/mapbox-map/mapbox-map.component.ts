@@ -7,6 +7,7 @@ import { CommonModule, JsonPipe } from '@angular/common';
 import { environment } from '../../environments/environment';
 import { Subscription } from 'rxjs';
 import { NewBuildingButton } from './new-buliding-button';
+import { TrashButton } from './custom-trash-button';
 import '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css';
 
 
@@ -139,6 +140,14 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
   
       if (this.map) {
         this.addDrawFeatures(this.map, geoJsonObject);
+
+         // Add tooltip to Mapbox Draw control button
+         setTimeout(() => {
+          const drawControlBtn = document.querySelector(".mapbox-gl-draw_ctrl-draw-btn.mapbox-gl-draw_polygon");
+          if (drawControlBtn) {
+            drawControlBtn.setAttribute("title", "Edit/Add polygon for existing data"); // Customize this as needed
+          }
+        }, 200); // Adjust delay if necessary
       }    
     });
   }else{
@@ -192,8 +201,8 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
     this.draw = new MapboxDraw({
       displayControlsDefault: false,
       controls: {
-        //polygon: true,
-        trash: true,
+        polygon: true,
+        //trash: true,
       },
       defaultMode: 'simple_select' ,
       userProperties: true,
@@ -470,9 +479,11 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
 
     });
     const addNewBuildingButton = new NewBuildingButton(() => this.createNewBuilding());
+    const addTrashButton = new TrashButton(() => this.deletePolygon());
 
     map.addControl(addNewBuildingButton, "top-right");
     map.addControl(this.draw, 'top-right');
+    map.addControl(addTrashButton, "top-right");
     map.addControl(new mapboxgl.NavigationControl(), 'bottom-left');
 
     geoJsonObject.features.forEach((feature: any) => {
@@ -492,7 +503,7 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
     
     
      map.on('draw.create', (e) => this.handleDrawEvent(e, this.draw)); 
-     map.on('draw.delete', (e) => this.handleDeleteEvent(e, this.draw, geoJsonObject)); 
+    // map.on('draw.delete', (e) => this.handleDeleteEvent(e, this.draw, geoJsonObject)); 
      map.on('draw.update', (e) => this.handleEditEvent(e, this.draw));
    }
 
@@ -561,6 +572,30 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
     this.clickedBuildingId = "New Building"
     this.draw?.changeMode('draw_polygon');
     this.geoJsonService.emitClickEvent(-1, -1, -1);     
+  }
+
+  deletePolygon(){
+    console.log("DELETE EVENT BEING CALLED");
+    const deletePolygonId = this.clickedBuildingId;
+    const clickedFeature = this.globalGeoJsonObject.features.find((feature: any) => feature.id === deletePolygonId);
+    const newBuildingCoordinates =  clickedFeature.geometry.coordinates[0];
+    const newBuildingId =  clickedFeature.id
+    console.log("in map", clickedFeature)
+    
+   
+        const newBuildingLongitude = 0;
+        const newBuildingLatitude = 0;
+        const newBuildingUbid: any = 0;
+        
+        
+       this.geoJsonService.setMapCoordinates(newBuildingLatitude, newBuildingLongitude);
+         
+       this.geoJsonService.insertNewBuildingInTable(this.newGeoJson);
+       this.selectedPolygonId = "";
+       this.geoJsonService.setIsDataSentFromTable(true);
+       this.geoJsonService.modifyBuildingInTable(newBuildingCoordinates, newBuildingLatitude, newBuildingLongitude, newBuildingUbid, newBuildingId);
+
+       this.draw?.delete(deletePolygonId)
   }
 
 

@@ -7,6 +7,7 @@ interface GeoJsonFeature {
     type: string;
     coordinates: any[]; // Adjust based on the expected coordinate structure
   };
+  id: string;
   properties: {
     [key: string]: any; // Allows for any property
   };
