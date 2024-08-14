@@ -4,7 +4,6 @@ import { Injectable } from '@angular/core';
   providedIn: 'root'
 })
 export class FileExportService {
-
   downloadJSON(data: any, filename: string): void {
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }); //contains file like object
     const url = window.URL.createObjectURL(blob); //creates URL for blob

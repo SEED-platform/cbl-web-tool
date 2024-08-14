@@ -18,8 +18,6 @@ import { FlaskRequests } from '../services/server.service';
   styleUrl: './home.component.css',
   imports: [ReactiveFormsModule, CommonModule, MapboxMapComponent, FirstTableComponent, CblTableComponent]
 })
-
-
 export class HomeComponent implements OnInit, OnDestroy {
   userFile: any;
   jsonData: any;
@@ -27,16 +25,17 @@ export class HomeComponent implements OnInit, OnDestroy {
   fatalErrorArray: string[] = ['Uploaded a file in the wrong format. Please upload different format', 'Failed to read file.'];
   private geoJsonSubscription: Subscription | undefined;
 
-  constructor(private apiHandler: FlaskRequests, private fileExportHandler: FileExportService, private router: Router, private geoJsonService: GeoJsonService) {
-  }
+  constructor(
+    private apiHandler: FlaskRequests,
+    private fileExportHandler: FileExportService,
+    private router: Router,
+    private geoJsonService: GeoJsonService
+  ) {}
 
   ngOnInit(): void {
-    this.geoJsonSubscription = this.geoJsonService.getGeoJson().subscribe(data => {
+    this.geoJsonSubscription = this.geoJsonService.getGeoJson().subscribe((data) => {
       this.jsonData = data;
-      if (this.jsonData &&
-        this.jsonData.features &&
-        this.jsonData.features.length > 0 &&
-        this.jsonData.features[0].properties) {
+      if (this.jsonData && this.jsonData.features && this.jsonData.features.length > 0 && this.jsonData.features[0].properties) {
         const geoJsonPropertyNames = Object.keys(this.jsonData.features[0].properties);
         sessionStorage.setItem('GEOJSONPROPERTYNAMES', JSON.stringify(geoJsonPropertyNames));
       }
@@ -56,7 +55,6 @@ export class HomeComponent implements OnInit, OnDestroy {
   getUploadFileFromUser(event: any) {
     this.userFile = event.target.files[0];
   }
-
 
   uploadInitialFileToServer() {
     const fileData = new FormData();
@@ -82,8 +80,8 @@ export class HomeComponent implements OnInit, OnDestroy {
         } else {
           alert(errorResponse.error.message);
         }
-      });
-
+      }
+    );
   }
 
   uploadFileToServer() {
@@ -99,11 +97,11 @@ export class HomeComponent implements OnInit, OnDestroy {
       },
       (errorResponse) => {
         console.error(errorResponse.error.message); // Handle error response
-      });
+      }
+    );
   }
 
   exportJSON(): void {
     this.fileExportHandler.downloadJSON(this.jsonData, 'data.json');
   }
-
 }

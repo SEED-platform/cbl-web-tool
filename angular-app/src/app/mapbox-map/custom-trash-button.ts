@@ -4,7 +4,6 @@ export class TrashButton implements mapboxgl.IControl {
   private container: HTMLDivElement;
   private callback: () => void;
 
-
   constructor(callback: () => void) {
     this.container = document.createElement('div');
     this.callback = callback;
@@ -21,11 +20,7 @@ export class TrashButton implements mapboxgl.IControl {
     this.container.style.cursor = 'pointer'; // Pointer cursor for better UX
 
     this.container.innerHTML =
-      '<div class="tools-box-trash">' +
-      '<button>' +
-      '<span class="mapboxgl-ctrl-icon my-image-button" aria-hidden="true" title="Delete a Polygon"></span>' +
-      '</button>' +
-      '</div>';
+      '<div class="tools-box-trash">' + '<button>' + '<span class="mapboxgl-ctrl-icon my-image-button" aria-hidden="true" title="Delete a Polygon"></span>' + '</button>' + '</div>';
 
     this.container.addEventListener('click', (e) => {
       e.preventDefault();
@@ -34,7 +29,6 @@ export class TrashButton implements mapboxgl.IControl {
 
     return this.container;
   }
-
 
   onRemove() {
     if (this.container.parentNode) {

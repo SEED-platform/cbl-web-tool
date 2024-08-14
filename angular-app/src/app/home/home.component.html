@@ -1,5 +1,4 @@
 <div *ngIf="!userFile && isObjectEmpty(jsonData)" class="file-container">
-
   <input (change)="getUploadFileFromUser($event)" class="file" type="file" />
 </div>
 
@@ -10,11 +9,7 @@
 
 <button (click)="uploadInitialFileToServer()" *ngIf="isObjectEmpty(jsonData)">upload file</button>
 
-
 <div *ngIf="!isObjectEmpty(jsonData)" id="data-container">
   <app-mapbox-map></app-mapbox-map>
   <app-cbl-table></app-cbl-table>
 </div>
-
-
-

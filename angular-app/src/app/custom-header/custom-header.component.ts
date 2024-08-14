@@ -3,7 +3,6 @@ import { FormsModule } from '@angular/forms';
 import type { IHeaderAngularComp } from 'ag-grid-angular';
 import type { IHeaderParams } from 'ag-grid-community';
 
-
 export interface MyParams {
   name?: string;
   index?: number;
@@ -18,7 +17,6 @@ export interface MyParams {
   styleUrl: './custom-header.component.css'
 })
 export class CustomHeaderComponent implements IHeaderAngularComp {
-
   name?: string;
   index?: number;
   api?: any;
@@ -33,11 +31,9 @@ export class CustomHeaderComponent implements IHeaderAngularComp {
     this.name = params.name;
     this.index = params.index;
     this.api = params.api;
-
   }
 
   onInputChange() {
-
     if (this.index !== undefined) {
       const colDefs = JSON.parse(sessionStorage.getItem('COL') || '[]');
 
@@ -45,11 +41,8 @@ export class CustomHeaderComponent implements IHeaderAngularComp {
         colDefs[this.index].headerName = this.name;
       }
 
-
       // Optionally, save the updated columnDefs back to sessionStorage
       sessionStorage.setItem('COL', JSON.stringify(colDefs));
     }
-
   }
-
 }

@@ -16,7 +16,6 @@ import { FlaskRequests } from '../services/server.service';
   templateUrl: './first-table.component.html',
   imports: [AgGridAngular, FormsModule, CommonModule]
 })
-
 export class FirstTableComponent implements OnInit {
   userList: any[] = [];
   colDefs: ColDef[] = [];
@@ -30,12 +29,16 @@ export class FirstTableComponent implements OnInit {
     filter: true,
     editable: true,
     suppressHeaderFilterButton: true,
-    headerComponent: CustomHeaderComponent  //allows editable headers
+    headerComponent: CustomHeaderComponent //allows editable headers
   };
   private gridApi: any;
 
-  constructor(private apiHandler: FlaskRequests, private router: Router, private cdr: ChangeDetectorRef, private geoJsonService: GeoJsonService) {
-  }
+  constructor(
+    private apiHandler: FlaskRequests,
+    private router: Router,
+    private cdr: ChangeDetectorRef,
+    private geoJsonService: GeoJsonService
+  ) {}
 
   getUser() {
     this.userList = JSON.parse(sessionStorage.getItem('FIRSTTABLEDATA') || '[]');
@@ -70,7 +73,6 @@ export class FirstTableComponent implements OnInit {
     sessionStorage.setItem('COL', JSON.stringify(this.colDefs));
   }
 
-
   convertAgGridDataToJson() {
     const csvUserData = this.gridApi.getDataAsCsv();
     const jsonHeaderData = JSON.parse(sessionStorage.getItem('COL') || '[]');
@@ -102,7 +104,8 @@ export class FirstTableComponent implements OnInit {
       (errorResponse) => {
         console.log(errorResponse.error.message); // Handle error response
         alert(errorResponse.error.message);
-      });
+      }
+    );
   }
 
   uploadJsonToServer() {
@@ -117,10 +120,7 @@ export class FirstTableComponent implements OnInit {
       },
       (errorResponse) => {
         console.error(errorResponse.error.message); // Handle error response
-      });
+      }
+    );
   }
-
 }
-
-
-

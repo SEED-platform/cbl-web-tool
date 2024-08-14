@@ -12,7 +12,6 @@ import { EditButton } from './custom-draw-button';
 import { TrashButton } from './custom-trash-button';
 import { NewBuildingButton } from './new-buliding-button';
 
-
 @Component({
   selector: 'app-mapbox-map',
   standalone: true,
@@ -42,21 +41,24 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
   private globalGeoJsonObject: any;
   private emptyBuildingId = 'none selected';
 
-  constructor(private cdr: ChangeDetectorRef, private geoJsonService: GeoJsonService, private apiHandler: FlaskRequests) {
-  }
+  constructor(
+    private cdr: ChangeDetectorRef,
+    private geoJsonService: GeoJsonService,
+    private apiHandler: FlaskRequests
+  ) {}
 
   ngOnInit() {
-    this.geoJsonSubscription = this.geoJsonService.getGeoJson().subscribe(geoJsonObject => {
+    this.geoJsonSubscription = this.geoJsonService.getGeoJson().subscribe((geoJsonObject) => {
       this.initializeMapWithGeoJson(geoJsonObject);
       this.globalGeoJsonObject = geoJsonObject;
       this.geoJsonPropertyNames = JSON.parse(sessionStorage.getItem('GEOJSONPROPERTYNAMES') || '[]');
     });
 
-    this.featureClickSubscription = this.geoJsonService.selectedFeature$.subscribe(feature => {
+    this.featureClickSubscription = this.geoJsonService.selectedFeature$.subscribe((feature) => {
       if (feature) {
         const { id } = feature;
 
-        if (id !== undefined && (feature.latitude.toString() !== '0' && feature.latitude.toString() !== '0') && (feature.quality !== 'Poor' && feature.quality !== 'Very Poor')) {
+        if (id !== undefined && feature.latitude.toString() !== '0' && feature.latitude.toString() !== '0' && feature.quality !== 'Poor' && feature.quality !== 'Very Poor') {
           this.flyToCoordinatesWithZoom(feature.longitude, feature.latitude);
           this.setActivePolygon(id);
           this.draw?.changeMode('simple_select');
@@ -67,16 +69,16 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
       }
     });
 
-    this.mapCoordinatesSubscription = this.geoJsonService.mapCoordinates$.subscribe(feature => {
+    this.mapCoordinatesSubscription = this.geoJsonService.mapCoordinates$.subscribe((feature) => {
       if (feature) {
         this.updateZoomLevelForDeletion();
         //this.setMapCenterAndZoom(feature.longitude, feature.latitude); // Update map view based on new coordinates
       }
     });
 
-    this.removedBuildingSubscription = this.geoJsonService.removeBuildingId$.subscribe(feature => {
+    this.removedBuildingSubscription = this.geoJsonService.removeBuildingId$.subscribe((feature) => {
       if (feature && feature.id) {
-        console.log(typeof (feature.id));
+        console.log(typeof feature.id);
         const clickedFeature = this.globalGeoJsonObject.features.find((f: any) => f.id === feature.id);
         if (clickedFeature) {
           console.log('this is being deleted', clickedFeature);
@@ -100,9 +102,7 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
   }
 
   initializeMapWithGeoJson(geoJsonObject: any) {
-
     if (!this.map) {
-
       let emptyLat = 0;
       let emptyLong = 0;
 
@@ -127,7 +127,6 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
           zoom: this.zoomLevel,
           center: [emptyLong, emptyLat] // [longitude, latitude]
         });
-
       } else {
         // if map has polygons
         this.buildingArray = geoJsonObject.features;
@@ -149,7 +148,7 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
             firstBuildingLatitude = coords.latitude;
           } else {
             firstBuildingLongitude = -98.5795; // Default longitude
-            firstBuildingLatitude = 39.8283;  // Default latitude
+            firstBuildingLatitude = 39.8283; // Default latitude
           }
         }
 
@@ -164,20 +163,15 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
       }
 
       this.map.on('load', () => {
-
         if (this.map) {
           this.addDrawFeatures(this.map, geoJsonObject);
         }
       });
     } else {
-
     }
 
     this.map.on('click', (event) => this.handleClick(event, geoJsonObject));
-
-
   }
-
 
   handleClick = (event: any, geoJsonObject: any) => {
     if (!this.map || !this.draw) return;
@@ -185,11 +179,9 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
     // Get the feature IDs under the click point
     const featureIds = this.draw.getFeatureIdsAt(event.point);
 
-
     if (featureIds && featureIds.length > 0) {
       // Assuming featureIds[0] is the ID of the clicked feature
       const clickedFeatureId = featureIds[0];
-
 
       // Find the corresponding feature in geoJsonObject
       const clickedFeature = geoJsonObject.features.find((feature: any) => feature.id === String(clickedFeatureId));
@@ -213,7 +205,6 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
     }
   };
 
-
   addDrawFeatures(map: mapboxgl.Map, geoJsonObject: any) {
     this.draw = new MapboxDraw({
       displayControlsDefault: false,
@@ -226,271 +217,218 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
         // default themes provided by MB Draw
         // default themes provided by MB Draw
 
-
         {
-          'id': 'gl-draw-polygon-fill-inactive',
-          'type': 'fill',
-          'filter': ['all', ['==', 'active', 'false'],
-            ['==', '$type', 'Polygon'],
-            ['!=', 'mode', 'static']
-          ],
-          'paint': {
+          id: 'gl-draw-polygon-fill-inactive',
+          type: 'fill',
+          filter: ['all', ['==', 'active', 'false'], ['==', '$type', 'Polygon'], ['!=', 'mode', 'static']],
+          paint: {
             'fill-color': '#3bb2d0',
             'fill-outline-color': '#3bb2d0',
             'fill-opacity': 0.1
           }
         },
         {
-          'id': 'gl-draw-polygon-fill-active',
-          'type': 'fill',
-          'filter': ['all', ['==', 'active', 'true'],
-            ['==', '$type', 'Polygon']
-          ],
-          'paint': {
+          id: 'gl-draw-polygon-fill-active',
+          type: 'fill',
+          filter: ['all', ['==', 'active', 'true'], ['==', '$type', 'Polygon']],
+          paint: {
             'fill-color': 'pink',
             'fill-outline-color': '#fbb03b',
             'fill-opacity': 0.6
           }
         },
         {
-          'id': 'gl-draw-polygon-midpoint',
-          'type': 'circle',
-          'filter': ['all', ['==', '$type', 'Point'],
-            ['==', 'meta', 'midpoint']
-          ],
-          'paint': {
+          id: 'gl-draw-polygon-midpoint',
+          type: 'circle',
+          filter: ['all', ['==', '$type', 'Point'], ['==', 'meta', 'midpoint']],
+          paint: {
             'circle-radius': 3,
             'circle-color': '#fbb03b'
           }
         },
         {
-          'id': 'gl-draw-polygon-stroke-inactive',
-          'type': 'line',
-          'filter': ['all', ['==', 'active', 'false'],
-            ['==', '$type', 'Polygon'],
-            ['!=', 'mode', 'static']
-          ],
-          'layout': {
+          id: 'gl-draw-polygon-stroke-inactive',
+          type: 'line',
+          filter: ['all', ['==', 'active', 'false'], ['==', '$type', 'Polygon'], ['!=', 'mode', 'static']],
+          layout: {
             'line-cap': 'round',
             'line-join': 'round'
           },
-          'paint': {
+          paint: {
             'line-color': '#3bb2d0',
             'line-width': 2
           }
         },
         {
-          'id': 'gl-draw-polygon-stroke-active',
-          'type': 'line',
-          'filter': ['all', ['==', 'active', 'true'],
-            ['==', '$type', 'Polygon']
-          ],
-          'layout': {
+          id: 'gl-draw-polygon-stroke-active',
+          type: 'line',
+          filter: ['all', ['==', 'active', 'true'], ['==', '$type', 'Polygon']],
+          layout: {
             'line-cap': 'round',
             'line-join': 'round'
           },
-          'paint': {
+          paint: {
             'line-color': '#fbb03b',
             'line-dasharray': [0.2, 2],
             'line-width': 2
           }
         },
         {
-          'id': 'gl-draw-line-inactive',
-          'type': 'line',
-          'filter': ['all', ['==', 'active', 'false'],
-            ['==', '$type', 'LineString'],
-            ['!=', 'mode', 'static']
-          ],
-          'layout': {
+          id: 'gl-draw-line-inactive',
+          type: 'line',
+          filter: ['all', ['==', 'active', 'false'], ['==', '$type', 'LineString'], ['!=', 'mode', 'static']],
+          layout: {
             'line-cap': 'round',
             'line-join': 'round'
           },
-          'paint': {
+          paint: {
             'line-color': '#3bb2d0',
             'line-width': 2
           }
         },
         {
-          'id': 'gl-draw-line-active',
-          'type': 'line',
-          'filter': ['all', ['==', '$type', 'LineString'],
-            ['==', 'active', 'true']
-          ],
-          'layout': {
+          id: 'gl-draw-line-active',
+          type: 'line',
+          filter: ['all', ['==', '$type', 'LineString'], ['==', 'active', 'true']],
+          layout: {
             'line-cap': 'round',
             'line-join': 'round'
           },
-          'paint': {
+          paint: {
             'line-color': '#fbb03b',
             'line-dasharray': [0.2, 2],
             'line-width': 2
           }
         },
         {
-          'id': 'gl-draw-polygon-and-line-vertex-stroke-inactive',
-          'type': 'circle',
-          'filter': ['all', ['==', 'meta', 'vertex'],
-            ['==', '$type', 'Point'],
-            ['!=', 'mode', 'static']
-          ],
-          'paint': {
+          id: 'gl-draw-polygon-and-line-vertex-stroke-inactive',
+          type: 'circle',
+          filter: ['all', ['==', 'meta', 'vertex'], ['==', '$type', 'Point'], ['!=', 'mode', 'static']],
+          paint: {
             'circle-radius': 5,
             'circle-color': '#fff'
           }
         },
         {
-          'id': 'gl-draw-polygon-and-line-vertex-inactive',
-          'type': 'circle',
-          'filter': ['all', ['==', 'meta', 'vertex'],
-            ['==', '$type', 'Point'],
-            ['!=', 'mode', 'static']
-          ],
-          'paint': {
+          id: 'gl-draw-polygon-and-line-vertex-inactive',
+          type: 'circle',
+          filter: ['all', ['==', 'meta', 'vertex'], ['==', '$type', 'Point'], ['!=', 'mode', 'static']],
+          paint: {
             'circle-radius': 3,
             'circle-color': '#fbb03b'
           }
         },
         {
-          'id': 'gl-draw-point-point-stroke-inactive',
-          'type': 'circle',
-          'filter': ['all', ['==', 'active', 'false'],
-            ['==', '$type', 'Point'],
-            ['==', 'meta', 'feature'],
-            ['!=', 'mode', 'static']
-          ],
-          'paint': {
+          id: 'gl-draw-point-point-stroke-inactive',
+          type: 'circle',
+          filter: ['all', ['==', 'active', 'false'], ['==', '$type', 'Point'], ['==', 'meta', 'feature'], ['!=', 'mode', 'static']],
+          paint: {
             'circle-radius': 5,
             'circle-opacity': 1,
             'circle-color': '#fff'
           }
         },
         {
-          'id': 'gl-draw-point-inactive',
-          'type': 'circle',
-          'filter': ['all', ['==', 'active', 'false'],
-            ['==', '$type', 'Point'],
-            ['==', 'meta', 'feature'],
-            ['!=', 'mode', 'static']
-          ],
-          'paint': {
+          id: 'gl-draw-point-inactive',
+          type: 'circle',
+          filter: ['all', ['==', 'active', 'false'], ['==', '$type', 'Point'], ['==', 'meta', 'feature'], ['!=', 'mode', 'static']],
+          paint: {
             'circle-radius': 3,
             'circle-color': '#3bb2d0'
           }
         },
         {
-          'id': 'gl-draw-point-stroke-active',
-          'type': 'circle',
-          'filter': ['all', ['==', '$type', 'Point'],
-            ['==', 'active', 'true'],
-            ['!=', 'meta', 'midpoint']
-          ],
-          'paint': {
+          id: 'gl-draw-point-stroke-active',
+          type: 'circle',
+          filter: ['all', ['==', '$type', 'Point'], ['==', 'active', 'true'], ['!=', 'meta', 'midpoint']],
+          paint: {
             'circle-radius': 7,
             'circle-color': '#fff'
           }
         },
         {
-          'id': 'gl-draw-point-active',
-          'type': 'circle',
-          'filter': ['all', ['==', '$type', 'Point'],
-            ['!=', 'meta', 'midpoint'],
-            ['==', 'active', 'true']
-          ],
-          'paint': {
+          id: 'gl-draw-point-active',
+          type: 'circle',
+          filter: ['all', ['==', '$type', 'Point'], ['!=', 'meta', 'midpoint'], ['==', 'active', 'true']],
+          paint: {
             'circle-radius': 5,
             'circle-color': '#fbb03b'
           }
         },
         {
-          'id': 'gl-draw-polygon-fill-static',
-          'type': 'fill',
-          'filter': ['all', ['==', 'mode', 'static'],
-            ['==', '$type', 'Polygon']
-          ],
-          'paint': {
+          id: 'gl-draw-polygon-fill-static',
+          type: 'fill',
+          filter: ['all', ['==', 'mode', 'static'], ['==', '$type', 'Polygon']],
+          paint: {
             'fill-color': '#404040',
             'fill-outline-color': '#404040',
             'fill-opacity': 0.1
           }
         },
         {
-          'id': 'gl-draw-polygon-stroke-static',
-          'type': 'line',
-          'filter': ['all', ['==', 'mode', 'static'],
-            ['==', '$type', 'Polygon']
-          ],
-          'layout': {
+          id: 'gl-draw-polygon-stroke-static',
+          type: 'line',
+          filter: ['all', ['==', 'mode', 'static'], ['==', '$type', 'Polygon']],
+          layout: {
             'line-cap': 'round',
             'line-join': 'round'
           },
-          'paint': {
+          paint: {
             'line-color': '#404040',
             'line-width': 2
           }
         },
         {
-          'id': 'gl-draw-line-static',
-          'type': 'line',
-          'filter': ['all', ['==', 'mode', 'static'],
-            ['==', '$type', 'LineString']
-          ],
-          'layout': {
+          id: 'gl-draw-line-static',
+          type: 'line',
+          filter: ['all', ['==', 'mode', 'static'], ['==', '$type', 'LineString']],
+          layout: {
             'line-cap': 'round',
             'line-join': 'round'
           },
-          'paint': {
+          paint: {
             'line-color': '#404040',
             'line-width': 2
           }
         },
         {
-          'id': 'gl-draw-point-static',
-          'type': 'circle',
-          'filter': ['all', ['==', 'mode', 'static'],
-            ['==', '$type', 'Point']
-          ],
-          'paint': {
+          id: 'gl-draw-point-static',
+          type: 'circle',
+          filter: ['all', ['==', 'mode', 'static'], ['==', '$type', 'Point']],
+          paint: {
             'circle-radius': 5,
             'circle-color': '#404040'
           }
         },
         {
-          'id': 'gl-draw-polygon-color-picker',
-          'type': 'fill',
-          'filter': ['all', ['==', '$type', 'Polygon'],
-            ['has', 'user_portColor']
-          ],
-          'paint': {
+          id: 'gl-draw-polygon-color-picker',
+          type: 'fill',
+          filter: ['all', ['==', '$type', 'Polygon'], ['has', 'user_portColor']],
+          paint: {
             'fill-color': ['get', 'user_portColor'],
             'fill-outline-color': ['get', 'user_portColor'],
             'fill-opacity': ['get', 'user_portOpacity']
           }
         },
         {
-          'id': 'gl-draw-line-color-picker',
-          'type': 'line',
-          'filter': ['all', ['==', '$type', 'LineString'],
-            ['has', 'user_portColor']
-          ],
-          'paint': {
+          id: 'gl-draw-line-color-picker',
+          type: 'line',
+          filter: ['all', ['==', '$type', 'LineString'], ['has', 'user_portColor']],
+          paint: {
             'line-color': ['get', 'user_portColor'],
             'line-width': 2
           }
         },
         {
-          'id': 'gl-draw-point-color-picker',
-          'type': 'circle',
-          'filter': ['all', ['==', '$type', 'Point'],
-            ['has', 'user_portColor']
-          ],
-          'paint': {
+          id: 'gl-draw-point-color-picker',
+          type: 'circle',
+          filter: ['all', ['==', '$type', 'Point'], ['has', 'user_portColor']],
+          paint: {
             'circle-radius': 3,
             'circle-color': ['get', 'user_portColor']
           }
         }
       ]
-
     });
     const addNewBuildingButton = new NewBuildingButton(() => this.createNewBuilding());
     const addTrashButton = new TrashButton(() => this.deletePolygon());
@@ -502,8 +440,13 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
     map.addControl(new mapboxgl.NavigationControl(), 'bottom-left');
 
     geoJsonObject.features.forEach((feature: any) => {
-
-      if (feature.geometry && feature.geometry.type === 'Polygon' && feature.properties.latitude !== '0' && feature.properties.longitude !== '0' && (feature.properties.ubid !== 0 || feature.properties.ubid !== '0')) {
+      if (
+        feature.geometry &&
+        feature.geometry.type === 'Polygon' &&
+        feature.properties.latitude !== '0' &&
+        feature.properties.longitude !== '0' &&
+        (feature.properties.ubid !== 0 || feature.properties.ubid !== '0')
+      ) {
         this.draw?.add({
           id: feature.id,
           type: 'Feature',
@@ -516,7 +459,6 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
       }
     });
 
-
     map.on('draw.create', (e) => this.handleDrawEvent(e, this.draw));
     // map.on('draw.delete', (e) => this.handleDeleteEvent(e, this.draw, geoJsonObject));
     map.on('draw.update', (e) => this.handleEditEvent(e, this.draw));
@@ -527,12 +469,11 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
     const newBuildingCoordinates = e.features[0].geometry.coordinates[0];
     let newBuildingId = '';
 
-
     newBuildingId = e.features[0].id;
 
     const jsonData = {
-      'coordinates': newBuildingCoordinates,
-      'propertyNames': this.geoJsonPropertyNames
+      coordinates: newBuildingCoordinates,
+      propertyNames: this.geoJsonPropertyNames
     };
 
     const jsonDataString = JSON.stringify(jsonData);
@@ -546,17 +487,15 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
         const newBuildingLatitude = this.newGeoJson.lat;
         const newBuildingUbid = this.newGeoJson.ubid;
 
-
         this.geoJsonService.setMapCoordinates(newBuildingLatitude, newBuildingLongitude);
         this.geoJsonService.setIsDataSentFromTable(true);
         this.geoJsonService.modifyBuildingInTable(newBuildingCoordinates, newBuildingLatitude, newBuildingLongitude, newBuildingUbid, newBuildingId);
       },
       (errorResponse) => {
         console.error(errorResponse.error.message); // Handle error response
-      });
-
+      }
+    );
   }
-
 
   handleDeleteEvent(e: any, draw: any, geoJsonObject: any) {
     console.log('DELETE EVENT BEING CALLED');
@@ -564,11 +503,9 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
     const newBuildingId = e.features[0].id;
     console.log('in map', e.features[0]);
 
-
     const newBuildingLongitude = 0;
     const newBuildingLatitude = 0;
     const newBuildingUbid: any = 0;
-
 
     //   this.geoJsonService.setMapCoordinates(newBuildingLatitude, newBuildingLongitude);
 
@@ -576,7 +513,6 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
     this.selectedPolygonId = '';
     this.geoJsonService.setIsDataSentFromTable(true);
     this.geoJsonService.modifyBuildingInTable(newBuildingCoordinates, newBuildingLatitude, newBuildingLongitude, newBuildingUbid, newBuildingId);
-
   }
 
   createNewBuilding() {
@@ -592,7 +528,6 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
   deletePolygon() {
     console.log('DELETE EVENT BEING CALLED');
 
-
     const deletePolygonId = this.clickedBuildingId;
     const clickedFeature = this.globalGeoJsonObject.features.find((feature: any) => feature.id === deletePolygonId);
     console.log(clickedFeature);
@@ -602,11 +537,9 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
       this.emptyBuildingId = newBuildingId;
       console.log('in map', clickedFeature);
 
-
       const newBuildingLongitude = 0;
       const newBuildingLatitude = 0;
       const newBuildingUbid: any = 0;
-
 
       this.geoJsonService.setMapCoordinates(newBuildingLatitude, newBuildingLongitude);
 
@@ -628,18 +561,14 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
     this.draw?.changeMode('draw_polygon');
   }
 
-
   handleDrawEvent(e: any, draw: any) {
-
-
     if (this.clickedBuildingId === 'New Building') {
       const newBuildingCoordinates = e.features[0].geometry.coordinates[0];
       const jsonData = {
-        'coordinates': newBuildingCoordinates,
-        'propertyNames': this.geoJsonPropertyNames,
-        'featuresLength': this.globalGeoJsonObject.features.length
+        coordinates: newBuildingCoordinates,
+        propertyNames: this.geoJsonPropertyNames,
+        featuresLength: this.globalGeoJsonObject.features.length
       };
-
 
       const jsonDataString = JSON.stringify(jsonData);
       this.apiHandler.sendReverseGeoCodeData(jsonDataString).subscribe(
@@ -659,15 +588,16 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
         },
         (errorResponse) => {
           console.error(errorResponse.error.message); // Handle error response
-        });
+        }
+      );
     } else {
       console.log('clicked', this.emptyBuildingId);
       const existingBuildingCoordinates = e.features[0].geometry.coordinates[0];
       const existingBuildingId = this.emptyBuildingId;
       const jsonData = {
-        'coordinates': existingBuildingCoordinates,
-        'propertyNames': this.geoJsonPropertyNames,
-        'featuresLength': this.globalGeoJsonObject.features.length
+        coordinates: existingBuildingCoordinates,
+        propertyNames: this.geoJsonPropertyNames,
+        featuresLength: this.globalGeoJsonObject.features.length
       };
 
       const jsonDataString = JSON.stringify(jsonData);
@@ -678,7 +608,6 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
           const existingBuildingLongitude = this.newGeoJson.properties.longitude;
           const existingBuildingLatitude = this.newGeoJson.properties.latitude;
           const existingBuildingUbid = this.newGeoJson.properties.ubid;
-
 
           const clickedFeature = this.globalGeoJsonObject.features.find((feature: any) => feature.id === existingBuildingId);
 
@@ -693,7 +622,6 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
                 coordinates: [existingBuildingCoordinates]
               };
             }
-
           } else {
             clickedFeature.properties.longitude = existingBuildingLatitude;
             clickedFeature.properties.latitude = existingBuildingLongitude;
@@ -707,7 +635,14 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
           draw.changeMode('simple_select');
           this.geoJsonService.setMapCoordinates(existingBuildingLatitude, existingBuildingLongitude);
           if (clickedFeature.properties.quality === 'Poor' || clickedFeature.properties.quality === 'very Poor') {
-            this.geoJsonService.modifyPoorBuildingInTable(existingBuildingCoordinates, existingBuildingLatitude, existingBuildingLongitude, existingBuildingUbid, existingBuildingId, clickedFeature.properties.quality = 'Reverse Geocoded');
+            this.geoJsonService.modifyPoorBuildingInTable(
+              existingBuildingCoordinates,
+              existingBuildingLatitude,
+              existingBuildingLongitude,
+              existingBuildingUbid,
+              existingBuildingId,
+              (clickedFeature.properties.quality = 'Reverse Geocoded')
+            );
           } else {
             this.geoJsonService.modifyBuildingInTable(existingBuildingCoordinates, existingBuildingLatitude, existingBuildingLongitude, existingBuildingUbid, existingBuildingId);
           }
@@ -715,20 +650,15 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
         },
         (errorResponse) => {
           console.error(errorResponse.error.message); // Handle error response
-        });
+        }
+      );
     }
     this.emptyBuildingId = 'none selected';
-
   }
 
-
   setActivePolygon(polygonId: any) {
-
-
     if (this.draw) {
-
       const polygon = this.draw.get(polygonId);
-
 
       if (polygon?.properties !== undefined) {
         if (!(this.selectedPolygonId === '')) {
@@ -741,45 +671,34 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
         this.clickedBuildingId = polygonId;
         this.emptyBuildingId = 'none selected';
 
-
         if (polygon?.properties !== undefined && polygon?.properties?.['portColor'] !== 'yellow') {
-
           this.draw?.setFeatureProperty(polygonId, 'portColor', 'yellow');
           this.draw?.setFeatureProperty(polygonId, 'portOpacity', 0.3);
 
-
           const feat = this.draw?.get(polygonId);
-          if (feat !== undefined)
-            this.draw?.add(feat);
-
+          if (feat !== undefined) this.draw?.add(feat);
         }
       }
     }
   }
 
-
   resetPolygonColor(polygonId: any) {
-
     if (this.draw && this.clickedBuildingId !== 'New Building') {
       // Retrieve the feature
 
       // Reset the color to the default or another color
       const polygon = this.draw.get(polygonId);
 
-
       if (polygon?.properties !== undefined) {
         if (polygon?.properties?.['portColor'] !== '#3bb2d0') {
           this.draw.setFeatureProperty(polygonId, 'portColor', '#3bb2d0'); // Default color
           this.draw?.setFeatureProperty(polygonId, 'portOpacity', 0.0);
           const feature = this.draw.get(polygonId);
-          if (feature !== undefined)
-            this.draw.add(feature); // Update the feature style
+          if (feature !== undefined) this.draw.add(feature); // Update the feature style
         }
       }
-
     }
   }
-
 
   flyToCoordinates(longitude: number, latitude: number) {
     if (this.map) {
@@ -791,7 +710,6 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
     }
   }
 
-
   flyToCoordinatesWithZoom(longitude: number, latitude: number) {
     if (this.map) {
       this.map.flyTo({
@@ -801,7 +719,6 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
       });
     }
   }
-
 
   updateZoomLevelForDeletion(): void {
     this.zoomLevel = 17.25;
@@ -814,6 +731,4 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
       this.map.setZoom(this.zoomLevel);
     }
   }
-
-
 }
