@@ -1,8 +1,9 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import type { OnDestroy, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { Subscription } from 'rxjs';
+import type { Subscription } from 'rxjs';
 import { CblTableComponent } from '../cbl-table/cbl-table.component';
 import { FirstTableComponent } from '../first-table/first-table.component';
 import { MapboxMapComponent } from '../mapbox-map/mapbox-map.component';

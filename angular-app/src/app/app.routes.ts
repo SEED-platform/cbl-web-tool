@@ -1,4 +1,4 @@
-import { Routes } from '@angular/router';
+import type { Routes } from '@angular/router';
 import { CblTableComponent } from './cbl-table/cbl-table.component';
 import { FirstTableComponent } from './first-table/first-table.component';
 import { HomeComponent } from './home/home.component';

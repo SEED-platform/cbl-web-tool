@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { IHeaderAngularComp } from 'ag-grid-angular';
-import { IHeaderParams } from 'ag-grid-community';
+import type { IHeaderAngularComp } from 'ag-grid-angular';
+import type { IHeaderParams } from 'ag-grid-community';
 
 
 export interface MyParams {

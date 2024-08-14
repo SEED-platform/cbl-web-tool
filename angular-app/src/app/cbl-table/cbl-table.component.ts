@@ -1,13 +1,12 @@
-import { ValueGetterParams } from '@ag-grid-community/core';
+import type { ValueGetterParams } from '@ag-grid-community/core';
 import { CommonModule } from '@angular/common';
-import { ChangeDetectorRef, Component, OnInit, ViewEncapsulation, OnDestroy } from '@angular/core';
+import type { OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, ViewEncapsulation } from '@angular/core';
 import { Router } from '@angular/router';
 import { AgGridAngular } from 'ag-grid-angular';
-import 'ag-grid-community/styles/ag-grid.css';
-import 'ag-grid-community/styles/ag-theme-quartz.css';
-import { ColDef } from 'ag-grid-community';
+import type { ColDef } from 'ag-grid-community';
 import Papa from 'papaparse';
-import { Subscription } from 'rxjs';
+import type { Subscription } from 'rxjs';
 import { GeoJsonService } from '../services/geojson.service';
 import { FlaskRequests } from '../services/server.service';
 

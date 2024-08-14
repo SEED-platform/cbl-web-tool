@@ -1,9 +1,10 @@
 import { CommonModule } from '@angular/common'; // Import CommonModule
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import type { OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component } from '@angular/core';
 import { FormsModule } from '@angular/forms'; // Import FormsModule
 import { Router } from '@angular/router';
 import { AgGridAngular } from 'ag-grid-angular';
-import { ColDef } from 'ag-grid-community';
+import type { ColDef } from 'ag-grid-community';
 import Papa from 'papaparse';
 import { CustomHeaderComponent } from '../custom-header/custom-header.component';
 import { GeoJsonService } from '../services/geojson.service';
