@@ -1,8 +1,8 @@
 import { Component} from '@angular/core';
-import { CommonModule } from '@angular/common'; 
+import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
-import { FlaskRequests } from '../services/server.service'; 
-import { FileExportService } from '../file-export.service';
+import { FlaskRequests } from '../services/server.service';
+import { FileExportService } from '../services/file-export.service';
 import { GeoJsonService } from '../services/geojson.service';
 import { MapboxMapComponent } from '../mapbox-map/mapbox-map.component';
 import { FirstTableComponent } from '../first-table/first-table.component';
@@ -14,8 +14,8 @@ import { Subscription } from 'rxjs';
   selector: 'app-home',
   standalone: true,
   templateUrl: './home.component.html',
-  styleUrls: ['./home.component.css'], 
-  imports: [ReactiveFormsModule, CommonModule, MapboxMapComponent, FirstTableComponent, CblTableComponent] 
+  styleUrl: './home.component.css',
+  imports: [ReactiveFormsModule, CommonModule, MapboxMapComponent, FirstTableComponent, CblTableComponent]
 })
 
 
@@ -24,7 +24,7 @@ export class HomeComponent{
    jsonData: any;
    initialJsonData: any;
    private geoJsonSubscription: Subscription | undefined;
- 
+
    fatalErrorArray: string[] = ["Uploaded a file in the wrong format. Please upload different format", "Failed to read file."]
 
 
@@ -33,9 +33,9 @@ export class HomeComponent{
     ngOnInit(): void {
       this.geoJsonSubscription = this.geoJsonService.getGeoJson().subscribe(data => {
         this.jsonData = data;
-        if (this.jsonData && 
-          this.jsonData.features && 
-          this.jsonData.features.length > 0 && 
+        if (this.jsonData &&
+          this.jsonData.features &&
+          this.jsonData.features.length > 0 &&
           this.jsonData.features[0].properties) {
           const geoJsonPropertyNames = Object.keys(this.jsonData.features[0].properties);
           sessionStorage.setItem("GEOJSONPROPERTYNAMES", JSON.stringify(geoJsonPropertyNames));
@@ -48,7 +48,7 @@ export class HomeComponent{
         this.geoJsonSubscription.unsubscribe();
       }
     }
-    
+
     isObjectEmpty(obj: object): boolean {
       return !obj || (Object.keys(obj).length === 0 && obj.constructor === Object);
     }
@@ -56,12 +56,12 @@ export class HomeComponent{
     getUploadFileFromUser(event: any){
       this.userFile = event.target.files[0];
     }
-     
+
 
     uploadInitialFileToServer() {
       let fileData = new FormData();
 
-      fileData.append("userFile", this.userFile); 
+      fileData.append("userFile", this.userFile);
       this.apiHandler.sendInitialData(fileData).subscribe(
         (response) => {
           console.log(response.message); // Handle successful response
@@ -73,7 +73,7 @@ export class HomeComponent{
         },
         (errorResponse) => {
           console.log(errorResponse.error.message); // Handle error response
-        
+
           if (this.userFile && !this.fatalErrorArray.includes(errorResponse.error.message)){
             this.initialJsonData = errorResponse.error.user_data;
             sessionStorage.setItem('FIRSTTABLEDATA', this.initialJsonData);
@@ -83,12 +83,12 @@ export class HomeComponent{
             alert(errorResponse.error.message);
           }
         });
-    
+
     }
 
     uploadFileToServer() {
       let fileData = new FormData();
-      fileData.append("userFile", this.userFile); 
+      fileData.append("userFile", this.userFile);
       console.log("File data prepared:", this.userFile);
       this.apiHandler.sendData(fileData).subscribe(
         (response) => {

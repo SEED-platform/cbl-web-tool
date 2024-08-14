@@ -1,29 +1,26 @@
-from flask import Flask, jsonify, request
-from flask_cors import CORS
-
 import gzip
 import json
 import os
 import sys
+import warnings
 from pathlib import Path
 from typing import Any
-import warnings
-import requests
 
 import geopandas as gpd
 import mercantile
-import pandas as pd
+import requests
+from flask import Flask, jsonify, request
+from flask_cors import CORS
 from shapely.geometry import Point, Polygon
 
-from utils.common import Location
-from utils.location_error import LocationError
-from utils.normalize_state import normalize_state
 from utils.check_data_quality import check_data_quality
-from utils.generate_locations_list import generate_locations_list
+from utils.common import Location
 from utils.convert_file_to_dicts import convert_file_to_dicts
+from utils.generate_locations_list import generate_locations_list
+from utils.location_error import LocationError
 from utils.merge_dicts import merge_dicts
 from utils.normalize_address import normalize_address
-from utils.geocode_addresses import geocode_addresses
+from utils.normalize_state import normalize_state
 from utils.ubid import encode_ubid
 from utils.update_dataset_links import update_dataset_links
 from utils.update_quadkeys import update_quadkeys
@@ -31,12 +28,11 @@ from utils.update_quadkeys import update_quadkeys
 warnings.filterwarnings("ignore", category=RuntimeWarning)
 warnings.filterwarnings("ignore", category=UserWarning)
 
-
 app = Flask(__name__)
 CORS(app)
 
 
-@app.route('/api/merge_files',  methods=['POST'])
+@app.route('/api/merge_files', methods=['POST'])
 def merge_files():
     files = []
     merged_data = []
@@ -45,12 +41,12 @@ def merge_files():
         file_data = convert_file_to_dicts(file)
         if not file_data or len(file_data) == 0:
             return jsonify({'message': 'Uploaded a file in the wrong format. Please upload different format'}), 400
-    
+
         if isinstance(file_data, LocationError):
             return jsonify({'message': f'{file_data.message}'}), 400
-        
+
         merged_data.extend(file_data)
-    
+
     json_data = json.dumps(merged_data)
     isGoodData = check_data_quality(merged_data)
 
@@ -60,17 +56,17 @@ def merge_files():
     return jsonify({"message": "success", "user_data": json_data}), 200
 
 
-@app.route('/api/submit_file',  methods=['POST'])
+@app.route('/api/submit_file', methods=['POST'])
 def get_and_check_file():
     file = request.files['userFile']
     file_data = convert_file_to_dicts(file)
 
     if not file_data or len(file_data) == 0:
         return jsonify({'message': 'Uploaded a file in the wrong format. Please upload different format'}), 400
-    
+
     if isinstance(file_data, LocationError):
         return jsonify({'message': f'{file_data.message}'}), 400
-    
+
     json_data = json.dumps(file_data)
     isGoodData = check_data_quality(file_data)
 
@@ -80,7 +76,7 @@ def get_and_check_file():
     return jsonify({"message": "success", "user_data": json_data}), 200
 
 
-@app.route('/api/check_data',  methods=['POST'])
+@app.route('/api/check_data', methods=['POST'])
 def check_edited_data():
     json_string = request.json.get('value')
     file_data = json.loads(json_string)
@@ -89,15 +85,15 @@ def check_edited_data():
     isGoodData = check_data_quality(file_data)
     if isinstance(isGoodData, LocationError):
         return jsonify({'message': f'{isGoodData.message}', "user_data": json_data}), 400
-    
+
     return jsonify({"message": "success", "user_data": json_data}), 200
 
-    
-@app.route('/api/generate_cbl',  methods=['POST'])
+
+@app.route('/api/generate_cbl', methods=['POST'])
 def run_cbl_workflow():
     file_data = []
     locations: list[Location] = []
-    
+
     try:
         json_string = request.json.get('value')
         file_data = json.loads(json_string)
@@ -106,7 +102,7 @@ def run_cbl_workflow():
 
     locations = generate_locations_list(file_data)
 
-    MAPQUEST_API_KEY = os.getenv("MAPQUEST_API_KEY")    # will need to change this to retrieve user's api key
+    MAPQUEST_API_KEY = os.getenv("MAPQUEST_API_KEY")  # will need to change this to retrieve user's api key
     if not MAPQUEST_API_KEY:
         sys.exit("Missing MapQuest API key")
 
@@ -208,7 +204,6 @@ def run_cbl_workflow():
         else:
             merged_data.append(file_dict)
 
-
     columns = ["street_address", "city", "state"]
     for key in merged_data[0].keys():
         if key.lower() not in columns:
@@ -225,14 +220,13 @@ def run_cbl_workflow():
     return jsonify({"message": "success", "user_data": final_geojson}), 200
 
 
-
-@app.route('/api/reverse_geocode',  methods=['POST'])
-def reverse_geocode():  
+@app.route('/api/reverse_geocode', methods=['POST'])
+def reverse_geocode():
     json_string = request.json.get('value')
     json_data = json.loads(json_string)
 
-    coords = json_data["coordinates"]   
-     
+    coords = json_data["coordinates"]
+
     properties = {}
     for key in json_data["propertyNames"]:
         properties[key] = " "
@@ -242,7 +236,7 @@ def reverse_geocode():
     centroid = polygon.centroid
 
     # calculate lat, long (center of polygon)
-    lat = centroid.y       
+    lat = centroid.y
     lon = centroid.x
 
     # encode ubid from coordinates 
@@ -251,18 +245,18 @@ def reverse_geocode():
         ubid = encode_ubid(polygon)
     except AssertionError:
         return jsonify({'message': "Invalid longitude coordinates"}), 400
-        
+
     url = f"https://api.mapbox.com/geocoding/v5/mapbox.places/{lon},{lat}.json"
     params = {
-        'access_token': "pk.eyJ1Ijoicm1pYW4tbnJlbCIsImEiOiJjbHlvc2lkNm8wbG1uMmlwcHR1aDZlMTR0In0.dZtyvX6DjlnEF8FVL7FV4Q",  
-        'limit': 1  
+        'access_token': "pk.eyJ1Ijoicm1pYW4tbnJlbCIsImEiOiJjbHlvc2lkNm8wbG1uMmlwcHR1aDZlMTR0In0.dZtyvX6DjlnEF8FVL7FV4Q",
+        'limit': 1
     }
-    
-    #TODO: remove verify 
+
+    # TODO: remove verify
     response = requests.get(url, params=params, verify=False)
     if response.status_code == 403 or response.status_code == 401:
         return jsonify({"message": "Error: Could not reverse geocode using the mapbox API."}), 400
-    
+
     result = response.json()
     try:
         properties["ubid"] = ubid
@@ -284,38 +278,38 @@ def reverse_geocode():
             if "country" in item["id"]:
                 properties["country"] = item["text"]
 
-        properties["street_address"] = normalize_address(features[0]["place_name"]) 
+        properties["street_address"] = normalize_address(features[0]["place_name"])
     except Exception:
         print("missing data from reverse geocoding")
 
     if not properties or len(properties) == 0:
         return jsonify({"message": "Error: Reverse geocoding returned poor data."}), 400
-    
+
     properties["quality"] = "reverseGeocode"
     returned_feature = {
-                    "id": newId,
-                    "type": "Feature",
-                    "properties": properties,
-                    "geometry": {
-                        "type": "Polygon",
-                        "coordinates": [coords]
-                    }
-                }
-    
+        "id": newId,
+        "type": "Feature",
+        "properties": properties,
+        "geometry": {
+            "type": "Polygon",
+            "coordinates": [coords]
+        }
+    }
+
     return jsonify({"message": "success", "user_data": json.dumps(returned_feature)}), 200
 
 
-@app.route('/api/edit_footprint',  methods=['POST'])
+@app.route('/api/edit_footprint', methods=['POST'])
 def edit_footprint():
     json_string = request.json.get('value')
     json_data = json.loads(json_string)
-    coords = json_data["coordinates"] 
+    coords = json_data["coordinates"]
 
     polygon = Polygon(coords)
     centroid = polygon.centroid
 
     # calculate lat, long (center of polygon)
-    lat = centroid.y       
+    lat = centroid.y
     lon = centroid.x
 
     # encode ubid from coordinates 
@@ -324,18 +318,17 @@ def edit_footprint():
         ubid = encode_ubid(polygon)
     except AssertionError:
         return jsonify({'message': "Invalid longitude coordinates"}), 400
-    
+
     newPolygonData = {"lat": lat, "lon": lon, "ubid": ubid}
     return jsonify({"message": "success", "user_data": json.dumps(newPolygonData)}), 200
 
 
-
-@app.route('/api/export_geojson',  methods=['POST'])
+@app.route('/api/export_geojson', methods=['POST'])
 def export_geojson():
     json_string = request.json.get('value')
     geojson_data = json.loads(json_string)
     list_of_features = []
-    
+
     for data in geojson_data:
         coords = data['coordinates'].split(',')
         coords = [(float(coords[i]), float(coords[i + 1])) for i in range(0, len(coords), 2)]
@@ -351,12 +344,13 @@ def export_geojson():
         list_of_features.append(feature)
 
     geojson = {
-            "type": "FeatureCollection",
-            "features": list_of_features
-            }
-    
+        "type": "FeatureCollection",
+        "features": list_of_features
+    }
+
     final_geojson = json.dumps(geojson)
     return jsonify({"message": "success", "user_data": final_geojson}), 200
+
 
 if __name__ == '__main__':
     app.run(port=5001)

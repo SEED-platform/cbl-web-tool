@@ -1,9 +1,7 @@
 import { Component, OnInit, ChangeDetectorRef} from '@angular/core';
-import {ColDef, GridOptions} from 'ag-grid-community';
-import { CommonModule, JsonPipe } from '@angular/common'; // Import CommonModule
+import { ColDef } from 'ag-grid-community';
+import { CommonModule } from '@angular/common'; // Import CommonModule
 import { AgGridAngular } from 'ag-grid-angular'
-import "ag-grid-community/styles/ag-grid.css";
-import 'ag-grid-community/styles/ag-theme-quartz.css';
 import { FormsModule } from '@angular/forms'; // Import FormsModule
 import { CustomHeaderComponent } from '../custom-header/custom-header.component';
 import { FlaskRequests } from '../services/server.service';
@@ -15,7 +13,7 @@ import Papa from 'papaparse';
   selector: 'app-first-table',
   standalone: true,
   templateUrl: './first-table.component.html',
-  styleUrls: ['./first-table.component.css'],
+  styleUrl: './first-table.component.css',
   imports: [AgGridAngular, FormsModule, CommonModule]
 })
 
@@ -25,8 +23,8 @@ export class FirstTableComponent implements OnInit {
    ValidatedJsonString: string = '';
    dataValid: boolean = false;
    geoJsonString: string = '';
- 
- 
+
+
   private gridApi: any;
   defaultColDef = {
     flex: 1,
@@ -37,7 +35,7 @@ export class FirstTableComponent implements OnInit {
     suppressHeaderFilterButton: true,
     headerComponent: CustomHeaderComponent  //allows editable headers
   };
- 
+
 
   constructor(private apiHandler: FlaskRequests, private router: Router, private cdr: ChangeDetectorRef, private geoJsonService: GeoJsonService) { }
 
@@ -47,17 +45,17 @@ export class FirstTableComponent implements OnInit {
     this.cdr.detectChanges();
     console.log(this.userList)
   }
- 
+
   onGridReady(params: any) {
     this.gridApi = params.api;
     this.gridApi.sizeColumnsToFit();
     this.getUser();
   }
- 
+
   ngOnInit(): void {
     this.getUser();
   }
- 
+
   setColumnDefs() {
     if (this.userList.length > 0) {
       const keys = Object.keys(this.userList[0]);
@@ -67,13 +65,13 @@ export class FirstTableComponent implements OnInit {
         headerComponentParams: {
           name: key,
           index: index,
-          api: this.gridApi 
+          api: this.gridApi
         }
       }));
     }
     sessionStorage.setItem("COL", JSON.stringify(this.colDefs));
   }
- 
+
 
 
   convertAgGridDataToJson(){
@@ -97,7 +95,7 @@ export class FirstTableComponent implements OnInit {
 
   checkData(){
     const finalUserJson = this.convertAgGridDataToJson()
-    
+
     this.apiHandler.checkData(finalUserJson).subscribe(
      (response) => {
        console.log(response.message); // Handle successful response
