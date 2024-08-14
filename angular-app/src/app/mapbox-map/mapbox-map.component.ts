@@ -167,7 +167,6 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
           this.addDrawFeatures(this.map, geoJsonObject);
         }
       });
-    } else {
     }
 
     this.map.on('click', (event) => this.handleClick(event, geoJsonObject));

@@ -135,8 +135,7 @@ export class CblTableComponent implements OnInit, OnDestroy {
 
   //dynamically sets grid for geojson values
   setColumnDefs() {
-    let keys: any;
-    keys = JSON.parse(sessionStorage.getItem('GEOJSONPROPERTYNAMES') || '[]');
+    const keys = JSON.parse(sessionStorage.getItem('GEOJSONPROPERTYNAMES') || '[]');
     keys.push('coordinates');
 
     const nonEditableKeys = ['ubid', 'longitude', 'latitude'];
