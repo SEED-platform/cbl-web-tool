@@ -31,6 +31,7 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
   private geoJsonSubscription: Subscription | undefined;
   private featureClickSubscription: Subscription | undefined;
   private mapCoordinatesSubscription: Subscription | undefined;
+  private removedBuildingSubscription: Subscription | undefined;
   private geoJsonPropertyNames: any;
   private newGeoJson: any;
   private satelliteView: boolean = false; 
@@ -67,6 +68,22 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
         this.updateZoomLevelForDeletion();
         //this.setMapCenterAndZoom(feature.longitude, feature.latitude); // Update map view based on new coordinates
       }
+    });
+
+    this.removedBuildingSubscription = this.geoJsonService.removeBuildingId$.subscribe(feature =>{
+      if (feature && feature.id) {
+        console.log(typeof(feature.id))
+        const clickedFeature = this.globalGeoJsonObject.features.find((f: any) => f.id === feature.id);
+        if(clickedFeature){
+          console.log("this is being deleted", clickedFeature)
+        this.draw?.changeMode('simple_select');
+        this.draw?.delete(clickedFeature.id);
+        this.emptyBuildingId = "none selected";
+        this.clickedBuildingId = "";
+        }else{
+          console.error("Something when wrong...check table, map, and geojson datasets");
+        }
+    }
     });
   }
 

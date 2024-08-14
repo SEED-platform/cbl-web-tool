@@ -299,6 +299,7 @@ export class CblTableComponent implements OnInit {
       
       const res = this.gridApi.applyTransaction({ remove: selectedData })!;
       this.geoJsonService.updateGeoJsonFromMap(res.remove[0].data);
+      console.log("THIS IS BEING SENT FROM THE MAP TO TABLE", res.remove[0].data)
      }
   }
 

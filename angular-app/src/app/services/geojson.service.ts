@@ -38,6 +38,10 @@ export class GeoJsonService {
   private modifyBuildingSubject = new BehaviorSubject<{ coordinates: number[], latitude: number, longitude: number, ubid: string, id: number } | null>(null);
   public modifyBuilding$: Observable<{ coordinates: number[], latitude: number, longitude: number, ubid: string, id: number } | null> = this.modifyBuildingSubject.asObservable();
   
+  
+  private removeBuildingSubject = new BehaviorSubject<{ id: string } | null>(null);
+  public removeBuildingId$: Observable<{ id: string } | null> = this.removeBuildingSubject.asObservable();
+  
 
 
   constructor() { }
@@ -61,6 +65,8 @@ export class GeoJsonService {
       console.error('Invalid object to remove');
       return;
     }
+
+   
     
     const { id, latitude, longitude } = mapRemovedObject.properties;
   
@@ -83,13 +89,18 @@ export class GeoJsonService {
       ...currentGeoJson,
       features: features
     };
-    
+    this.removeEntirePolygonRefInMap(mapRemovedObject.id);
     // Update the subject with the new GeoJSON
     this.geoJsonSubject.next(updatedGeoJson);
     
     // Optionally call additional methods or emit values as needed
     this.setGeoJson(updatedGeoJson);
     this.mapCoordinatesSubject.next({ latitude, longitude });
+  }
+
+  removeEntirePolygonRefInMap(id: string){
+    console.log('Emitting removeBuildingId:', id);
+    this.removeBuildingSubject.next({id});
   }
   
 
