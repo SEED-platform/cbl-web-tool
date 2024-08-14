@@ -66,9 +66,12 @@ export class CblTableComponent implements OnInit {
 
     this.clickEventSubscription = this.geoJsonService.clickEvent$.subscribe(clickEvent => {
       if (clickEvent) {
-        this.scrollToFeature(clickEvent.latitude, clickEvent.longitude);
+        if(clickEvent.id !== -1){
         this.selectedRowIdStorage = clickEvent.id;
+        this.scrollToFeatureById(this.selectedRowIdStorage);
+        console.log("THIS IS SELECTED ROW ID", this,this.selectedRowIdStorage)
         sessionStorage.setItem("SELECTEDROW", JSON.stringify(this.selectedRowIdStorage));
+        }
       }
     });
 
@@ -77,6 +80,7 @@ export class CblTableComponent implements OnInit {
         console.log("new building", newBuilding)
          this.gridApi.applyTransaction({ add: [newBuilding], addIndex: 0 });
          this.geoJsonService.insertNewBuildingInGeoJson(newBuilding);
+         this.updateTable();
       }
     })
 
@@ -164,22 +168,6 @@ export class CblTableComponent implements OnInit {
         }
         return true;
         }
-        // ,
-        // cellStyle: (params: any) => {
-        //   const field1 = params.data.properties['ubid'];
-        //   const field2 = params.data.properties['street_address'];
-        //   const uniqueString = `${field1}-${field2}`;
-   
-        //   const isDuplicate = (this.duplicateMap[uniqueString] || 0) > 1
-          
-        //   // Apply custom styles based on conditions
-        //   if (isDuplicate) {
-        //     return {
-        //       backgroundColor: 'yellow',
-        //     };
-        //   }
-        //   return {};  // Return an empty object for default styling
-        // }
       }));
     sessionStorage.setItem("COL", JSON.stringify(this.colDefs));
   }
@@ -245,10 +233,8 @@ export class CblTableComponent implements OnInit {
 
   scrollToFeatureById(id: number) {
     // Find the feature in rowData'
-     if (!this.gridApi) return;
-    this.gridApi!.setGridOption("loading", true);
   
- 
+    console.log("This is data on the map", this.rowData);
     const feature = this.rowData.find((f: any) => f.id === id.toString());
 
 
@@ -256,26 +242,20 @@ export class CblTableComponent implements OnInit {
       console.error(`Feature with ID ${id} not found.`);
       return;
     }
-  
-    if (!this.gridApi) {
-      console.error('Grid API is not initialized.');
-      return;
-    }
+
   
     if (feature && this.gridApi) {
       this.gridApi.ensureIndexVisible(this.rowData.indexOf(feature), 'top');
       const index = this.rowData.indexOf(feature);
 
       const rowNode = this.gridApi.getDisplayedRowAtIndex(index);
-
+      
       if (rowNode) {
         rowNode.setSelected(true);
       }
     }
-
-    timer(200).subscribe(() => {
-      this.gridApi!.setGridOption("loading", false);
-    });
+      console.log("This is data on the map", this.rowData);
+ 
 
 
   }

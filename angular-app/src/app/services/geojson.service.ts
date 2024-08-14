@@ -127,13 +127,15 @@ export class GeoJsonService {
     
     // Optionally call additional methods or emit values as needed
     this.setGeoJson(updatedGeoJson);
+    console.log("MODDED VALUE", updatedGeoJson);
     this.mapCoordinatesSubject.next({ latitude, longitude });
     
   }
 
   modifyBuildingInTable(coordinates: number[], latitude: number, longitude: number, ubid: string, id: number): void {
-
+      
     const updatedBuilding = { coordinates, latitude, longitude, ubid, id };
+    console.log(updatedBuilding)
 
     // Update the BehaviorSubject with the new building data
     this.modifyBuildingSubject.next(updatedBuilding);
@@ -144,7 +146,7 @@ export class GeoJsonService {
     const currentGeoJson = this.geoJsonSubject.getValue();
     currentGeoJson.features.unshift(buildingObject);
     this.setGeoJson(currentGeoJson);
-    console.log("NEW geojson", currentGeoJson);
+    console.log("NEW GEO IN SOURCE", currentGeoJson);
   }
 
   emitClickEvent(latitude: number, longitude: number, id: number): void {

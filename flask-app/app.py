@@ -266,8 +266,8 @@ def reverse_geocode():
     result = response.json()
     try:
         properties["ubid"] = ubid
-        properties["latitude"] = lat
-        properties["longitude"] = lon
+        properties["latitude"] = str(lat)
+        properties["longitude"] = str(lon)
         features = result["features"]
         context = features[0]["context"]
         for item in context:

@@ -35,11 +35,13 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
   private draw: MapboxDraw | undefined;
   private clickedBuildingId: string = "";
   private selectedPolygonId: string ="";
+  private globalGeoJsonObject: any;
   constructor(private cdr: ChangeDetectorRef, private geoJsonService: GeoJsonService, private apiHandler: FlaskRequests) {}
 
   ngOnInit() {
     this.geoJsonSubscription = this.geoJsonService.getGeoJson().subscribe(geoJsonObject => {
       this.initializeMapWithGeoJson(geoJsonObject);
+      this.globalGeoJsonObject = geoJsonObject;
       this.geoJsonPropertyNames = JSON.parse(sessionStorage.getItem("GEOJSONPROPERTYNAMES") || "[]");
     });
 
@@ -50,6 +52,7 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
         if (id !== undefined && (feature.latitude.toString() !== '0' && feature.latitude.toString()  !== '0')) {
           this.flyToCoordinatesWithZoom(feature.longitude, feature.latitude);
           this.setActivePolygon(id);
+          this.draw?.changeMode('simple_select')
         }
       }
     });
@@ -133,7 +136,7 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
   }
 
     this.map.on('load', () => {
-    
+  
       if (this.map) {
         this.addDrawFeatures(this.map, geoJsonObject);
       }    
@@ -171,7 +174,7 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
             const { latitude, longitude } = clickedFeature.properties;
             //reset any clicked polygon outline
            
-   
+            console.log("THIS IS CLICKED ID ON MAP", this.clickedBuildingId)
             // Emit the click event with the latitude and longitude
             this.geoJsonService.setIsDataSentFromTable(true);
             this.geoJsonService.emitClickEvent(latitude, longitude, Number(this.clickedBuildingId));     
@@ -488,22 +491,19 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
     })
     
     
-     map.on('draw.create', (e) => this.handleDrawEvent(e, this.draw, geoJsonObject)); 
+     map.on('draw.create', (e) => this.handleDrawEvent(e, this.draw)); 
      map.on('draw.delete', (e) => this.handleDeleteEvent(e, this.draw, geoJsonObject)); 
-     map.on('draw.update', (e) => this.handleEditEvent(e, this.draw, geoJsonObject));
+     map.on('draw.update', (e) => this.handleEditEvent(e, this.draw));
    }
 
-  handleEditEvent(e: any, draw: any, geoJsonObject: any) {
-   
+  handleEditEvent(e: any, draw: any) {
+      console.log("EDIT EVENT BEING CALLED");
     const newBuildingCoordinates =  e.features[0].geometry.coordinates[0];
     let newBuildingId = 0;
-    console.log("edit", geoJsonObject);
-    if(this.clickedBuildingId === "New Building"){
-       newBuildingId = geoJsonObject.features.length - 1;
-       console.log("selected Buidlign id", newBuildingId);
-     } else{
-       newBuildingId =  e.features[0].id;
-    }
+   
+  
+      newBuildingId =  e.features[0].id;
+    
     const jsonData = {
       "coordinates": newBuildingCoordinates,
       "propertyNames": this.geoJsonPropertyNames,
@@ -533,7 +533,7 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
 
 
   handleDeleteEvent(e: any, draw: any, geoJsonObject: any) {
-   
+      console.log("DELETE EVENT BEING CALLED");
     const newBuildingCoordinates =  e.features[0].geometry.coordinates[0];
     const newBuildingId =  e.features[0].id
     console.log("in map", e.features[0])
@@ -564,14 +564,14 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
   }
 
 
-  handleDrawEvent(e: any, draw: any, geoJsonObject: any) {
+  handleDrawEvent(e: any, draw: any) {
    
     const newBuildingCoordinates =  e.features[0].geometry.coordinates[0];
-    const newBuildingId =  geoJsonObject.features.length.toString();
+    const newBuildingId =  this.globalGeoJsonObject.features.length.toString();
     const jsonData = {
       "coordinates": newBuildingCoordinates,
       "propertyNames": this.geoJsonPropertyNames,
-      "featuresLength": geoJsonObject.features.length
+      "featuresLength": this.globalGeoJsonObject.features.length
     }
 
     const jsonDataString = JSON.stringify(jsonData);
@@ -581,13 +581,18 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
         this.newGeoJson = JSON.parse(response.user_data)
         const newBuildinglongitude = this.newGeoJson.properties.longitude;
         const newBuildingLatitude = this.newGeoJson.properties.latitude;
+        const featureId = e.features[0].id;
+ 
+        draw.delete(featureId);
+        draw.changeMode('simple_select')
         this.geoJsonService.setMapCoordinates(newBuildingLatitude, newBuildinglongitude);
         this.geoJsonService.insertNewBuildingInTable(this.newGeoJson);
-       
+        draw.add(this.newGeoJson);
       },
       (errorResponse) => {
         console.error(errorResponse.error.message); // Handle error response
       });
+     
   }
 
   setActivePolygon(polygonId: any) {
