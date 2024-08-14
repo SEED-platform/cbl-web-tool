@@ -65,6 +65,13 @@ Given a list of addresses, this workflow will automatically:
         }
         ```
 
+### Linting with Pre-commit
+
+```shell
+cd flask-app
+pre-commit run --all-files
+```
+
 ### Notes
 
 - This workflow is optimized to be self-updating, and only downloads quadkeys and quadkey dataset-links if they haven't previously been downloaded or if an update is available

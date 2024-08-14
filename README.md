@@ -69,4 +69,3 @@ Given a list of addresses uploaded in JSON, CSV, or Excel format, this tool will
 - Flagging duplicate buildings
 - Uploading multiple files and merging the contents before generating the CBL
 - Switching between map and satellite view on the map
-
