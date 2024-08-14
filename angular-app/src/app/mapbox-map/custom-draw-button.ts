@@ -19,7 +19,7 @@ export class EditButton implements mapboxgl.IControl {
     this.container.style.backgroundPosition = 'center'; // Center the image
     this.container.style.backgroundRepeat = 'no-repeat'; // No repeating
     this.container.style.cursor = 'pointer'; // Pointer cursor for better UX
- 
+
     this.container.innerHTML =
       '<div class="tools-box-trash">' +
       '<button>' +
@@ -27,15 +27,14 @@ export class EditButton implements mapboxgl.IControl {
       '</button>' +
       '</div>';
 
-      this.container.addEventListener('click', (e) => {
-        e.preventDefault();
-        this.callback();
-      });
+    this.container.addEventListener('click', (e) => {
+      e.preventDefault();
+      this.callback();
+    });
 
     return this.container;
   }
 
-  
 
   onRemove() {
     if (this.container.parentNode) {

@@ -1,18 +1,15 @@
-import { Component, OnInit, ChangeDetectorRef, ViewEncapsulation } from '@angular/core';
-import {ColDef, RowClassRules } from 'ag-grid-community';
+import { ValueGetterParams } from '@ag-grid-community/core';
 import { CommonModule } from '@angular/common';
-import { AgGridAngular } from 'ag-grid-angular';
-import "ag-grid-community/styles/ag-grid.css";
-import 'ag-grid-community/styles/ag-theme-quartz.css';
-import { FlaskRequests } from '../services/server.service';
-import { GeoJsonService } from '../services/geojson.service';
+import { ChangeDetectorRef, Component, OnInit, ViewEncapsulation, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
-import { ValueGetterParams,  CellEditingStoppedEvent} from "@ag-grid-community/core";
+import { AgGridAngular } from 'ag-grid-angular';
+import 'ag-grid-community/styles/ag-grid.css';
+import 'ag-grid-community/styles/ag-theme-quartz.css';
+import { ColDef } from 'ag-grid-community';
 import Papa from 'papaparse';
-import { timer, Subscription } from 'rxjs';
-
-
-
+import { Subscription } from 'rxjs';
+import { GeoJsonService } from '../services/geojson.service';
+import { FlaskRequests } from '../services/server.service';
 
 
 @Component({
@@ -24,21 +21,12 @@ import { timer, Subscription } from 'rxjs';
   encapsulation: ViewEncapsulation.None
 })
 
-export class CblTableComponent implements OnInit {
+export class CblTableComponent implements OnInit, OnDestroy {
   featuresArray: any[] = [];
   colDefs: ColDef[] = [];
   geoJson: any;
-  public duplicateMap: { [key: string]: number } = {};
-  private gridApi: any;
+  public duplicateMap: Record<string, number> = {};
   public rowData: any[] = [];
-  private geoJsonSubscription: Subscription | undefined;
-  private clickEventSubscription: Subscription | undefined;
-  private newBuilingSubscription: Subscription | undefined;
-  private modifyBuildingSubscription: Subscription | undefined;
-  private isEditing: boolean = false;
-  private selectedRowIdStorage: string  | undefined = undefined;
-  private initialLoad: boolean = true; // Flag to track initial load
-
   //ag grid set up
   defaultColDef = {
     flex: 1,
@@ -46,15 +34,24 @@ export class CblTableComponent implements OnInit {
     sortable: false,
     filter: true,
     editable: true,
-    enableCellChangeFlash: true,
+    enableCellChangeFlash: true
   };
+  private gridApi: any;
+  private geoJsonSubscription: Subscription | undefined;
+  private clickEventSubscription: Subscription | undefined;
+  private newBuilingSubscription: Subscription | undefined;
+  private modifyBuildingSubscription: Subscription | undefined;
+  private isEditing = false;
+  private selectedRowIdStorage: string | undefined = undefined;
+  private initialLoad = true; // Flag to track initial load
 
-  constructor(private apiHandler: FlaskRequests, private router: Router, private cdr: ChangeDetectorRef, private geoJsonService: GeoJsonService) { }
+  constructor(private apiHandler: FlaskRequests, private router: Router, private cdr: ChangeDetectorRef, private geoJsonService: GeoJsonService) {
+  }
 
 
   ngOnInit(): void {
 
-      this.geoJsonSubscription = this.geoJsonService.getGeoJson().subscribe(data => {
+    this.geoJsonSubscription = this.geoJsonService.getGeoJson().subscribe(data => {
       this.geoJson = data;
       if (this.initialLoad) { //keeps it from rendering every change..better performance
         this.updateTable(); // Update table only on initial load
@@ -65,32 +62,36 @@ export class CblTableComponent implements OnInit {
     //if a building is clicked it will scroll to that index on table
     this.clickEventSubscription = this.geoJsonService.clickEvent$.subscribe(clickEvent => {
       if (clickEvent) {
-        if(clickEvent.id !== ""){
-        this.selectedRowIdStorage = clickEvent.id;
-        this.scrollToFeatureById(this.selectedRowIdStorage);
-        console.log("THIS IS SELECTED ROW ID", this,this.selectedRowIdStorage) //keep selected row incase the table re renders and you want to go back to it
-        sessionStorage.setItem("SELECTEDROW", JSON.stringify(this.selectedRowIdStorage));
+        if (clickEvent.id !== '') {
+          this.selectedRowIdStorage = clickEvent.id;
+          this.scrollToFeatureById(this.selectedRowIdStorage);
+          console.log('THIS IS SELECTED ROW ID', this, this.selectedRowIdStorage); //keep selected row incase the table re renders and you want to go back to it
+          sessionStorage.setItem('SELECTEDROW', JSON.stringify(this.selectedRowIdStorage));
         }
       }
     });
 
     //inserts new building in table and geojson
     this.newBuilingSubscription = this.geoJsonService.newBuilding$.subscribe(newBuilding => {
-      if (newBuilding){
-         this.gridApi.applyTransaction({ add: [newBuilding], addIndex: 0 });
-         this.geoJsonService.insertNewBuildingInGeoJson(newBuilding); //updates the original geojson
-         setTimeout(()=>{this.updateTable(), 10}); //needed to keep in sync with map
+      if (newBuilding) {
+        this.gridApi.applyTransaction({ add: [newBuilding], addIndex: 0 });
+        this.geoJsonService.insertNewBuildingInGeoJson(newBuilding); //updates the original geojson
+        setTimeout(() => {
+          this.updateTable(), 10;
+        }); //needed to keep in sync with map
       }
-    })
+    });
 
     //just modies the existing row...... does not need rerender
     this.modifyBuildingSubscription = this.geoJsonService.modifyBuilding$.subscribe(modBuilding => {
       if (modBuilding) {
-          this.updateModifiedRow(modBuilding);
-          setTimeout(()=>{this.geoJsonService.modifyBuildingInGeoJson(modBuilding)}, 300);
-    }
-  })
-}
+        this.updateModifiedRow(modBuilding);
+        setTimeout(() => {
+          this.geoJsonService.modifyBuildingInGeoJson(modBuilding);
+        }, 300);
+      }
+    });
+  }
 
   ngOnDestroy(): void {
     if (this.geoJsonSubscription) {
@@ -108,7 +109,7 @@ export class CblTableComponent implements OnInit {
   }
 
 
- //sets up the grid....also use when need to re-sync data
+  //sets up the grid....also use when need to re-sync data
   updateTable() {
 
     if (!this.geoJson || !this.geoJson.features) {
@@ -116,21 +117,20 @@ export class CblTableComponent implements OnInit {
       return;
     }
 
-   if(this.geoJson.features.length > 0){
-    this.featuresArray = this.geoJson.features;
-    this.rowData = this.featuresArray;
-   }
-   this.setColumnDefs();
+    if (this.geoJson.features.length > 0) {
+      this.featuresArray = this.geoJson.features;
+      this.rowData = this.featuresArray;
+    }
+    this.setColumnDefs();
 
-   if(this.gridApi){
-   setTimeout(() =>{
+    if (this.gridApi) {
+      setTimeout(() => {
 
-                   this.gridApi.deselectAll();
-                   this.scrollToTop()
-              }, 100)
+        this.gridApi.deselectAll();
+        this.scrollToTop();
+      }, 100);
+    }
   }
-}
-
 
 
   capitalizeFirstLetter = (string: string) => {
@@ -138,39 +138,39 @@ export class CblTableComponent implements OnInit {
     return string.charAt(0).toUpperCase() + string.slice(1);
   };
 
-   //dynamically sets grid for geojson values
+  //dynamically sets grid for geojson values
   setColumnDefs() {
-        let keys:any;
-        keys = JSON.parse(sessionStorage.getItem("GEOJSONPROPERTYNAMES")|| '[]');
-        keys.push('coordinates');
+    let keys: any;
+    keys = JSON.parse(sessionStorage.getItem('GEOJSONPROPERTYNAMES') || '[]');
+    keys.push('coordinates');
 
-        const nonEditableKeys = ['ubid', 'longitude', 'latitude'];
+    const nonEditableKeys = ['ubid', 'longitude', 'latitude'];
 
-      this.colDefs = keys.map((key:any) => ({
+    this.colDefs = keys.map((key: any) => ({
         field: key,
         editable: !nonEditableKeys.includes(key),
         headerName: this.capitalizeFirstLetter(key),
         valueGetter: (params: ValueGetterParams) => {
-          if(this.geoJson.features.length > 0){
-          if (key === 'coordinates') {
-            return params.data.geometry?.coordinates;
+          if (this.geoJson.features.length > 0) {
+            if (key === 'coordinates') {
+              return params.data.geometry?.coordinates;
+            }
+            return params.data.properties[key];
           }
-          return params.data.properties[key];
-        }
-        },   valueSetter: (params: any) => {
-          if(this.geoJson.features.length > 0){
-          if (key === 'coordinates') {
-            params.data.geometry = params.data.geometry || {};
-            params.data.geometry.coordinates = params.newValue;
-          } else {
-            params.data.properties[key] = params.newValue;
+        }, valueSetter: (params: any) => {
+          if (this.geoJson.features.length > 0) {
+            if (key === 'coordinates') {
+              params.data.geometry = params.data.geometry || {};
+              params.data.geometry.coordinates = params.newValue;
+            } else {
+              params.data.properties[key] = params.newValue;
+            }
           }
-        }
-        return true;
+          return true;
         }
       }
-       ));
-    sessionStorage.setItem("COL", JSON.stringify(this.colDefs));
+    ));
+    sessionStorage.setItem('COL', JSON.stringify(this.colDefs));
   }
 
   exportAsJson() {
@@ -178,10 +178,10 @@ export class CblTableComponent implements OnInit {
     this.gridApi.stopEditing();
 
     // Get the data as CSV
-    let csvUserData = this.gridApi.getDataAsCsv();
+    const csvUserData = this.gridApi.getDataAsCsv();
 
     // Convert CSV to JSON using PapaParse
-    let jsonString:string;
+    let jsonString: string;
     try {
       jsonString = JSON.stringify(Papa.parse(csvUserData, { header: true }).data);
     } catch (error) {
@@ -202,12 +202,11 @@ export class CblTableComponent implements OnInit {
 
   scrollToFeature(latitude: number, longitude: number) {
 
-    if(longitude === -1 && latitude === -1){
-      this.scrollToTop()
+    if (longitude === -1 && latitude === -1) {
+      this.scrollToTop();
       this.gridApi.deselectAll();
       return;
     }
-
 
 
     const feature = this.rowData.find((f: any) =>
@@ -225,10 +224,10 @@ export class CblTableComponent implements OnInit {
   }
 
 
-  scrollToTop(){
+  scrollToTop() {
 
     this.gridApi.ensureIndexVisible(0, 'top');
-    var rowNode1 = this.gridApi!.getDisplayedRowAtIndex(0)!;
+    const rowNode1 = this.gridApi!.getDisplayedRowAtIndex(0)!;
     this.gridApi!.flashCells({ rowNodes: [rowNode1] });
   }
 
@@ -242,7 +241,7 @@ export class CblTableComponent implements OnInit {
       return;
     }
 
-    console.log("THIS IS THE FEATURE BEING SEARCHED", feature)
+    console.log('THIS IS THE FEATURE BEING SEARCHED', feature);
     console.log(this.rowData.indexOf(feature));
 
     if (feature && this.gridApi) {
@@ -256,11 +255,9 @@ export class CblTableComponent implements OnInit {
     }
 
 
-
-
   }
 
-  onRowClicked(event: any){
+  onRowClicked(event: any) {
     this.geoJsonService.setIsDataSentFromTable(false);
     this.onRowSelected(event);
   }
@@ -270,16 +267,16 @@ export class CblTableComponent implements OnInit {
 
     if (event.node.isSelected()) {
       const data = event.node.data;
-      console.log("RICKY WHEN I CATCH YOU RICKY", data)
-      const id =  data.id;
-      console.log("this is selected in row", id);
+      console.log('RICKY WHEN I CATCH YOU RICKY', data);
+      const id = data.id;
+      console.log('this is selected in row', id);
       this.selectedRowIdStorage = id;
-      sessionStorage.setItem("SELECTEDROW", JSON.stringify(this.selectedRowIdStorage));
+      sessionStorage.setItem('SELECTEDROW', JSON.stringify(this.selectedRowIdStorage));
       const latitude = data.properties.latitude;
       const longitude = data.properties.longitude;
       const quality = data.properties.quality;
-      if(!this.geoJsonService.isDataSentFromTable()){
-      this.geoJsonService.emitSelectedFeature(latitude, longitude, id, quality);
+      if (!this.geoJsonService.isDataSentFromTable()) {
+        this.geoJsonService.emitSelectedFeature(latitude, longitude, id, quality);
       }
     }
 
@@ -295,42 +292,42 @@ export class CblTableComponent implements OnInit {
   }
 
   handleDelete() {
-     if(this.rowData.length !== 0){
+    if (this.rowData.length !== 0) {
       const selectedData = this.gridApi.getSelectedRows();
 
       const res = this.gridApi.applyTransaction({ remove: selectedData })!;
 
-      console.log("THIS IS BEING SENT FROM THE MAP TO TABLE", res.remove[0].data);
+      console.log('THIS IS BEING SENT FROM THE MAP TO TABLE', res.remove[0].data);
       this.geoJsonService.removeEntirePolygonRefInMap(res.remove[0].data.id);
       this.updateTable();
 
-     }
+    }
   }
 
   updateModifiedRow(modBuilding: any) {
-    if(this.rowData.length !== 0){
+    if (this.rowData.length !== 0) {
       const rowNode = this.rowData.find(row => row.id === modBuilding.id.toString());
 
 
-     if (rowNode) {
-      // Update the row data
-      const data = rowNode;
+      if (rowNode) {
+        // Update the row data
+        const data = rowNode;
 
-      data.geometry.coordinates = modBuilding.coordinates;
-      data.properties.latitude = modBuilding.latitude;
-      data.properties.longitude = modBuilding.longitude;
-      data.properties.ubid = modBuilding.ubid;
+        data.geometry.coordinates = modBuilding.coordinates;
+        data.properties.latitude = modBuilding.latitude;
+        data.properties.longitude = modBuilding.longitude;
+        data.properties.ubid = modBuilding.ubid;
 
-      // Apply the update transaction
-      const res = this.gridApi.applyTransaction({
-        update: [data] // Use `update` key to modify existing rows
-      });
+        // Apply the update transaction
+        const res = this.gridApi.applyTransaction({
+          update: [data] // Use `update` key to modify existing rows
+        });
 
-     }
-   }
+      }
+    }
   }
 
-  findDuplicates(geoJson : any){
+  findDuplicates(geoJson: any) {
     geoJson.features.forEach((feature: any) => {
       const ubid = feature.properties.ubid;
       const streetAddress = feature.properties.street_address;

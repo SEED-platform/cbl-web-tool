@@ -8,9 +8,7 @@ interface GeoJsonFeature {
     coordinates: any[]; // Adjust based on the expected coordinate structure
   };
   id: string;
-  properties: {
-    [key: string]: any; // Allows for any property
-  };
+  properties: Record<string, any>;
 }
 
 @Injectable({
@@ -20,14 +18,14 @@ interface GeoJsonFeature {
 
 export class GeoJsonService {
 
-  private isSentFromTable: boolean = false; // Flag to track selection source
+  private isSentFromTable = false; // Flag to track selection source
   private geoJsonSubject: BehaviorSubject<any> = new BehaviorSubject<any>(this.getGeoJsonFromSessionStorage());
 
   private clickEventSubject = new BehaviorSubject<{ latitude: number, longitude: number, id: string } | null>(null);
-  public clickEvent$: Observable<{ latitude: number, longitude: number, id:string  } | null> = this.clickEventSubject.asObservable();
+  public clickEvent$: Observable<{ latitude: number, longitude: number, id: string } | null> = this.clickEventSubject.asObservable();
 
   private selectedFeatureSubject = new BehaviorSubject<{ latitude: number, longitude: number, id: string, quality: string } | null>(null);
-  public selectedFeature$: Observable<{ latitude: number, longitude: number, id: string, quality: string} | null> = this.selectedFeatureSubject.asObservable();
+  public selectedFeature$: Observable<{ latitude: number, longitude: number, id: string, quality: string } | null> = this.selectedFeatureSubject.asObservable();
 
   private mapCoordinatesSubject = new BehaviorSubject<{ latitude: number, longitude: number } | null>(null);
   public mapCoordinates$: Observable<{ latitude: number, longitude: number } | null> = this.mapCoordinatesSubject.asObservable();
@@ -35,25 +33,21 @@ export class GeoJsonService {
   private newBuildingSubject = new BehaviorSubject<GeoJsonFeature | null>(null);
   public newBuilding$: Observable<GeoJsonFeature | null> = this.newBuildingSubject.asObservable();
 
-  private modifyBuildingSubject = new BehaviorSubject<{ coordinates: number[], latitude: number, longitude: number, ubid: string, id: string} | null>(null);
-  public modifyBuilding$: Observable<{ coordinates: number[], latitude: number, longitude: number, ubid: string, id: string} | null> = this.modifyBuildingSubject.asObservable();
+  private modifyBuildingSubject = new BehaviorSubject<{ coordinates: number[], latitude: number, longitude: number, ubid: string, id: string } | null>(null);
+  public modifyBuilding$: Observable<{ coordinates: number[], latitude: number, longitude: number, ubid: string, id: string } | null> = this.modifyBuildingSubject.asObservable();
 
 
   private removeBuildingSubject = new BehaviorSubject<{ id: string } | null>(null);
   public removeBuildingId$: Observable<{ id: string } | null> = this.removeBuildingSubject.asObservable();
 
 
-
-  constructor() { }
-
-  private getGeoJsonFromSessionStorage(): any {
-    return JSON.parse(sessionStorage.getItem("GEOJSONDATA") || '{}');
+  constructor() {
   }
 
   setGeoJson(serverGeoJson: any): void {
 
     this.geoJsonSubject.next(serverGeoJson);
-    sessionStorage.setItem("GEOJSONDATA", JSON.stringify(serverGeoJson));
+    sessionStorage.setItem('GEOJSONDATA', JSON.stringify(serverGeoJson));
   }
 
   getGeoJson(): Observable<any> {
@@ -67,10 +61,9 @@ export class GeoJsonService {
     }
 
 
-
     const { latitude, longitude } = mapRemovedObject.properties;
     const id = mapRemovedObject.id;
-    console.log(mapRemovedObject,"yurttrtrew")
+    console.log(mapRemovedObject, 'yurttrtrew');
 
     // Get the current GeoJSON from the subject
     const currentGeoJson = this.geoJsonSubject.getValue();
@@ -80,8 +73,8 @@ export class GeoJsonService {
 
     // Find the index of the feature to remove
     const indexToRemove = features.findIndex((feature: any) => feature.id === id);
-    console.log("IndexToRemove", indexToRemove);
-    console.log("has been found???", features[indexToRemove]);
+    console.log('IndexToRemove', indexToRemove);
+    console.log('has been found???', features[indexToRemove]);
     // Remove the feature at the found index if it exists
     if (indexToRemove !== -1) {
       features.splice(indexToRemove, 1); // Remove the feature at the found index
@@ -94,21 +87,20 @@ export class GeoJsonService {
     };
     // Update the subject with the new GeoJSON
     this.setGeoJson(updatedGeoJson);
-    console.log("Map remove object", updatedGeoJson)
+    console.log('Map remove object', updatedGeoJson);
     this.mapCoordinatesSubject.next({ latitude, longitude });
   }
 
-  removeEntirePolygonRefInMap(id: string){
+  removeEntirePolygonRefInMap(id: string) {
     console.log('Emitting removeBuildingId:', id);
-    this.removeBuildingSubject.next({id});
+    this.removeBuildingSubject.next({ id });
   }
-
 
   insertNewBuildingInTable(buildingObject: GeoJsonFeature): void {
     this.newBuildingSubject.next(buildingObject);
   }
 
-  modifyBuildingInGeoJson(modBuilding: any){
+  modifyBuildingInGeoJson(modBuilding: any) {
 
 
     console.log(modBuilding);
@@ -139,15 +131,15 @@ export class GeoJsonService {
 
     // Optionally call additional methods or emit values as needed
     this.setGeoJson(updatedGeoJson);
-    console.log("MODDED VALUE", updatedGeoJson);
+    console.log('MODDED VALUE', updatedGeoJson);
     this.mapCoordinatesSubject.next({ latitude, longitude });
 
   }
 
   modifyBuildingInTable(coordinates: number[], latitude: number, longitude: number, ubid: string, id: string): void {
 
-    const updatedBuilding = { coordinates, latitude, longitude, ubid, id};
-    console.log(updatedBuilding)
+    const updatedBuilding = { coordinates, latitude, longitude, ubid, id };
+    console.log(updatedBuilding);
 
     // Update the BehaviorSubject with the new building data
     this.modifyBuildingSubject.next(updatedBuilding);
@@ -155,19 +147,18 @@ export class GeoJsonService {
 
   modifyPoorBuildingInTable(coordinates: number[], latitude: number, longitude: number, ubid: string, id: string, quality: string): void {
 
-    const updatedBuilding = { coordinates, latitude, longitude, ubid, id, quality};
-    console.log(updatedBuilding)
+    const updatedBuilding = { coordinates, latitude, longitude, ubid, id, quality };
+    console.log(updatedBuilding);
 
     // Update the BehaviorSubject with the new building data
     this.modifyBuildingSubject.next(updatedBuilding);
   }
 
-
-  insertNewBuildingInGeoJson(buildingObject: GeoJsonFeature): void{
+  insertNewBuildingInGeoJson(buildingObject: GeoJsonFeature): void {
     const currentGeoJson = this.geoJsonSubject.getValue();
     currentGeoJson.features.unshift(buildingObject);
     this.setGeoJson(currentGeoJson);
-    console.log("NEW GEO IN SOURCE", currentGeoJson);
+    console.log('NEW GEO IN SOURCE', currentGeoJson);
   }
 
   emitClickEvent(latitude: number, longitude: number, id: string): void {
@@ -175,11 +166,11 @@ export class GeoJsonService {
   }
 
   emitSelectedFeature(latitude: number, longitude: number, id: string, quality: string): void {
-    this.selectedFeatureSubject.next({ latitude, longitude, id, quality});
+    this.selectedFeatureSubject.next({ latitude, longitude, id, quality });
   }
 
-  setMapCoordinates(latitude: number, longitude:number): void{
-    this.mapCoordinatesSubject.next({latitude, longitude});
+  setMapCoordinates(latitude: number, longitude: number): void {
+    this.mapCoordinatesSubject.next({ latitude, longitude });
   }
 
   getCurrentCoordinates(): { latitude: number, longitude: number } | null {
@@ -192,6 +183,10 @@ export class GeoJsonService {
 
   isDataSentFromTable(): boolean {
     return this.isSentFromTable;
+  }
+
+  private getGeoJsonFromSessionStorage(): any {
+    return JSON.parse(sessionStorage.getItem('GEOJSONDATA') || '{}');
   }
 
 }

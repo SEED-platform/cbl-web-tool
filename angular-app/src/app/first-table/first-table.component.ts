@@ -1,13 +1,13 @@
-import { Component, OnInit, ChangeDetectorRef} from '@angular/core';
-import { ColDef } from 'ag-grid-community';
 import { CommonModule } from '@angular/common'; // Import CommonModule
-import { AgGridAngular } from 'ag-grid-angular'
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms'; // Import FormsModule
-import { CustomHeaderComponent } from '../custom-header/custom-header.component';
-import { FlaskRequests } from '../services/server.service';
-import { GeoJsonService } from '../services/geojson.service';
 import { Router } from '@angular/router';
+import { AgGridAngular } from 'ag-grid-angular';
+import { ColDef } from 'ag-grid-community';
 import Papa from 'papaparse';
+import { CustomHeaderComponent } from '../custom-header/custom-header.component';
+import { GeoJsonService } from '../services/geojson.service';
+import { FlaskRequests } from '../services/server.service';
 
 @Component({
   selector: 'app-first-table',
@@ -17,14 +17,11 @@ import Papa from 'papaparse';
 })
 
 export class FirstTableComponent implements OnInit {
-   userList: any[] = [];
-   colDefs: ColDef[] = []
-   ValidatedJsonString: string = '';
-   dataValid: boolean = false;
-   geoJsonString: string = '';
-
-
-  private gridApi: any;
+  userList: any[] = [];
+  colDefs: ColDef[] = [];
+  ValidatedJsonString = '';
+  dataValid = false;
+  geoJsonString = '';
   defaultColDef = {
     flex: 1,
     minWidth: 100,
@@ -34,15 +31,16 @@ export class FirstTableComponent implements OnInit {
     suppressHeaderFilterButton: true,
     headerComponent: CustomHeaderComponent  //allows editable headers
   };
+  private gridApi: any;
 
-
-  constructor(private apiHandler: FlaskRequests, private router: Router, private cdr: ChangeDetectorRef, private geoJsonService: GeoJsonService) { }
+  constructor(private apiHandler: FlaskRequests, private router: Router, private cdr: ChangeDetectorRef, private geoJsonService: GeoJsonService) {
+  }
 
   getUser() {
     this.userList = JSON.parse(sessionStorage.getItem('FIRSTTABLEDATA') || '[]');
     this.setColumnDefs();
     this.cdr.detectChanges();
-    console.log(this.userList)
+    console.log(this.userList);
   }
 
   onGridReady(params: any) {
@@ -68,57 +66,56 @@ export class FirstTableComponent implements OnInit {
         }
       }));
     }
-    sessionStorage.setItem("COL", JSON.stringify(this.colDefs));
+    sessionStorage.setItem('COL', JSON.stringify(this.colDefs));
   }
 
 
-
-  convertAgGridDataToJson(){
-    let csvUserData = this.gridApi.getDataAsCsv();
-    let jsonHeaderData = JSON.parse(sessionStorage.getItem("COL") || "[]");
+  convertAgGridDataToJson() {
+    const csvUserData = this.gridApi.getDataAsCsv();
+    const jsonHeaderData = JSON.parse(sessionStorage.getItem('COL') || '[]');
     const parsedCsvData = Papa.parse(csvUserData, { header: true }).data;
-    const updatedHeaders = jsonHeaderData.map((item:any) => item.headerName);
+    const updatedHeaders = jsonHeaderData.map((item: any) => item.headerName);
 
     const updatedData = parsedCsvData.map((row: any) => {
       const updatedRow: any = {};
       updatedHeaders.forEach((header: string | number, index: number) => {
-      updatedRow[header] = row[Object.keys(row)[index]];
+        updatedRow[header] = row[Object.keys(row)[index]];
       });
       return updatedRow;
     });
 
-   const newJson = JSON.stringify(updatedData, null, 2);
+    const newJson = JSON.stringify(updatedData, null, 2);
 
-   return newJson;
+    return newJson;
   }
 
-  checkData(){
-    const finalUserJson = this.convertAgGridDataToJson()
+  checkData() {
+    const finalUserJson = this.convertAgGridDataToJson();
 
     this.apiHandler.checkData(finalUserJson).subscribe(
-     (response) => {
-       console.log(response.message); // Handle successful response
-       this.ValidatedJsonString = response.user_data
-       this.dataValid = true
+      (response) => {
+        console.log(response.message); // Handle successful response
+        this.ValidatedJsonString = response.user_data;
+        this.dataValid = true;
       },
-     (errorResponse) => {
-       console.log(errorResponse.error.message); // Handle error response
-       alert(errorResponse.error.message)
+      (errorResponse) => {
+        console.log(errorResponse.error.message); // Handle error response
+        alert(errorResponse.error.message);
       });
   }
 
- uploadJsonToServer() {
-   this.apiHandler.sendJsonData(this.ValidatedJsonString).subscribe(
-     (response) => {
-       console.log(response.message); // Handle successful response
-       this.geoJsonString = response.user_data
-       const geoJson = JSON.parse(this.geoJsonString);
-       this.geoJsonService.setGeoJson(geoJson);
-       sessionStorage.setItem('GEOJSONDATA', this.geoJsonString);
-       this.router.navigate(['']);
+  uploadJsonToServer() {
+    this.apiHandler.sendJsonData(this.ValidatedJsonString).subscribe(
+      (response) => {
+        console.log(response.message); // Handle successful response
+        this.geoJsonString = response.user_data;
+        const geoJson = JSON.parse(this.geoJsonString);
+        this.geoJsonService.setGeoJson(geoJson);
+        sessionStorage.setItem('GEOJSONDATA', this.geoJsonString);
+        this.router.navigate(['']);
       },
-     (errorResponse) => {
-       console.error(errorResponse.error.message); // Handle error response
+      (errorResponse) => {
+        console.error(errorResponse.error.message); // Handle error response
       });
   }
 

@@ -7,6 +7,8 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
+    "lint": "ng lint",
+    "lint:fix": "ng lint --fix",
     "stylelint": "stylelint src/**/*.css",
     "stylelint:fix": "npm run stylelint -- --fix"
   },
@@ -39,11 +41,13 @@
     "@angular/cli": "^18.1.0",
     "@angular/compiler-cli": "^18.1.0",
     "@types/jasmine": "~5.1.0",
-    "@types/mapbox__mapbox-gl-draw": "^1.4.7",
     "@types/mapbox-gl": "^3.1.0",
+    "@types/mapbox__mapbox-gl-draw": "^1.4.7",
     "@types/node": "^20.14.12",
     "@types/papaparse": "^5.3.14",
     "@types/uuid": "^10.0.0",
+    "angular-eslint": "18.3.0",
+    "eslint": "^9.9.0",
     "jasmine-core": "~5.1.0",
     "karma": "~6.4.0",
     "karma-chrome-launcher": "~3.2.0",
@@ -52,6 +56,7 @@
     "karma-jasmine-html-reporter": "~2.1.0",
     "stylelint": "^16.8.1",
     "stylelint-config-standard": "^36.0.1",
-    "typescript": "~5.5.2"
+    "typescript": "~5.5.2",
+    "typescript-eslint": "8.1.0"
   }
 }
