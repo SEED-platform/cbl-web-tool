@@ -181,11 +181,11 @@ def run_cbl_workflow():
             datum["postal_code"] = None
             datum["county"] = None
             datum["country"] = None
-            datum["latitude"] = None
-            datum["longitude"] = None
+            datum["latitude"] = 0
+            datum["longitude"] = 0
             datum["quality"] = "Ambiguous"
             datum["geometry"] = None
-            datum["ubid"] = None
+            datum["ubid"] = 0
         index = index + 1
 
     # since the data dict contains information only from mapquest, need to merge original 
@@ -195,12 +195,12 @@ def run_cbl_workflow():
         file_dict = file_data[i]
         data_dict = data[i]
 
-        if "P1AAA" == data_dict["quality"]:
+        if "P1A" in data_dict["quality"] or "P1B" in data_dict["quality"]:
             data_dict["quality"] = "Very Good"
-        elif "L1AAA" == data_dict["quality"]:
+        elif "L1A" in data_dict["quality"] or "L1B" in data_dict["quality"]:
             data_dict["quality"] = "Good"
         elif data_dict["quality"] in poorQualityCodes:
-            data_dict["quality"] = "Very Poor"
+            data_dict["quality"] = "Poor"
 
         if (file_dict != data_dict):
             merged_dict = merge_dicts(file_dict, data_dict)
