@@ -89,7 +89,6 @@ export class GeoJsonService {
       ...currentGeoJson,
       features: features
     };
-    this.removeEntirePolygonRefInMap(mapRemovedObject.id);
     // Update the subject with the new GeoJSON
     this.geoJsonSubject.next(updatedGeoJson);
     

@@ -78,6 +78,7 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
           console.log("this is being deleted", clickedFeature)
         this.draw?.changeMode('simple_select');
         this.draw?.delete(clickedFeature.id);
+        this.geoJsonService.updateGeoJsonFromMap(clickedFeature)
         this.emptyBuildingId = "none selected";
         this.clickedBuildingId = "";
         }else{
