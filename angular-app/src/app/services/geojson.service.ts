@@ -68,7 +68,9 @@ export class GeoJsonService {
 
    
     
-    const { id, latitude, longitude } = mapRemovedObject.properties;
+    const { latitude, longitude } = mapRemovedObject.properties;
+    const id = mapRemovedObject.id;
+    console.log(mapRemovedObject,"yurttrtrew")
   
     // Get the current GeoJSON from the subject
     const currentGeoJson = this.geoJsonSubject.getValue();
@@ -77,8 +79,9 @@ export class GeoJsonService {
     const features = [...currentGeoJson.features];
     
     // Find the index of the feature to remove
-    const indexToRemove = features.findIndex((feature: any) => feature.properties.id === id);
-    
+    const indexToRemove = features.findIndex((feature: any) => feature.id === id);
+    console.log("IndexToRemove", indexToRemove);
+    console.log("has been found???", features[indexToRemove]);
     // Remove the feature at the found index if it exists
     if (indexToRemove !== -1) {
       features.splice(indexToRemove, 1); // Remove the feature at the found index
@@ -90,10 +93,8 @@ export class GeoJsonService {
       features: features
     };
     // Update the subject with the new GeoJSON
-    this.geoJsonSubject.next(updatedGeoJson);
-    
-    // Optionally call additional methods or emit values as needed
     this.setGeoJson(updatedGeoJson);
+    console.log("Map remove object", updatedGeoJson)
     this.mapCoordinatesSubject.next({ latitude, longitude });
   }
 

@@ -10,6 +10,7 @@ import { NewBuildingButton } from './new-buliding-button';
 import { TrashButton } from './custom-trash-button';
 import { EditButton } from './custom-draw-button';
 import '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css';
+import { v4 as uuidv4 } from 'uuid';
 
 
 @Component({
@@ -81,6 +82,7 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
         this.geoJsonService.updateGeoJsonFromMap(clickedFeature)
         this.emptyBuildingId = "none selected";
         this.clickedBuildingId = "";
+        console.log("This is the update geojson after deletion", this.globalGeoJsonObject);
         }else{
           console.error("Something when wrong...check table, map, and geojson datasets");
         }
@@ -181,7 +183,7 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
     // Get the feature IDs under the click point
     const featureIds = this.draw.getFeatureIdsAt(event.point);
 
-    console.log(featureIds)
+
   
 
     if (featureIds && featureIds.length > 0) {
@@ -631,7 +633,6 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
 
     if (this.clickedBuildingId === "New Building"){
     const newBuildingCoordinates =  e.features[0].geometry.coordinates[0];
-    const newBuildingId =  this.globalGeoJsonObject.features.length.toString();
     const jsonData = {
       "coordinates": newBuildingCoordinates,
       "propertyNames": this.geoJsonPropertyNames,
@@ -644,6 +645,7 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
       (response) => {
         console.log(response.message); // Handle successful response
         this.newGeoJson = JSON.parse(response.user_data)
+        this.newGeoJson.id =  uuidv4();
         const newBuildinglongitude = this.newGeoJson.properties.longitude;
         const newBuildingLatitude = this.newGeoJson.properties.latitude;
         const featureId = e.features[0].id;
@@ -706,8 +708,7 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
       if (this.draw) {
 
         const polygon = this.draw.get(polygonId);
-        // Reset color of the previously selected polygon, if any
-        console.log("trying to set properties", polygon)
+       
 
        if(polygon?.properties !== undefined){
         if (!(this.selectedPolygonId === "")) {
@@ -716,23 +717,22 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
     
         // Update the current selected polygon ID
         this.selectedPolygonId = polygonId;
-         console.log("comingin", this.draw.get(polygonId))
+
          this.clickedBuildingId = polygonId;
          this.emptyBuildingId = "none selected"
-         console.log(this.clickedBuildingId, "cccccccccc")
+         
          
          
          if(polygon?.properties !== undefined && polygon?.properties?.['portColor'] !== 'yellow'){
-          console.log(polygon?.properties?.['portColor'])
+        
          this.draw?.setFeatureProperty(polygonId, 'portColor', 'yellow');
          this.draw?.setFeatureProperty(polygonId, 'portOpacity', 0.3);
-         console.log(polygon?.properties?.['portColor'])
+  
 
          var feat = this.draw?.get(polygonId);
          if (feat !== undefined)
             this.draw?.add(feat)
 
-         console.log(feat, "new added")
         }
       }
     }
@@ -740,13 +740,13 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
 
 
   resetPolygonColor(polygonId: any) {
-    console.log(this.clickedBuildingId)
+
     if (this.draw && this.clickedBuildingId !== 'New Building') {
       // Retrieve the feature
 
         // Reset the color to the default or another color
         const polygon = this.draw.get(polygonId);
-        console.log("checking polygon", polygon)
+    
         
        if(polygon?.properties !== undefined){
         if(polygon?.properties?.['portColor'] !== '#3bb2d0'){
@@ -755,7 +755,6 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
         const feature = this.draw.get(polygonId);
         if (feature !== undefined)
         this.draw.add(feature); // Update the feature style
-        console.log("reset", feature)
       }
      }
 

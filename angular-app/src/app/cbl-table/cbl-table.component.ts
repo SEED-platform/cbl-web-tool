@@ -77,7 +77,6 @@ export class CblTableComponent implements OnInit {
     //inserts new building in table and geojson
     this.newBuilingSubscription = this.geoJsonService.newBulding$.subscribe(newBuilding => {
       if (newBuilding){
-        console.log("new building", newBuilding)
          this.gridApi.applyTransaction({ add: [newBuilding], addIndex: 0 });
          this.geoJsonService.insertNewBuildingInGeoJson(newBuilding); //updates the original geojson
          setTimeout(()=>{this.updateTable(), 10}); //needed to keep in sync with map
@@ -87,7 +86,6 @@ export class CblTableComponent implements OnInit {
     //just modies the existing row...... does not need rerender
     this.modifyBuildingSubscription = this.geoJsonService.modifyBuilding$.subscribe(modBuilding => {
       if (modBuilding) {
-        console.log("in table" ,modBuilding)
           this.updateModifiedRow(modBuilding);
           setTimeout(()=>{this.geoJsonService.modifyBuildingInGeoJson(modBuilding)}, 300);
     }
@@ -235,28 +233,27 @@ export class CblTableComponent implements OnInit {
 
   scrollToFeatureById(id: string) {
     // Find the feature in rowData'
-  
-    console.log("This is data on the map", this.rowData);
-    const feature = this.rowData.find((f: any) => f.id === id);
 
+    const feature = this.rowData.find((f: any) => f.id === id);
 
     if (!feature) {
       console.error(`Feature with ID ${id} not found.`);
       return;
     }
-
+     
+    console.log("THIS IS THE FEATURE BEING SEARCHED", feature)
+    console.log(this.rowData.indexOf(feature));
   
     if (feature && this.gridApi) {
-      this.gridApi.ensureIndexVisible(this.rowData.indexOf(feature), 'top');
+      this.gridApi.ensureIndexVisible(this.rowData.indexOf(feature), 'middle');
       const index = this.rowData.indexOf(feature);
-
       const rowNode = this.gridApi.getDisplayedRowAtIndex(index);
-      
+        
       if (rowNode) {
         rowNode.setSelected(true);
       }
     }
-      console.log("This is data on the map", this.rowData);
+
  
 
 
@@ -273,6 +270,7 @@ export class CblTableComponent implements OnInit {
     if (event.node.isSelected()) {
       const data = event.node.data;
       const id =  data.id;
+      console.log("this is selected in row", id);
       this.selectedRowIdStorage = id;
       sessionStorage.setItem("SELECTEDROW", JSON.stringify(this.selectedRowIdStorage));
       const latitude = data.properties.latitude;
@@ -298,9 +296,11 @@ export class CblTableComponent implements OnInit {
       const selectedData = this.gridApi.getSelectedRows();
       
       const res = this.gridApi.applyTransaction({ remove: selectedData })!;
-
+          
       console.log("THIS IS BEING SENT FROM THE MAP TO TABLE", res.remove[0].data);
       this.geoJsonService.removeEntirePolygonRefInMap(res.remove[0].data.id);
+      this.updateTable();
+      
      }
   }
 
