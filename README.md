@@ -9,18 +9,25 @@ Given a list of addresses uploaded in JSON, CSV, or excel format, this tool will
 - Display the results of the workflow in a table on the webpage or export the resulting data as csv and GeoJSON
 
 ### Prerequisites
-1. Optionally create a Virtualenv Environment in the flask-app directory
-2. Dependencies for the flask app are managed through Poetry, install with `pip install poetry`
-3. Create a `.env` file in the flask-app directory with your MapQuest API key in the format:
+1. Create a Virtualenv Environment in the flask-app directory:
+   -  `python -m venv myenv`
+   -  `source myenv/bin/activate` (macOS/Linux) or `myenv\Scripts\activate` (Windows) to enter your virtual environment
+2. Install poetry in your virutal environment with `pip install poetry`
+3. Install dependencies in your virutal environment with `poetry install`
+4. Create a `.env` file in the flask-app directory with your MapQuest API key in the format:
     ```dotenv
     MAPQUEST_API_KEY=XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
     ```
     Note that if an env key for MAPQUEST_API_KEY exists in your profile, then it use that over the .env file.
-4. Install dependencies with `poetry install`
 5. In the angular-app directory, install angular by running `npm install -g @angular/cli@17`
+6. In the angular-app directory, navigate to the src folder and create a environment.ts and add your MapBox API key in the format:
+   ```export const environment = {
+    production: false,
+    mapboxToken: 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'
+  };
 
 ### Running the Web App
-1. Run the web app by opening two terminals: one with the working directory as angular-app and running `ng serve -o` and the other with the working directory as flask-app and running `python app.py`
+1. Run the web app by opening two terminals: one with the working directory as angular-app and running `ng serve -o` and the other with the working directory as flask-app(in your virtual environment) and running `python app.py`
 2. After connecting to the web application using the following link http://localhost:4200/, upload a file in the format of a json (example below) or excel/csv with columns for street_address, city, and state:
     ```json
     [
