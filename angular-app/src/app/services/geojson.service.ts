@@ -23,8 +23,8 @@ export class GeoJsonService {
   private isSentFromTable: boolean = false; // Flag to track selection source
   private geoJsonSubject: BehaviorSubject<any> = new BehaviorSubject<any>(this.getGeoJsonFromSessionStorage());
 
-  private clickEventSubject = new BehaviorSubject<{ latitude: number, longitude: number, id:number } | null>(null);
-  public clickEvent$: Observable<{ latitude: number, longitude: number, id:number  } | null> = this.clickEventSubject.asObservable();
+  private clickEventSubject = new BehaviorSubject<{ latitude: number, longitude: number, id: string } | null>(null);
+  public clickEvent$: Observable<{ latitude: number, longitude: number, id:string  } | null> = this.clickEventSubject.asObservable();
   
   private selectedFeatureSubject = new BehaviorSubject<{ latitude: number, longitude: number, id: number } | null>(null);
   public selectedFeature$: Observable<{ latitude: number, longitude: number, id: number } | null> = this.selectedFeatureSubject.asObservable();
@@ -35,8 +35,8 @@ export class GeoJsonService {
   private newBulidingSubject = new BehaviorSubject<GeoJsonFeature | null>(null);
   public newBulding$: Observable<GeoJsonFeature | null> = this.newBulidingSubject.asObservable();
   
-  private modifyBuildingSubject = new BehaviorSubject<{ coordinates: number[], latitude: number, longitude: number, ubid: string, id: number } | null>(null);
-  public modifyBuilding$: Observable<{ coordinates: number[], latitude: number, longitude: number, ubid: string, id: number } | null> = this.modifyBuildingSubject.asObservable();
+  private modifyBuildingSubject = new BehaviorSubject<{ coordinates: number[], latitude: number, longitude: number, ubid: string, id: string} | null>(null);
+  public modifyBuilding$: Observable<{ coordinates: number[], latitude: number, longitude: number, ubid: string, id: string} | null> = this.modifyBuildingSubject.asObservable();
   
   
   private removeBuildingSubject = new BehaviorSubject<{ id: string } | null>(null);
@@ -144,7 +144,7 @@ export class GeoJsonService {
     
   }
 
-  modifyBuildingInTable(coordinates: number[], latitude: number, longitude: number, ubid: string, id: number): void {
+  modifyBuildingInTable(coordinates: number[], latitude: number, longitude: number, ubid: string, id: string): void {
       
     const updatedBuilding = { coordinates, latitude, longitude, ubid, id };
     console.log(updatedBuilding)
@@ -161,7 +161,7 @@ export class GeoJsonService {
     console.log("NEW GEO IN SOURCE", currentGeoJson);
   }
 
-  emitClickEvent(latitude: number, longitude: number, id: number): void {
+  emitClickEvent(latitude: number, longitude: number, id: string): void {
     this.clickEventSubject.next({ latitude, longitude, id });
   }
   

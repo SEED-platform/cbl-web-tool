@@ -203,7 +203,7 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
             console.log("THIS IS CLICKED ID ON MAP", this.clickedBuildingId)
             // Emit the click event with the latitude and longitude
             this.geoJsonService.setIsDataSentFromTable(true);
-            this.geoJsonService.emitClickEvent(latitude, longitude, Number(this.clickedBuildingId));     
+            this.geoJsonService.emitClickEvent(latitude, longitude, this.clickedBuildingId);     
             //this.geoJsonService.setMapCoordinates(latitude, longitude);
         } else {
             console.error(`Feature with ID ${clickedFeatureId} not found in geoJsonObject.`);
@@ -527,7 +527,7 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
   handleEditEvent(e: any, draw: any) {
       console.log("EDIT EVENT BEING CALLED");
     const newBuildingCoordinates =  e.features[0].geometry.coordinates[0];
-    let newBuildingId = 0;
+    let newBuildingId = "";
    
   
       newBuildingId =  e.features[0].id;
@@ -588,7 +588,7 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
     }
     this.clickedBuildingId = "New Building"
     this.draw?.changeMode('draw_polygon');
-    this.geoJsonService.emitClickEvent(-1, -1, -1);     
+    this.geoJsonService.emitClickEvent(-1, -1, "");     
   }
 
   deletePolygon(){
@@ -690,7 +690,7 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
         draw.add(clickedFeature);
         draw.changeMode('simple_select')
         this.geoJsonService.setMapCoordinates(existingBuildingLatitude, existingBuildingLongitude);
-        this.geoJsonService.modifyBuildingInTable(existingBuildingCoordinates,  existingBuildingLatitude, existingBuildingLongitude, existingBuildingUbid, Number(existingBuildingId));
+        this.geoJsonService.modifyBuildingInTable(existingBuildingCoordinates,  existingBuildingLatitude, existingBuildingLongitude, existingBuildingUbid, existingBuildingId);
         console.log("clicked feature", clickedFeature)
       },
       (errorResponse) => {

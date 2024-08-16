@@ -65,8 +65,8 @@ export class CblTableComponent implements OnInit {
     //if a building is clicked it will scroll to that index on table
     this.clickEventSubscription = this.geoJsonService.clickEvent$.subscribe(clickEvent => {
       if (clickEvent) {
-        if(clickEvent.id !== -1){
-        this.selectedRowIdStorage = clickEvent.id.toString();
+        if(clickEvent.id !== ""){
+        this.selectedRowIdStorage = clickEvent.id;
         this.scrollToFeatureById(this.selectedRowIdStorage);
         console.log("THIS IS SELECTED ROW ID", this,this.selectedRowIdStorage) //keep selected row incase the table re renders and you want to go back to it
         sessionStorage.setItem("SELECTEDROW", JSON.stringify(this.selectedRowIdStorage));
