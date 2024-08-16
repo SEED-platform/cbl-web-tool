@@ -1,17 +1,18 @@
 def merge_dicts(file_dict, data_dict):
     merged_dict = {}
     for key, value in data_dict.items():
-        if "address" == key.lower():
+        if key.lower() == "address":
             merged_dict["street_address"] = value
-        elif key != "side_of_street" and key != "footprint_match" and key != "neighborhood" and key != "height" and key != "quadkey":      # want to exclude this useless data
+        elif key not in {"side_of_street", "footprint_match", "neighborhood", "height", "quadkey"}:
+            # want to exclude this useless data
             merged_dict[key.lower()] = value
 
     for key, value in file_dict.items():
-        if "street_address" != key.lower():     # don't want to overwrite normalized address from data dict
+        if key.lower() != "street_address":  # don't want to overwrite normalized address from data dict
             merged_dict[key.lower()] = value
 
-    merged_dict = remove_duplicate_vals(merged_dict)     
-    
+    merged_dict = remove_duplicate_vals(merged_dict)
+
     return merged_dict
 
 
@@ -28,5 +29,5 @@ def remove_duplicate_vals(d):
     for value, keys in value_to_keys.items():
         if keys:
             new_dict[keys[0]] = value
-    
+
     return new_dict

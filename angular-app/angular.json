@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "angular-app": {
+    "cbl-web-tool": {
       "projectType": "application",
       "schematics": {},
       "root": "",
@@ -13,23 +13,18 @@
         "build": {
           "builder": "@angular-devkit/build-angular:application",
           "options": {
-            "outputPath": "dist/angular-app",
+            "outputPath": "dist",
             "index": "src/index.html",
             "browser": "src/main.ts",
-            "polyfills": [
-              "zone.js"
-            ],
+            "polyfills": [],
             "tsConfig": "tsconfig.app.json",
             "assets": [
               {
                 "glob": "**/*",
                 "input": "public"
-              },
-              "src/assets",
-              "src/assets/nrel.ico"
+              }
             ],
             "styles": [
-              "node_modules/mapbox-gl/dist/mapbox-gl.css",
               "src/styles.css"
             ],
             "scripts": []
@@ -40,7 +35,7 @@
                 {
                   "type": "initial",
                   "maximumWarning": "500kB",
-                  "maximumError": "1MB"
+                  "maximumError": "5MB"
                 },
                 {
                   "type": "anyComponentStyle",
@@ -48,6 +43,7 @@
                   "maximumError": "4kB"
                 }
               ],
+              "extractLicenses": false,
               "outputHashing": "all"
             },
             "development": {
@@ -62,10 +58,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "angular-app:build:production"
+              "buildTarget": "cbl-web-tool:build:production"
             },
             "development": {
-              "buildTarget": "angular-app:build:development"
+              "buildTarget": "cbl-web-tool:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -88,17 +84,27 @@
               }
             ],
             "styles": [
-              "node_modules/ag-grid-community/styles/ag-theme-quartz.css",
-              "node_modules/ag-grid-community/styles/ag-grid.css",
               "src/styles.css"
             ],
             "scripts": []
+          }
+        },
+        "lint": {
+          "builder": "@angular-eslint/builder:lint",
+          "options": {
+            "lintFilePatterns": [
+              "src/**/*.ts",
+              "src/**/*.html"
+            ]
           }
         }
       }
     }
   },
   "cli": {
-    "analytics": false
+    "analytics": false,
+    "schematicCollections": [
+      "@angular-eslint/schematics"
+    ]
   }
 }

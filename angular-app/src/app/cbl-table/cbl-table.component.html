@@ -1,11 +1,13 @@
 <div class="cbl-table-container">
-<button  (click)="handleDelete()" class="delete-btn">Deleted Selected Row</button>
-<ag-grid-angular class="ag-theme-quartz" style="height: 100%; width: 50vw;"
-[rowData]="rowData"
-[columnDefs]="colDefs"
-[defaultColDef]="defaultColDef"
-(gridReady)="onGridReady($event)"
-[rowSelection]="'single'" 
-(rowClicked)="onRowClicked($event)"
- />
+  <button (click)="handleDelete()" class="delete-btn">Deleted Selected Row</button>
+  <ag-grid-angular
+    (gridReady)="onGridReady($event)"
+    (rowClicked)="onRowClicked($event)"
+    [columnDefs]="colDefs"
+    [defaultColDef]="defaultColDef"
+    [rowData]="rowData"
+    [rowSelection]="'single'"
+    class="ag-theme-quartz"
+    style="height: 100%; width: 50vw"
+  />
 </div>

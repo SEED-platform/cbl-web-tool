@@ -1,0 +1,16 @@
+header {
+  border: none;
+  padding: 10px;
+  width: 100%; /* Ensure the header takes full width of its container */
+  height: 100%; /* Ensure the header takes full height of its container */
+  box-sizing: border-box;
+}
+
+input {
+  width: 100%; /* Input will take full width of its parent header */
+  height: 100%; /* Input will take full height of its parent header */
+  border: none;
+  padding: 5px;
+  box-sizing: border-box;
+  background: transparent;
+}

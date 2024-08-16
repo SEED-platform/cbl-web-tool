@@ -4,7 +4,6 @@ export class EditButton implements mapboxgl.IControl {
   private container: HTMLDivElement;
   private callback: () => void;
 
-
   constructor(callback: () => void) {
     this.container = document.createElement('div');
     this.callback = callback;
@@ -19,23 +18,17 @@ export class EditButton implements mapboxgl.IControl {
     this.container.style.backgroundPosition = 'center'; // Center the image
     this.container.style.backgroundRepeat = 'no-repeat'; // No repeating
     this.container.style.cursor = 'pointer'; // Pointer cursor for better UX
- 
-    this.container.innerHTML =
-      '<div class="tools-box-trash">' +
-      '<button>' +
-      '<span class="mapboxgl-ctrl-icon my-image-button" aria-hidden="true" title="Edit a Polygon"></span>' +
-      '</button>' +
-      '</div>';
 
-      this.container.addEventListener('click', (e) => {
-        e.preventDefault();
-        this.callback();
-      });
+    this.container.innerHTML =
+      '<div class="tools-box-trash">' + '<button>' + '<span class="mapboxgl-ctrl-icon my-image-button" aria-hidden="true" title="Edit a Polygon"></span>' + '</button>' + '</div>';
+
+    this.container.addEventListener('click', (e) => {
+      e.preventDefault();
+      this.callback();
+    });
 
     return this.container;
   }
-
-  
 
   onRemove() {
     if (this.container.parentNode) {

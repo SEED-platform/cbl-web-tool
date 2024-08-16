@@ -1,21 +1,15 @@
-<div class="file-container" *ngIf="!userFile && isObjectEmpty(jsonData)">
-
-  <input type="file" (change)="getUploadFileFromUser($event)" class="file" />
+<div *ngIf="!userFile && isObjectEmpty(jsonData)" class="file-container">
+  <input (change)="getUploadFileFromUser($event)" class="file" type="file" />
 </div>
 
 <div *ngIf="userFile && isObjectEmpty(jsonData)">
-  File name: {{userFile.name}} <br />
+  File name: {{ userFile.name }} <br />
   <button (click)="userFile = undefined">clear file</button>
 </div>
 
 <button (click)="uploadInitialFileToServer()" *ngIf="isObjectEmpty(jsonData)">upload file</button>
 
-
-
-<div id="data-container" *ngIf="!isObjectEmpty(jsonData)">
-<app-mapbox-map> </app-mapbox-map>
-<app-cbl-table></app-cbl-table>
+<div *ngIf="!isObjectEmpty(jsonData)" id="data-container">
+  <app-mapbox-map></app-mapbox-map>
+  <app-cbl-table></app-cbl-table>
 </div>
-
-
-
