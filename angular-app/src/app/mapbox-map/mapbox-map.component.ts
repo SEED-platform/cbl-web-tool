@@ -1,11 +1,5 @@
-import { CommonModule } from '@angular/common';
 import type { OnDestroy, OnInit } from '@angular/core';
 import { ChangeDetectorRef, Component } from '@angular/core';
-import MapboxDraw from '@mapbox/mapbox-gl-draw';
-import * as mapboxgl from 'mapbox-gl';
-import type { Subscription } from 'rxjs';
-import { v4 as uuidv4 } from 'uuid';
-import { environment } from '../../environments/environment';
 import { GeoJsonService } from '../services/geojson.service';
 import { FlaskRequests } from '../services/server.service';
 import * as mapboxgl from 'mapbox-gl';
