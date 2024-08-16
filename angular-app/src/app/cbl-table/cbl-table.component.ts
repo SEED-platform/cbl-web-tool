@@ -1,10 +1,9 @@
-import type { ValueGetterParams } from '@ag-grid-community/core';
 import { CommonModule } from '@angular/common';
 import type { OnDestroy, OnInit } from '@angular/core';
 import { ChangeDetectorRef, Component, ViewEncapsulation } from '@angular/core';
 import { Router } from '@angular/router';
 import { AgGridAngular } from 'ag-grid-angular';
-import type { ColDef } from 'ag-grid-community';
+import type { ColDef, ValueGetterParams, ValueSetterParams } from 'ag-grid-community';
 import Papa from 'papaparse';
 import type { Subscription } from 'rxjs';
 import { GeoJsonService } from '../services/geojson.service';
@@ -140,7 +139,7 @@ export class CblTableComponent implements OnInit, OnDestroy {
 
     const nonEditableKeys = ['ubid', 'longitude', 'latitude'];
 
-    this.colDefs = keys.map((key: any) => ({
+    this.colDefs = keys.map((key: string) => ({
       field: key,
       editable: !nonEditableKeys.includes(key),
       headerName: this.capitalizeFirstLetter(key),
@@ -152,7 +151,7 @@ export class CblTableComponent implements OnInit, OnDestroy {
           return params.data.properties[key];
         }
       },
-      valueSetter: (params: any) => {
+      valueSetter: (params: ValueSetterParams) => {
         if (this.geoJson.features.length > 0) {
           if (key === 'coordinates') {
             params.data.geometry = params.data.geometry || {};
