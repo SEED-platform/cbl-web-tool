@@ -4,11 +4,11 @@ import { ChangeDetectorRef, Component } from '@angular/core';
 import { FormsModule } from '@angular/forms'; // Import FormsModule
 import { Router } from '@angular/router';
 import { AgGridAngular } from 'ag-grid-angular';
-import type { ColDef } from 'ag-grid-community';
+import type { ColDef, GridApi, GridReadyEvent } from 'ag-grid-community';
 import Papa from 'papaparse';
-import { CustomHeaderComponent } from '../custom-header/custom-header.component';
 import { GeoJsonService } from '../services/geojson.service';
 import { FlaskRequests } from '../services/server.service';
+import { CustomHeaderComponent } from './custom-header/custom-header.component';
 
 @Component({
   selector: 'app-first-table',
@@ -31,7 +31,7 @@ export class FirstTableComponent implements OnInit {
     suppressHeaderFilterButton: true,
     headerComponent: CustomHeaderComponent //allows editable headers
   };
-  private gridApi: any;
+  private gridApi!: GridApi;
 
   constructor(
     private apiHandler: FlaskRequests,
@@ -47,37 +47,32 @@ export class FirstTableComponent implements OnInit {
     console.log(this.userList);
   }
 
-  onGridReady(params: any) {
-    this.gridApi = params.api;
+  onGridReady(event: GridReadyEvent) {
+    this.gridApi = event.api;
     this.gridApi.sizeColumnsToFit();
     this.getUser();
   }
 
-  ngOnInit(): void {
+  ngOnInit() {
     this.getUser();
   }
 
   setColumnDefs() {
     if (this.userList.length > 0) {
       const keys = Object.keys(this.userList[0]);
-      this.colDefs = keys.map((key, index) => ({
+      this.colDefs = keys.map((key) => ({
         field: key,
-        headerName: key,
-        headerComponentParams: {
-          name: key,
-          index: index,
-          api: this.gridApi
-        }
+        headerName: key
       }));
     }
     sessionStorage.setItem('COL', JSON.stringify(this.colDefs));
   }
 
   convertAgGridDataToJson() {
-    const csvUserData = this.gridApi.getDataAsCsv();
-    const jsonHeaderData = JSON.parse(sessionStorage.getItem('COL') || '[]');
-    const parsedCsvData = Papa.parse(csvUserData, { header: true }).data;
-    const updatedHeaders = jsonHeaderData.map((item: any) => item.headerName);
+    const csvUserData = this.gridApi.getDataAsCsv() ?? '';
+    const jsonHeaderData: ColDef[] = JSON.parse(sessionStorage.getItem('COL') || '[]');
+    const { data: parsedCsvData } = Papa.parse(csvUserData, { header: true });
+    const updatedHeaders = jsonHeaderData.map((item) => item.headerName ?? '');
 
     const updatedData = parsedCsvData.map((row: any) => {
       const updatedRow: any = {};
@@ -87,9 +82,7 @@ export class FirstTableComponent implements OnInit {
       return updatedRow;
     });
 
-    const newJson = JSON.stringify(updatedData, null, 2);
-
-    return newJson;
+    return JSON.stringify(updatedData, null, 2);
   }
 
   checkData() {

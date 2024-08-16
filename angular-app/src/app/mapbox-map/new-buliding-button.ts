@@ -9,11 +9,11 @@ export class NewBuildingButton implements mapboxgl.IControl {
     this.callback = callback;
   }
 
-  onAdd(map: mapboxgl.Map) {
+  onAdd(_map: mapboxgl.Map) {
     this.container.className = 'mapboxgl-ctrl mapboxgl-ctrl-group';
     this.container.addEventListener('contextmenu', (e) => e.preventDefault());
     this.container.addEventListener('click', (e) => e.preventDefault());
-    this.container.style.backgroundImage = 'url(../assets/buildingicon.png)';
+    this.container.style.backgroundImage = 'url(buildingicon.png)';
     this.container.style.backgroundSize = '15px 15px'; // Smaller background image size
     this.container.style.backgroundPosition = 'center'; // Center the image
     this.container.style.backgroundRepeat = 'no-repeat'; // No repeating

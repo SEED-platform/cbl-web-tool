@@ -3,8 +3,8 @@ import { ChangeDetectorRef, Component } from '@angular/core';
 import { GeoJsonService } from '../services/geojson.service';
 import { FlaskRequests } from '../services/server.service';
 import * as mapboxgl from 'mapbox-gl';
-import MapboxDraw from "@mapbox/mapbox-gl-draw";
-import { CommonModule, JsonPipe } from '@angular/common';
+import MapboxDraw from '@mapbox/mapbox-gl-draw';
+import { CommonModule } from '@angular/common';
 import { environment } from '../../environments/environment';
 import { Subscription } from 'rxjs';
 import { NewBuildingButton } from './new-buliding-button';
@@ -14,7 +14,6 @@ import { ToggleButton } from './custom-toggle-button';
 import '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css';
 import { v4 as uuidv4 } from 'uuid';
 
-
 @Component({
   selector: 'app-mapbox-map',
   standalone: true,
@@ -23,7 +22,7 @@ import { v4 as uuidv4 } from 'uuid';
   styleUrl: './mapbox-map.component.css'
 })
 export class MapboxMapComponent implements OnInit, OnDestroy {
-  map: mapboxgl.Map | undefined;
+  map?: mapboxgl.Map;
   style = 'mapbox://styles/mapbox/streets-v12';
   satelliteStyle = 'mapbox://styles/mapbox/satellite-v12';
   lat = 30.2672;
@@ -31,20 +30,24 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
   buildingArray: any[] = [];
   private zoomLevel = 15;
   private isFirstLoad = true;
-  private geoJsonSubscription: Subscription | undefined;
-  private featureClickSubscription: Subscription | undefined;
-  private mapCoordinatesSubscription: Subscription | undefined;
-  private removedBuildingSubscription: Subscription | undefined;
+  private geoJsonSubscription?: Subscription;
+  private featureClickSubscription?: Subscription;
+  private mapCoordinatesSubscription?: Subscription;
+  private removedBuildingSubscription?: Subscription;
   private geoJsonPropertyNames: any;
   private newGeoJson: any;
   private satelliteView = false;
-  private draw: MapboxDraw | undefined;
+  private draw?: MapboxDraw;
   private clickedBuildingId = '';
   private selectedPolygonId = '';
   private globalGeoJsonObject: any;
-  private emptyBuildingId: string = "none selected";
-  private isStreet: boolean = true;
-  constructor(private cdr: ChangeDetectorRef, private geoJsonService: GeoJsonService, private apiHandler: FlaskRequests) {}
+  private emptyBuildingId = 'none selected';
+  private isStreet = true;
+  constructor(
+    private cdr: ChangeDetectorRef,
+    private geoJsonService: GeoJsonService,
+    private apiHandler: FlaskRequests
+  ) {}
 
   ngOnInit() {
     this.geoJsonSubscription = this.geoJsonService.getGeoJson().subscribe((geoJsonObject) => {
@@ -430,14 +433,13 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
     });
     const addNewBuildingButton = new NewBuildingButton(() => this.createNewBuilding());
     const addTrashButton = new TrashButton(() => this.deletePolygon());
-    const addEditButton = new EditButton(() => this.editEmptyData())
-    const addToggleButton = new ToggleButton(() => this.changeStyle()); 
-    map.addControl(this.draw, "top-right")
-    map.addControl(addNewBuildingButton, "top-right");
-    map.addControl(addEditButton, "top-right");
-    map.addControl(addTrashButton, "top-right"); 
-    map.addControl(addToggleButton, "bottom-left");
-
+    const addEditButton = new EditButton(() => this.editEmptyData());
+    const addToggleButton = new ToggleButton(() => this.changeStyle());
+    map.addControl(this.draw, 'top-right');
+    map.addControl(addNewBuildingButton, 'top-right');
+    map.addControl(addEditButton, 'top-right');
+    map.addControl(addTrashButton, 'top-right');
+    map.addControl(addToggleButton, 'bottom-left');
 
     geoJsonObject.features.forEach((feature: any) => {
       if (
@@ -653,27 +655,18 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
         }
       );
     }
-     this.emptyBuildingId = "none selected";
-     
+    this.emptyBuildingId = 'none selected';
   }
 
-
-
-  changeStyle(){
-    if (this.isStreet){
+  changeStyle() {
+    if (this.isStreet) {
       this.map?.setStyle('mapbox://styles/mapbox/satellite-streets-v12');
       this.isStreet = false;
-    }else{
+    } else {
       this.map?.setStyle('mapbox://styles/mapbox/streets-v12');
       this.isStreet = true;
     }
   }
-
-
-
-
-
-
 
   setActivePolygon(polygonId: any) {
     if (this.draw) {

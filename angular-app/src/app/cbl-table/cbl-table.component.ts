@@ -34,12 +34,12 @@ export class CblTableComponent implements OnInit, OnDestroy {
     enableCellChangeFlash: true
   };
   private gridApi: any;
-  private geoJsonSubscription: Subscription | undefined;
-  private clickEventSubscription: Subscription | undefined;
-  private newBuilingSubscription: Subscription | undefined;
-  private modifyBuildingSubscription: Subscription | undefined;
+  private geoJsonSubscription?: Subscription;
+  private clickEventSubscription?: Subscription;
+  private newBuilingSubscription?: Subscription;
+  private modifyBuildingSubscription?: Subscription;
   private isEditing = false;
-  private selectedRowIdStorage: string | undefined = undefined;
+  private selectedRowIdStorage?: string;
   private initialLoad = true; // Flag to track initial load
 
   constructor(
@@ -49,7 +49,7 @@ export class CblTableComponent implements OnInit, OnDestroy {
     private geoJsonService: GeoJsonService
   ) {}
 
-  ngOnInit(): void {
+  ngOnInit() {
     this.geoJsonSubscription = this.geoJsonService.getGeoJson().subscribe((data) => {
       this.geoJson = data;
       if (this.initialLoad) {
@@ -93,7 +93,7 @@ export class CblTableComponent implements OnInit, OnDestroy {
     });
   }
 
-  ngOnDestroy(): void {
+  ngOnDestroy() {
     if (this.geoJsonSubscription) {
       this.geoJsonSubscription.unsubscribe();
     }

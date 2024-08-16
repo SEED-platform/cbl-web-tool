@@ -13,7 +13,7 @@ export class EditButton implements mapboxgl.IControl {
     this.container.className = 'mapboxgl-ctrl mapboxgl-ctrl-group';
     this.container.addEventListener('contextmenu', (e) => e.preventDefault());
     this.container.addEventListener('click', (e) => e.preventDefault());
-    this.container.style.backgroundImage = 'url(../assets/editicon.png)';
+    this.container.style.backgroundImage = 'url(editicon.png)';
     this.container.style.backgroundSize = '15px 15px'; // Smaller background image size
     this.container.style.backgroundPosition = 'center'; // Center the image
     this.container.style.backgroundRepeat = 'no-repeat'; // No repeating

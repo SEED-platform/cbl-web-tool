@@ -23,7 +23,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   jsonData: any;
   initialJsonData: any;
   fatalErrorArray: string[] = ['Uploaded a file in the wrong format. Please upload different format', 'Failed to read file.'];
-  private geoJsonSubscription: Subscription | undefined;
+  private geoJsonSubscription?: Subscription;
 
   constructor(
     private apiHandler: FlaskRequests,
@@ -32,7 +32,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     private geoJsonService: GeoJsonService
   ) {}
 
-  ngOnInit(): void {
+  ngOnInit() {
     this.geoJsonSubscription = this.geoJsonService.getGeoJson().subscribe((data) => {
       this.jsonData = data;
       if (this.jsonData && this.jsonData.features && this.jsonData.features.length > 0 && this.jsonData.features[0].properties) {
@@ -42,10 +42,8 @@ export class HomeComponent implements OnInit, OnDestroy {
     });
   }
 
-  ngOnDestroy(): void {
-    if (this.geoJsonSubscription) {
-      this.geoJsonSubscription.unsubscribe();
-    }
+  ngOnDestroy() {
+    this.geoJsonSubscription?.unsubscribe();
   }
 
   isObjectEmpty(obj: object): boolean {

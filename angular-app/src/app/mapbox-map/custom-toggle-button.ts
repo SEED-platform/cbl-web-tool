@@ -4,11 +4,9 @@ export class ToggleButton implements mapboxgl.IControl {
   private container: HTMLDivElement;
   private callback: () => void;
 
-
   constructor(callback: () => void) {
     this.container = document.createElement('div');
     this.callback = callback;
- 
 
     // Inline CSS styles
     const style = document.createElement('style');
@@ -138,11 +136,10 @@ export class ToggleButton implements mapboxgl.IControl {
         <span>Street View</span>
         <span>Satellite View</span>
       </label>`;
-    
-      this.container.addEventListener('click', (e) => {
-        this.callback();
-      });
- 
+
+    this.container.addEventListener('click', (e) => {
+      this.callback();
+    });
 
     return this.container;
   }

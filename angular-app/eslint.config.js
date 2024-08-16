@@ -29,7 +29,14 @@ module.exports = tseslint.config(
           prefix: 'app',
           style: 'kebab-case'
         }
-      ]
+      ],
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        {
+          argsIgnorePattern: '^_'
+        }
+      ],
+      'quotes': ['error', 'single']
     }
   },
   {
