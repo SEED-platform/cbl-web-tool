@@ -7,7 +7,7 @@ import 'ag-grid-community/styles/ag-theme-quartz.css';
 import { FlaskRequests } from '../services/server.service';
 import { GeoJsonService } from '../services/geojson.service';
 import { Router } from '@angular/router';
-import { ValueGetterParams } from "@ag-grid-community/core";
+import { ValueGetterParams,  CellEditingStoppedEvent} from "@ag-grid-community/core";
 import Papa from 'papaparse';
 import { timer, Subscription } from 'rxjs';
 
@@ -168,7 +168,8 @@ export class CblTableComponent implements OnInit {
         }
         return true;
         }
-      }));
+      }
+       ));
     sessionStorage.setItem("COL", JSON.stringify(this.colDefs));
   }
 
@@ -269,14 +270,16 @@ export class CblTableComponent implements OnInit {
        
     if (event.node.isSelected()) {
       const data = event.node.data;
+      console.log("RICKY WHEN I CATCH YOU RICKY", data)
       const id =  data.id;
       console.log("this is selected in row", id);
       this.selectedRowIdStorage = id;
       sessionStorage.setItem("SELECTEDROW", JSON.stringify(this.selectedRowIdStorage));
       const latitude = data.properties.latitude;
       const longitude = data.properties.longitude;
+      const quality = data.properties.quality;
       if(!this.geoJsonService.isDataSentFromTable()){
-      this.geoJsonService.emitSelectedFeature(latitude, longitude, id);
+      this.geoJsonService.emitSelectedFeature(latitude, longitude, id, quality);
       }
     }
      

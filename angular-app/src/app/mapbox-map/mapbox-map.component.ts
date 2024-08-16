@@ -54,12 +54,13 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
       if (feature) {
         const { id } = feature;
       
-        if (id !== undefined && (feature.latitude.toString() !== '0' && feature.latitude.toString()  !== '0')) {
+        if (id !== undefined && (feature.latitude.toString() !== '0' && feature.latitude.toString()  !== '0') &&  (feature.quality !== "Poor" && feature.quality !== "Very Poor")) {
           this.flyToCoordinatesWithZoom(feature.longitude, feature.latitude);
           this.setActivePolygon(id);
           this.draw?.changeMode('simple_select')
         }else{
           this.emptyBuildingId = id.toString();
+          this.clickedBuildingId = id.toString();
         }
       }
     });
@@ -598,6 +599,7 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
     const deletePolygonId = this.clickedBuildingId;
     const clickedFeature = this.globalGeoJsonObject.features.find((feature: any) => feature.id === deletePolygonId); 
     console.log(clickedFeature)
+    if(clickedFeature){
     const newBuildingCoordinates =  clickedFeature.geometry.coordinates[0];
     const newBuildingId =  clickedFeature.id
     this.emptyBuildingId = newBuildingId;
@@ -616,6 +618,8 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
        this.geoJsonService.modifyBuildingInTable(newBuildingCoordinates, newBuildingLatitude, newBuildingLongitude, newBuildingUbid, newBuildingId);
 
        this.draw?.delete(deletePolygonId)
+    }
+       this.draw?.changeMode("simple_select")
   }
 
   editEmptyData(){
@@ -680,17 +684,36 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
         
 
         const clickedFeature = this.globalGeoJsonObject.features.find((feature: any) => feature.id === existingBuildingId);
+
+        if(clickedFeature.properties.quality === "Poor" || clickedFeature.properties.quality === "very Poor"){
+          clickedFeature.properties.longitude =existingBuildingLatitude;
+          clickedFeature.properties.latitude = existingBuildingLongitude;
+          clickedFeature.properties.ubid = existingBuildingUbid;
+          clickedFeature.properties.quality = "Reverse Geocoded"
+          if (clickedFeature.geometry === null || clickedFeature.geometry.type !== 'Point') {
+            clickedFeature.geometry = {
+                type: "Polygon",
+                coordinates: [existingBuildingCoordinates]
+            };
+        }
+        
+      }else{
         clickedFeature.properties.longitude =existingBuildingLatitude;
         clickedFeature.properties.latitude = existingBuildingLongitude;
         clickedFeature.properties.ubid = existingBuildingUbid;
         clickedFeature.geometry.coordinates = [existingBuildingCoordinates]
+      }
 
         const featureId = e.features[0].id;
         draw.delete(featureId);
         draw.add(clickedFeature);
         draw.changeMode('simple_select')
         this.geoJsonService.setMapCoordinates(existingBuildingLatitude, existingBuildingLongitude);
+        if(clickedFeature.properties.quality === "Poor" || clickedFeature.properties.quality === "very Poor"){
+          this.geoJsonService.modifyPoorBuildingInTable(existingBuildingCoordinates,  existingBuildingLatitude, existingBuildingLongitude, existingBuildingUbid, existingBuildingId, clickedFeature.properties.quality = "Reverse Geocoded");
+        }else{
         this.geoJsonService.modifyBuildingInTable(existingBuildingCoordinates,  existingBuildingLatitude, existingBuildingLongitude, existingBuildingUbid, existingBuildingId);
+        }
         console.log("clicked feature", clickedFeature)
       },
       (errorResponse) => {
@@ -700,6 +723,12 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
      this.emptyBuildingId = "none selected";
      
   }
+
+
+
+
+
+
 
   setActivePolygon(polygonId: any) {
 

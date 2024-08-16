@@ -26,8 +26,8 @@ export class GeoJsonService {
   private clickEventSubject = new BehaviorSubject<{ latitude: number, longitude: number, id: string } | null>(null);
   public clickEvent$: Observable<{ latitude: number, longitude: number, id:string  } | null> = this.clickEventSubject.asObservable();
   
-  private selectedFeatureSubject = new BehaviorSubject<{ latitude: number, longitude: number, id: number } | null>(null);
-  public selectedFeature$: Observable<{ latitude: number, longitude: number, id: number } | null> = this.selectedFeatureSubject.asObservable();
+  private selectedFeatureSubject = new BehaviorSubject<{ latitude: number, longitude: number, id: string, quality: string } | null>(null);
+  public selectedFeature$: Observable<{ latitude: number, longitude: number, id: string, quality: string} | null> = this.selectedFeatureSubject.asObservable();
 
   private mapCoordinatesSubject = new BehaviorSubject<{ latitude: number, longitude: number } | null>(null);
   public mapCoordinates$: Observable<{ latitude: number, longitude: number } | null> = this.mapCoordinatesSubject.asObservable();
@@ -146,7 +146,16 @@ export class GeoJsonService {
 
   modifyBuildingInTable(coordinates: number[], latitude: number, longitude: number, ubid: string, id: string): void {
       
-    const updatedBuilding = { coordinates, latitude, longitude, ubid, id };
+    const updatedBuilding = { coordinates, latitude, longitude, ubid, id};
+    console.log(updatedBuilding)
+
+    // Update the BehaviorSubject with the new building data
+    this.modifyBuildingSubject.next(updatedBuilding);
+  }
+
+  modifyPoorBuildingInTable(coordinates: number[], latitude: number, longitude: number, ubid: string, id: string, quality: string): void {
+      
+    const updatedBuilding = { coordinates, latitude, longitude, ubid, id, quality};
     console.log(updatedBuilding)
 
     // Update the BehaviorSubject with the new building data
@@ -165,8 +174,8 @@ export class GeoJsonService {
     this.clickEventSubject.next({ latitude, longitude, id });
   }
   
-  emitSelectedFeature(latitude: number, longitude: number, id: number): void {
-    this.selectedFeatureSubject.next({ latitude, longitude, id });
+  emitSelectedFeature(latitude: number, longitude: number, id: string, quality: string): void {
+    this.selectedFeatureSubject.next({ latitude, longitude, id, quality});
   }
 
   setMapCoordinates(latitude: number, longitude:number): void{
