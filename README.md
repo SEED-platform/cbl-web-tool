@@ -25,8 +25,7 @@ Given a list of addresses uploaded in JSON, CSV, or excel format, this tool will
    export const environment = {
     production: false,
     mapboxToken: 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'
-  };
-   ```
+  };```
   
 
 ### Running the Web App
