@@ -21,11 +21,12 @@ Given a list of addresses uploaded in JSON, CSV, or excel format, this tool will
     Note that if an env key for MAPQUEST_API_KEY exists in your profile, then it use that over the .env file.
 5. In the angular-app directory, install angular by running `npm install -g @angular/cli@17`
 6. In the angular-app directory, navigate to the src folder and create a environment.ts and add your MapBox API key in the format:
-   ```
-   export const environment = {
+    ```
+    export const environment = {
     production: false,
     mapboxToken: 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'
-  };```
+   };
+    ```
   
 
 ### Running the Web App
