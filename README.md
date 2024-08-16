@@ -24,7 +24,7 @@ Given a list of addresses uploaded in JSON, CSV, or excel format, this tool will
    ```export const environment = {
     production: false,
     mapboxToken: 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'
-  };
+  };```
 
 ### Running the Web App
 1. Run the web app by opening two terminals: one with the working directory as angular-app and running `ng serve -o` and the other with the working directory as flask-app(in your virtual environment) and running `python app.py`
