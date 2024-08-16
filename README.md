@@ -45,11 +45,11 @@ Given a list of addresses uploaded in JSON, CSV, or excel format, this tool will
 There are three required column names that can be edited in the table: street_address, city, and state
 4. If the data conforms to the data check requirements, a button labeled `Run CBL Workflow` will appear. Click this button to generate a covered buildings list. Note: it will take some time to generate the list and display it.
 5. Once the list is generated, a table and map with highlighted building footprints will appear side-by-side on the web page. In this menu, there are a multitude of functions to utilize:
-   a. The user can select on a row in the table and fly to a specific building, as well as edit data in the rows of the table. 
-   b. A footprint can be manually edited/redrawn by double clicking on an existing footprint and dragging any of the polygon's vertices.
-   c. For a specific piece of data, if a row is selected, the user can click the trashcan icon on the map and remove the footprint corresponding to that row in the table. A new footprint          for this row can be redrawn using the pencil icon and the data in the row will be automatically updated.
-   d. The user can reverse geocode/add a new building using the building icon on the map and drawing a new footprint at the desired location. This will add a new entry to the table.
-   e. The user can also delete data entirely from the map and the table by selecting the row on the table and clicking the `Delete Selected Row` button.
+- The user can select on a row in the table and fly to a specific building, as well as edit data in the rows of the table. 
+- A footprint can be manually edited/redrawn by double clicking on an existing footprint and dragging any of the polygon's vertices.
+- For a specific piece of data, if a row is selected, the user can click the trashcan icon on the map and remove the footprint corresponding to that row in the table. A new footprint          for this row can be redrawn using the pencil icon and the data in the row will be automatically updated.
+- The user can reverse geocode/add a new building using the building icon on the map and drawing a new footprint at the desired location. This will add a new entry to the table.
+- The user can also delete data entirely from the map and the table by selecting the row on the table and clicking the `Delete Selected Row` button.
 
 ### Future Ideas
 - Flagging duplicate buildings
