@@ -9,6 +9,7 @@ import { Subscription } from 'rxjs';
 import { NewBuildingButton } from './new-buliding-button';
 import { TrashButton } from './custom-trash-button';
 import { EditButton } from './custom-draw-button';
+import { ToggleButton } from './custom-toggle-button';
 import '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -41,6 +42,7 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
   private selectedPolygonId: string ="";
   private globalGeoJsonObject: any;
   private emptyBuildingId: string = "none selected";
+  private isStreet: boolean = true;
   constructor(private cdr: ChangeDetectorRef, private geoJsonService: GeoJsonService, private apiHandler: FlaskRequests) {}
 
   ngOnInit() {
@@ -498,11 +500,13 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
     const addNewBuildingButton = new NewBuildingButton(() => this.createNewBuilding());
     const addTrashButton = new TrashButton(() => this.deletePolygon());
     const addEditButton = new EditButton(() => this.editEmptyData())
+    const addToggleButton = new ToggleButton(() => this.changeStyle()); 
     map.addControl(this.draw, "top-right")
     map.addControl(addNewBuildingButton, "top-right");
     map.addControl(addEditButton, "top-right");
-    map.addControl(addTrashButton, "top-right");
-    map.addControl(new mapboxgl.NavigationControl(), 'bottom-left');
+    map.addControl(addTrashButton, "top-right"); 
+    map.addControl(addToggleButton, "bottom-left");
+
 
     geoJsonObject.features.forEach((feature: any) => {
   
@@ -722,6 +726,18 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
     }
      this.emptyBuildingId = "none selected";
      
+  }
+
+
+
+  changeStyle(){
+    if (this.isStreet){
+      this.map?.setStyle('mapbox://styles/mapbox/satellite-streets-v12');
+      this.isStreet = false;
+    }else{
+      this.map?.setStyle('mapbox://styles/mapbox/streets-v12');
+      this.isStreet = true;
+    }
   }
 
 
