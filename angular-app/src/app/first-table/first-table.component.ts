@@ -9,6 +9,8 @@ import Papa from 'papaparse';
 import { GeoJsonService } from '../services/geojson.service';
 import { FlaskRequests } from '../services/server.service';
 import { CustomHeaderComponent } from './custom-header/custom-header.component';
+import LZString from 'lz-string';
+
 
 @Component({
   selector: 'app-first-table',
@@ -41,7 +43,7 @@ export class FirstTableComponent implements OnInit {
   ) {}
 
   getUser() {
-    this.userList = JSON.parse(sessionStorage.getItem('FIRSTTABLEDATA') || '[]');
+    this.userList = JSON.parse(LZString.decompress(sessionStorage.getItem('FIRSTTABLEDATA') || '[]'));
     this.setColumnDefs();
     this.cdr.detectChanges();
     console.log(this.userList);
@@ -108,7 +110,7 @@ export class FirstTableComponent implements OnInit {
         this.geoJsonString = response.user_data;
         const geoJson = JSON.parse(this.geoJsonString);
         this.geoJsonService.setGeoJson(geoJson);
-        sessionStorage.setItem('GEOJSONDATA', this.geoJsonString);
+        sessionStorage.setItem('GEOJSONDATA', LZString.compress(this.geoJsonString));
         this.router.navigate(['']);
       },
       (errorResponse) => {

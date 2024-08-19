@@ -10,6 +10,16 @@ import { MapboxMapComponent } from '../mapbox-map/mapbox-map.component';
 import { FileExportService } from '../services/file-export.service';
 import { GeoJsonService } from '../services/geojson.service';
 import { FlaskRequests } from '../services/server.service';
+import LZString from 'lz-string';
+
+// Compress a string
+const compressed = LZString.compress('Hello, World!');
+
+// Decompress the string
+const decompressed = LZString.decompress(compressed);
+
+console.log('Compressed:', compressed);
+console.log('Decompressed:', decompressed);
 
 @Component({
   selector: 'app-home',
@@ -62,7 +72,7 @@ export class HomeComponent implements OnInit, OnDestroy {
       (response) => {
         console.log(response.message); // Handle successful response
         this.initialJsonData = response.user_data;
-        sessionStorage.setItem('FIRSTTABLEDATA', this.initialJsonData);
+        sessionStorage.setItem('FIRSTTABLEDATA', LZString.compress(this.initialJsonData));
         if (this.userFile) {
           this.router.navigate(['/first-table']);
         }
@@ -72,7 +82,7 @@ export class HomeComponent implements OnInit, OnDestroy {
 
         if (this.userFile && !this.fatalErrorArray.includes(errorResponse.error.message)) {
           this.initialJsonData = errorResponse.error.user_data;
-          sessionStorage.setItem('FIRSTTABLEDATA', this.initialJsonData);
+          sessionStorage.setItem('FIRSTTABLEDATA', LZString.compress(this.initialJsonData));
           console.log(this.initialJsonData);
           this.router.navigate(['/first-table']);
         } else {
@@ -82,24 +92,5 @@ export class HomeComponent implements OnInit, OnDestroy {
     );
   }
 
-  uploadFileToServer() {
-    const fileData = new FormData();
-    fileData.append('userFile', this.userFile);
-    console.log('File data prepared:', this.userFile);
-    this.apiHandler.sendData(fileData).subscribe(
-      (response) => {
-        console.log(response.message); // Handle successful response
-        this.jsonData = response.user_data;
-        sessionStorage.setItem('GEOJSONDATA', this.jsonData);
-        this.geoJsonService.setGeoJson(this.jsonData);
-      },
-      (errorResponse) => {
-        console.error(errorResponse.error.message); // Handle error response
-      }
-    );
-  }
 
-  exportJSON(): void {
-    this.fileExportHandler.downloadJSON(this.jsonData, 'data.json');
-  }
 }

@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, OnDestroy, OnInit} from '@angular/core';
 import type { Observable } from 'rxjs';
 import { BehaviorSubject } from 'rxjs';
 
@@ -15,7 +15,7 @@ interface GeoJsonFeature {
 @Injectable({
   providedIn: 'root'
 })
-export class GeoJsonService {
+export class GeoJsonService implements OnDestroy{
   private isSentFromTable = false; // Flag to track selection source
   private geoJsonSubject: BehaviorSubject<any> = new BehaviorSubject<any>(this.getGeoJsonFromSessionStorage());
 
@@ -37,12 +37,30 @@ export class GeoJsonService {
   private removeBuildingSubject = new BehaviorSubject<{ id: string } | null>(null);
   public removeBuildingId$: Observable<{ id: string } | null> = this.removeBuildingSubject.asObservable();
 
-  constructor() {}
+ 
+
+
+  constructor() {
+    // Listen for the beforeunload event to save the data
+    window.addEventListener('beforeunload', this.handleUnload.bind(this));
+  }
+
+  ngOnDestroy() {
+    // Clean up the event listener when the component is destroyed
+    window.removeEventListener('beforeunload', this.handleUnload.bind(this));
+  }
+
+  handleUnload(event: BeforeUnloadEvent) {
+    const geoJson = this.geoJsonSubject.getValue();
+    sessionStorage.setItem('GEOJSONDATA', JSON.stringify(geoJson));
+    // For modern browsers, you may want to include a returnValue to trigger a confirmation dialog
+    event.returnValue = 'Your data is being saved. Are you sure you want to leave?';
+  }
 
   setGeoJson(serverGeoJson: any): void {
     this.geoJsonSubject.next(serverGeoJson);
-    sessionStorage.setItem('GEOJSONDATA', JSON.stringify(serverGeoJson));
   }
+
 
   getGeoJson(): Observable<any> {
     return this.geoJsonSubject.asObservable();
