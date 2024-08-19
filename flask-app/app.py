@@ -118,7 +118,7 @@ def run_cbl_workflow():
     # except Exception as e:
     #     return jsonify({'message': 'Failed geocoding property states due to MapQuest error. " "Your MapQuest API Key is either invalid or at its limit.'}), 400
 
-    with open("testing.json") as fr:
+    with open("test_data/testing.json") as fr:
         data = json.load(fr)
 
     # with open('testing.json', 'w') as fr:
