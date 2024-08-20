@@ -118,18 +118,19 @@ def run_cbl_workflow():
     # except Exception as e:
     #     return jsonify({'message': 'Failed geocoding property states due to MapQuest error. " "Your MapQuest API Key is either invalid or at its limit.'}), 400
 
-    with open("test_data/testing.json") as fr:
+    with open("test_data/large_test.json") as fr:
         data = json.load(fr)
 
-    # with open('testing.json', 'w') as fr:
+    # with open('large_test.json', 'w') as fr:
     #     json.dump(data, fr, indent=2)
 
-    poorQualityCodes = ["Ambiguous", "P1CAA", "B1CAA", "B1ACA", "A5XAX"]
+    poorQualityCodes = ["Ambiguous", "P1CAA", "B1CAA", "B1ACA", "A5XAX", "L1CAA", "B1AAA", "L1BCA"]
 
     # Find all quadkeys that the coordinates fall within
     quadkeys = set()
     for datum in data:
         if datum["quality"] not in poorQualityCodes:
+            print(datum)
             tile = mercantile.tile(datum["longitude"], datum["latitude"], 9)
             quadkey = int(mercantile.quadkey(tile))
             quadkeys.add(quadkey)
@@ -198,11 +199,8 @@ def run_cbl_workflow():
         elif data_dict["quality"] in poorQualityCodes:
             data_dict["quality"] = "Poor"
 
-        if file_dict != data_dict:
-            merged_dict = merge_dicts(file_dict, data_dict)
-            merged_data.append(merged_dict)
-        else:
-            merged_data.append(file_dict)
+        merged_dict = merge_dicts(file_dict, data_dict)
+        merged_data.append(merged_dict)
 
     columns = ["street_address", "city", "state"]
     for key in merged_data[0]:

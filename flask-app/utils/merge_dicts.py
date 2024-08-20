@@ -2,13 +2,16 @@ def merge_dicts(file_dict, data_dict):
     merged_dict = {}
     for key, value in data_dict.items():
         if key.lower() == "address":
-            merged_dict["street_address"] = value
-        elif key not in {"side_of_street", "footprint_match", "neighborhood", "height", "quadkey"}:
-            # want to exclude this useless data
+            if value == None:
+                merged_dict["street_address"] = "Missing Address"
+            else:
+                merged_dict["street_address"] = value
+        elif key not in {"side_of_street", "footprint_match", "neighborhood", "height", "quadkey"}:  # want to exclude this useless data
             merged_dict[key.lower()] = value
 
     for key, value in file_dict.items():
-        if key.lower() != "street_address":  # don't want to overwrite normalized address from data dict
+        # don't want to overwrite this data from mapquest
+        if key.lower() != "street_address" and key.lower() != "geometry" and key.lower() != "longitude" and key.lower() != "latitude":
             merged_dict[key.lower()] = value
 
     merged_dict = remove_duplicate_vals(merged_dict)

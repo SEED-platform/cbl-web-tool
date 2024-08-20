@@ -1,4 +1,4 @@
-import { Injectable, OnDestroy, OnInit} from '@angular/core';
+import { Injectable, OnDestroy, OnInit } from '@angular/core';
 import type { Observable } from 'rxjs';
 import { BehaviorSubject } from 'rxjs';
 
@@ -15,7 +15,7 @@ interface GeoJsonFeature {
 @Injectable({
   providedIn: 'root'
 })
-export class GeoJsonService implements OnDestroy{
+export class GeoJsonService implements OnDestroy {
   private isSentFromTable = false; // Flag to track selection source
   private geoJsonSubject: BehaviorSubject<any> = new BehaviorSubject<any>(this.getGeoJsonFromSessionStorage());
 
@@ -37,9 +37,6 @@ export class GeoJsonService implements OnDestroy{
   private removeBuildingSubject = new BehaviorSubject<{ id: string } | null>(null);
   public removeBuildingId$: Observable<{ id: string } | null> = this.removeBuildingSubject.asObservable();
 
- 
-
-
   constructor() {
     // Listen for the beforeunload event to save the data
     window.addEventListener('beforeunload', this.handleUnload.bind(this));
@@ -60,7 +57,6 @@ export class GeoJsonService implements OnDestroy{
   setGeoJson(serverGeoJson: any): void {
     this.geoJsonSubject.next(serverGeoJson);
   }
-
 
   getGeoJson(): Observable<any> {
     return this.geoJsonSubject.asObservable();

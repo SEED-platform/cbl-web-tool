@@ -11,7 +11,6 @@ import { FlaskRequests } from '../services/server.service';
 import { CustomHeaderComponent } from './custom-header/custom-header.component';
 import LZString from 'lz-string';
 
-
 @Component({
   selector: 'app-first-table',
   standalone: true,

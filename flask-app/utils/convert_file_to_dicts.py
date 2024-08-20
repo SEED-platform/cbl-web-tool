@@ -53,9 +53,6 @@ def convert_file_to_dicts(file):
         return file_data
 
 
-# NOTE: IDEA!!!
-# If the user already has GeoJSON, we can throw it onto mapbox without using these functions!!
-# If user wants to run CBL-workflow using GeoJSON, then parse information out of GeoJSON using these functions!!
 def convert_geojson_to_dict(file_data):
     newError = LocationError("Improper GeoJSON format")
 
