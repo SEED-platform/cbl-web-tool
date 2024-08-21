@@ -1,6 +1,9 @@
 @import '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css';
 @import 'ag-grid-community/styles/ag-grid.css';
 @import 'ag-grid-community/styles/ag-theme-quartz.css';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 html,
 body {

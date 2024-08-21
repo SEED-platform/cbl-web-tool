@@ -7,26 +7,19 @@ import type { Subscription } from 'rxjs';
 import { CblTableComponent } from '../cbl-table/cbl-table.component';
 import { FirstTableComponent } from '../first-table/first-table.component';
 import { MapboxMapComponent } from '../mapbox-map/mapbox-map.component';
+import { FileUploadComponent } from './file-upload/file-upload.component';
 import { FileExportService } from '../services/file-export.service';
 import { GeoJsonService } from '../services/geojson.service';
 import { FlaskRequests } from '../services/server.service';
 import LZString from 'lz-string';
 
-// Compress a string
-const compressed = LZString.compress('Hello, World!');
-
-// Decompress the string
-const decompressed = LZString.decompress(compressed);
-
-console.log('Compressed:', compressed);
-console.log('Decompressed:', decompressed);
 
 @Component({
   selector: 'app-home',
   standalone: true,
   templateUrl: './home.component.html',
   styleUrl: './home.component.css',
-  imports: [ReactiveFormsModule, CommonModule, MapboxMapComponent, FirstTableComponent, CblTableComponent]
+  imports: [ReactiveFormsModule, CommonModule, MapboxMapComponent, FirstTableComponent, CblTableComponent, FileUploadComponent]
 })
 export class HomeComponent implements OnInit, OnDestroy {
   userFile: any;

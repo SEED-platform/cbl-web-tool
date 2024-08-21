@@ -10,6 +10,7 @@ from utils.location_error import LocationError
 # dictionary may have keys like Address and Address.1
 def convert_file_to_dicts(file):
     file_type = file.content_type
+    print(file_type)
     newError = LocationError("Failed to read file.")
 
     if file_type == "application/json":
@@ -41,7 +42,7 @@ def convert_file_to_dicts(file):
 
         return file_data
 
-    if file_type == "application/geo+json":
+    if file_type == "application/geo+json" or file_type =="application/octet-stream":
         try:
             file_content = file.read().decode("utf-8")
             file_data = json.loads(file_content)
