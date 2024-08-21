@@ -29,6 +29,7 @@ export class FileUploadComponent {
   initialJsonData: any;
   userFile: any;
   fatalErrorArray: string[] = ['Uploaded a file in the wrong format. Please upload different format', 'Failed to read file.'];
+  isLoading = false;
 
 
   constructor(private apiHandler: FlaskRequests,  private router: Router,){}
@@ -133,7 +134,7 @@ export class FileUploadComponent {
 
   uploadInitialFileToServer() {
     const fileData = new FormData();
-
+    this.isLoading = true;
     
 
     this.actualFiles.forEach(file => {
@@ -153,16 +154,21 @@ export class FileUploadComponent {
       (errorResponse) => {
         console.log(errorResponse.error.message); // Handle error response
 
-        if (!this.fatalErrorArray.includes(errorResponse.error.message)) {
+        if (!this.fatalErrorArray.includes(errorResponse.error.message) && errorResponse.error.message !== undefined) {
           this.initialJsonData = errorResponse.error.user_data;
           sessionStorage.setItem('FIRSTTABLEDATA', LZString.compress(this.initialJsonData));
           setTimeout(()=>{  console.log(this.initialJsonData);
             this.router.navigate(['/first-table'])},500);
-        
         } else {
           alert(errorResponse.error.message);
         }
+        this.isLoading = false
       }
-    );
+      
+    )
+
   }
+
+
+
 }
