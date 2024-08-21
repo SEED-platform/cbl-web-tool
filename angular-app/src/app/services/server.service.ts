@@ -10,6 +10,7 @@ export class FlaskRequests {
   constructor(private http: HttpClient) {}
 
   sendInitialData(fileData: FormData): Observable<any> {
+    console.log(fileData)
     return this.http.post<any>('http://127.0.0.1:5001/api/submit_file', fileData);
   }
 

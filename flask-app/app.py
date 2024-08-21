@@ -58,7 +58,7 @@ def merge_files():
 
 @app.route("/api/submit_file", methods=["POST"])
 def get_and_check_file():
-    file = request.files["userFile"]
+    file = request.files["userFiles[]"]
     file_data = convert_file_to_dicts(file)
 
     if not file_data or len(file_data) == 0:

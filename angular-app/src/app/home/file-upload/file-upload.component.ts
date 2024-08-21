@@ -1,6 +1,9 @@
 import { CommonModule } from '@angular/common';
 import { Component, ElementRef, ViewChild } from '@angular/core';
-import { FileExportService } from '../../services/file-export.service';
+import { FlaskRequests } from '../../services/server.service'; 
+import { Router } from '@angular/router';
+import LZString from 'lz-string';
+
 
 interface FileItem {
   objectURL: string;
@@ -20,8 +23,15 @@ export class FileUploadComponent {
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
 
   files: FileItem[] = [];
+  actualFiles: File[] = [];
   allowedFileTypes: string[] = ['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'text/csv', 'application/json',  'application/geo+json']; 
   isDraggedOver = false;
+  initialJsonData: any;
+  userFile: any;
+  fatalErrorArray: string[] = ['Uploaded a file in the wrong format. Please upload different format', 'Failed to read file.'];
+
+
+  constructor(private apiHandler: FlaskRequests,  private router: Router,){}
 
   onDrop(event: DragEvent) {
     event.preventDefault();
@@ -75,6 +85,7 @@ export class FileUploadComponent {
       size: this.formatFileSize(file.size),
       isImage
     });
+    this.actualFiles.push(file); // Store actual File object
   }else{
     alert(file.name + ' is not a valid file');
   }
@@ -116,5 +127,42 @@ export class FileUploadComponent {
   onCancel() {
     this.files.forEach(file => URL.revokeObjectURL(file.objectURL));
     this.files = [];
+  }
+
+
+
+  uploadInitialFileToServer() {
+    const fileData = new FormData();
+
+    
+
+    this.actualFiles.forEach(file => {
+      fileData.append('userFiles[]', file, file.name); // Append actual File object
+    });
+
+
+    this.apiHandler.sendInitialData(fileData).subscribe(
+      (response) => {
+        console.log(response.message); // Handle successful response
+        this.initialJsonData = response.user_data;
+        sessionStorage.setItem('FIRSTTABLEDATA', LZString.compress(this.initialJsonData));
+        if (this.userFile) {
+          this.router.navigate(['/first-table']);
+        }
+      },
+      (errorResponse) => {
+        console.log(errorResponse.error.message); // Handle error response
+
+        if (!this.fatalErrorArray.includes(errorResponse.error.message)) {
+          this.initialJsonData = errorResponse.error.user_data;
+          sessionStorage.setItem('FIRSTTABLEDATA', LZString.compress(this.initialJsonData));
+          setTimeout(()=>{  console.log(this.initialJsonData);
+            this.router.navigate(['/first-table'])},500);
+        
+        } else {
+          alert(errorResponse.error.message);
+        }
+      }
+    );
   }
 }
