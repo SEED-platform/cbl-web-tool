@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, ViewChild } from '@angular/core';
 import { FlaskRequests } from '../../services/server.service'; 
 import { Router } from '@angular/router';
 import LZString from 'lz-string';
@@ -32,7 +32,7 @@ export class FileUploadComponent {
   isLoading = false;
 
 
-  constructor(private apiHandler: FlaskRequests,  private router: Router,){}
+  constructor(private apiHandler: FlaskRequests,  private router: Router, private ref: ChangeDetectorRef){}
 
   onDrop(event: DragEvent) {
     event.preventDefault();
@@ -160,9 +160,14 @@ export class FileUploadComponent {
           setTimeout(()=>{  console.log(this.initialJsonData);
             this.router.navigate(['/first-table'])},500);
         } else {
+          if(errorResponse.error.message === undefined){
+            alert('Internal Server Issue');
+          }else{
           alert(errorResponse.error.message);
+          }
         }
-        this.isLoading = false
+        this.isLoading = false;
+        this.ref.detectChanges();
       }
       
     )

@@ -64,20 +64,21 @@
       </article>
       </main>
       </div>
+      
       <div class="button-container flex items-center justify-center">
         <button 
           class="relative h-14 w-[12rem] flex items-center justify-center rounded-md bg-neutral-950 px-6 font-medium text-neutral-50 text-2xl shadow-neutral-500/20 transition active:scale-95 bg-nrel-second-dark-blue text-white hover:bg-nrel-dark-blue"
           (click)="uploadInitialFileToServer()"
           [disabled]="isLoading">
-          <ng-container *ngIf="!isLoading; else spinner">
+          <ng-container *ngIf="!isLoading">
             Get Started
           </ng-container>
-          <ng-template #spinner>
-            <svg class="animate-spin h-8 w-8 text-white absolute inset-0 m-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+    
+            <svg *ngIf="isLoading" class="animate-spin h-8 w-8 text-white absolute inset-0 m-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
               <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
               <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
             </svg>
-          </ng-template>
+ 
         </button>
       </div>
       
