@@ -3,6 +3,7 @@ import { ChangeDetectorRef, Component, ElementRef, ViewChild } from '@angular/co
 import { FlaskRequests } from '../../services/server.service'; 
 import { Router } from '@angular/router';
 import LZString from 'lz-string';
+import { log } from 'console';
 
 
 interface FileItem {
@@ -28,7 +29,7 @@ export class FileUploadComponent {
   isDraggedOver = false;
   initialJsonData: any;
   userFile: any;
-  fatalErrorArray: string[] = ['Uploaded a file in the wrong format. Please upload different format', 'Failed to read file.'];
+  fatalErrorArray: string[] = ['Uploaded a file in the wrong format. Please upload different format', 'Failed to read file.', 'Uploaded files with conflicting column names. Please upload files with identical column names.'];
   isLoading = false;
 
 
@@ -95,7 +96,7 @@ export class FileUploadComponent {
   isValidFile(file: File):boolean {
      const isValidType = this.allowedFileTypes.includes(file.type);
      const isGeoJsonFileName = file.name.toLowerCase().includes('.geojson');
-
+     console.log(file.type)
 // Combine both checks
     const isValid = isValidType || isGeoJsonFileName;
 
@@ -144,12 +145,17 @@ export class FileUploadComponent {
 
     this.apiHandler.sendInitialData(fileData).subscribe(
       (response) => {
-        console.log("made it bruh")
+       
         console.log(response.message); // Handle successful response
         this.initialJsonData = response.user_data;
         sessionStorage.setItem('FIRSTTABLEDATA', LZString.compress(this.initialJsonData));
+        if(JSON.parse(this.initialJsonData).length !== 0){
         this.router.navigate(['/first-table']);
-        
+        }else{
+        alert('No File Submitted')
+        }
+        this.isLoading = false;
+        this.ref.detectChanges();
       },
       (errorResponse) => {
         console.log(errorResponse.error.message); // Handle error response
