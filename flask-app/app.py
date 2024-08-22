@@ -32,48 +32,48 @@ app = Flask(__name__)
 CORS(app)
 
 
-@app.route("/api/merge_files", methods=["POST"])
-def merge_files():
-    files = []
-    merged_data = []
+# @app.route("/api/merge_files", methods=["POST"])
+# def merge_files():
+#     files = []
+#     merged_data = []
 
+#     for file in files:
+#         file_data = convert_file_to_dicts(file)
+#         if not file_data or len(file_data) == 0:
+#             return jsonify({"message": "Uploaded a file in the wrong format. Please upload different format"}), 400
+
+#         if isinstance(file_data, LocationError):
+#             return jsonify({"message": f"{file_data.message}"}), 400
+
+#         merged_data.extend(file_data)
+
+#     json_data = json.dumps(merged_data)
+#     isGoodData = check_data_quality(merged_data)
+
+#     if isinstance(isGoodData, LocationError):
+#         return jsonify({"message": f"{isGoodData.message}", "user_data": json_data}), 400
+
+#     return jsonify({"message": "success", "user_data": json_data}), 200
+
+
+@app.route("/api/submit_file", methods=["POST"])
+def get_and_check_file():
+    files = request.files.getlist("userFiles[]")
+    merged_data = []
+    
     for file in files:
         file_data = convert_file_to_dicts(file)
+
         if not file_data or len(file_data) == 0:
             return jsonify({"message": "Uploaded a file in the wrong format. Please upload different format"}), 400
 
         if isinstance(file_data, LocationError):
             return jsonify({"message": f"{file_data.message}"}), 400
-
+        
         merged_data.extend(file_data)
 
-    json_data = json.dumps(merged_data)
-    isGoodData = check_data_quality(merged_data)
-
-    if isinstance(isGoodData, LocationError):
-        return jsonify({"message": f"{isGoodData.message}", "user_data": json_data}), 400
-
-    return jsonify({"message": "success", "user_data": json_data}), 200
-
-
-@app.route("/api/submit_file", methods=["POST"])
-def get_and_check_file():
-    file = request.files["userFiles[]"]
-    file_data = convert_file_to_dicts(file)
-
-    if not file_data or len(file_data) == 0:
-        return jsonify({"message": "Uploaded a file in the wrong format. Please upload different format"}), 400
-
-    if isinstance(file_data, LocationError):
-        return jsonify({"message": f"{file_data.message}"}), 400
-
-    json_data = json.dumps(file_data)
-    isGoodData = check_data_quality(file_data)
-
-    if isinstance(isGoodData, LocationError):
-        return jsonify({"message": f"{isGoodData.message}", "user_data": json_data}), 400
-
-    return jsonify({"message": "success", "user_data": json_data}), 200
+    all_data = json.dumps(merged_data)    
+    return jsonify({"message": "success", "user_data": all_data}), 200
 
 
 @app.route("/api/check_data", methods=["POST"])
