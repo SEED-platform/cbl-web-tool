@@ -144,10 +144,12 @@ export class FileUploadComponent {
 
     this.apiHandler.sendInitialData(fileData).subscribe(
       (response) => {
+        console.log("made it bruh")
         console.log(response.message); // Handle successful response
         this.initialJsonData = response.user_data;
         sessionStorage.setItem('FIRSTTABLEDATA', LZString.compress(this.initialJsonData));
-          this.router.navigate(['/first-table']);
+        this.router.navigate(['/first-table']);
+        
       },
       (errorResponse) => {
         console.log(errorResponse.error.message); // Handle error response
