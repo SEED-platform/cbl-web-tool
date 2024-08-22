@@ -18,11 +18,13 @@ import LZString from 'lz-string';
   imports: [AgGridAngular, FormsModule, CommonModule]
 })
 export class FirstTableComponent implements OnInit {
-  userList: any[] = [];
+  userList = [];
   colDefs: ColDef[] = [];
   ValidatedJsonString = '';
   dataValid = false;
   geoJsonString = '';
+  isLoading = false;
+
   defaultColDef = {
     flex: 1,
     minWidth: 100,
@@ -87,6 +89,7 @@ export class FirstTableComponent implements OnInit {
   }
 
   checkData() {
+    this.isLoading = true;
     const finalUserJson = this.convertAgGridDataToJson();
 
     this.apiHandler.checkData(finalUserJson).subscribe(
@@ -94,11 +97,15 @@ export class FirstTableComponent implements OnInit {
         console.log(response.message); // Handle successful response
         this.ValidatedJsonString = response.user_data;
         this.dataValid = true;
+        this.uploadJsonToServer();
       },
       (errorResponse) => {
         console.log(errorResponse.error.message); // Handle error response
         alert(errorResponse.error.message);
+        this.isLoading = false; 
+        this.cdr.detectChanges();   
       }
+      
     );
   }
 
@@ -111,9 +118,13 @@ export class FirstTableComponent implements OnInit {
         this.geoJsonService.setGeoJson(geoJson);
         sessionStorage.setItem('GEOJSONDATA', LZString.compress(this.geoJsonString));
         this.router.navigate(['']);
+        this.isLoading = false;
+        this.cdr.detectChanges();
       },
       (errorResponse) => {
         console.error(errorResponse.error.message); // Handle error response
+        this.isLoading = false; 
+        this.cdr.detectChanges();  
       }
     );
   }
