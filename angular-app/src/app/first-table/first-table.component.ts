@@ -32,8 +32,7 @@ export class FirstTableComponent implements OnInit {
     filter: true,
     editable: true,
     suppressHeaderFilterButton: true,
-    headerComponent: CustomHeaderComponent,  //allows editable headers
- 
+    headerComponent: CustomHeaderComponent //allows editable headers
   };
   private gridApi!: GridApi;
 
@@ -103,10 +102,9 @@ export class FirstTableComponent implements OnInit {
       (errorResponse) => {
         console.log(errorResponse.error.message); // Handle error response
         alert(errorResponse.error.message);
-        this.isLoading = false; 
-        this.cdr.detectChanges();   
+        this.isLoading = false;
+        this.cdr.detectChanges();
       }
-      
     );
   }
 
@@ -124,8 +122,8 @@ export class FirstTableComponent implements OnInit {
       },
       (errorResponse) => {
         console.error(errorResponse.error.message); // Handle error response
-        this.isLoading = false; 
-        this.cdr.detectChanges();  
+        this.isLoading = false;
+        this.cdr.detectChanges();
       }
     );
   }

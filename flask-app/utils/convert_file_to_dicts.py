@@ -42,9 +42,8 @@ def convert_file_to_dicts(file):
 
         return file_data
 
-    if file_type == "application/geo+json" or file_type =="application/octet-stream":
+    if file_type == "application/geo+json" or file_type == "application/octet-stream":
         try:
-          
             file_content = file.read().decode("utf-8")
             print("asadsfdsfsadf")
             print(json.loads(file_content))
@@ -55,7 +54,7 @@ def convert_file_to_dicts(file):
 
         # need to extract info from geoJSON to make regular dict object
         file_data = convert_geojson_to_dict(file_data)
-        
+
         return file_data
 
 

@@ -62,7 +62,7 @@ def get_and_check_file():
     print(files)
     merged_data = []
     seen_filenames = set()
-    
+
     for file in files:
         if file.filename in seen_filenames:
             return jsonify({"message": "Uploaded two of the same file. Please upload non-duplicate files."}), 400
@@ -71,19 +71,21 @@ def get_and_check_file():
         file_data = convert_file_to_dicts(file)
         if not file_data or len(file_data) == 0:
             return jsonify({"message": "Uploaded a file in the wrong format. Please upload different format"}), 400
-        
+
         if isinstance(file_data, LocationError):
             return jsonify({"message": f"{file_data.message}"}), 400
-        
+
         merged_data.extend(file_data)
 
     if len(files) > 1:
         for dict1 in merged_data:
             for dict2 in merged_data:
                 if set(dict1.keys()) != set(dict2.keys()):
-                    return jsonify({"message": "Uploaded files with conflicting column names. Please upload files with identical column names."}), 400
+                    return jsonify(
+                        {"message": "Uploaded files with conflicting column names. Please upload files with identical column names."}
+                    ), 400
 
-    all_data = json.dumps(merged_data)    
+    all_data = json.dumps(merged_data)
     return jsonify({"message": "success", "user_data": all_data}), 200
 
 

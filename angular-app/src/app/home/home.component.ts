@@ -14,7 +14,6 @@ import { FlaskRequests } from '../services/server.service';
 import { DropdownMenuComponent } from './dropdown-menu/dropdown-menu.component';
 import LZString from 'lz-string';
 
-
 @Component({
   selector: 'app-home',
   standalone: true,
@@ -67,7 +66,7 @@ export class HomeComponent implements OnInit, OnDestroy {
         console.log(response.message); // Handle successful response
         this.initialJsonData = response.user_data;
         sessionStorage.setItem('FIRSTTABLEDATA', LZString.compress(this.initialJsonData));
-          this.router.navigate(['/first-table']);
+        this.router.navigate(['/first-table']);
       },
       (errorResponse) => {
         console.log(errorResponse.error.message); // Handle error response

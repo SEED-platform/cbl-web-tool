@@ -5,15 +5,11 @@ import { CommonModule } from '@angular/common';
   selector: 'app-image-slider',
   standalone: true,
   imports: [CommonModule],
-  templateUrl: './image-slider.component.html',
+  templateUrl: './image-slider.component.html'
 })
 export class ImageSliderComponent {
   currentIndex = 0;
-  images = [
-    'https://unsplash.it/640/425?image=30',
-    'https://unsplash.it/640/425?image=40',
-    'https://unsplash.it/640/425?image=50'
-  ];
+  images = ['https://unsplash.it/640/425?image=30', 'https://unsplash.it/640/425?image=40', 'https://unsplash.it/640/425?image=50'];
 
   previous() {
     if (this.currentIndex > 0) {
@@ -26,5 +22,4 @@ export class ImageSliderComponent {
       this.currentIndex++;
     }
   }
-
 }

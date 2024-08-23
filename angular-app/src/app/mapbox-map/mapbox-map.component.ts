@@ -140,11 +140,11 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
 
         if (this.isFirstLoad) {
           let firstBuilding = this.buildingArray[0];
-          console.log(firstBuilding)
+          console.log(firstBuilding);
           let i = 0;
-          while(firstBuilding.properties.quality === 'Poor' || firstBuilding.properties.quality === 'Very Poor' && i < this.buildingArray.length){
+          while (firstBuilding.properties.quality === 'Poor' || (firstBuilding.properties.quality === 'Very Poor' && i < this.buildingArray.length)) {
             i++;
-            firstBuilding = this.buildingArray[i]
+            firstBuilding = this.buildingArray[i];
           }
           firstBuildingLongitude = firstBuilding.properties.longitude;
           firstBuildingLatitude = firstBuilding.properties.latitude;
@@ -445,15 +445,13 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
     const addEditButton = new EditButton(() => this.editEmptyData());
     const addToggleButton = new ToggleButton(() => this.changeStyle());
     const addInfoButton = new InfoButton();
-    
+
     map.addControl(addInfoButton, 'top-right');
     map.addControl(this.draw, 'top-right');
     map.addControl(addNewBuildingButton, 'top-right');
     map.addControl(addEditButton, 'top-right');
     map.addControl(addTrashButton, 'top-right');
     map.addControl(addToggleButton, 'bottom-left');
-  
-
 
     geoJsonObject.features.forEach((feature: any) => {
       if (

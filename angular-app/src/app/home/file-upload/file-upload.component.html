@@ -1,36 +1,37 @@
 <div class="md:py-5 sm:py-8 min-w-[30rem]">
   <main class="container mx-auto w-full h-full flex flex-col justify-center">
-    <article aria-label="File Upload Modal" class="relative h-full flex flex-col bg-white shadow-xl rounded-md"
-      (drop)="onDrop($event)" 
+    <article
+      aria-label="File Upload Modal"
+      class="relative h-full flex flex-col bg-white shadow-xl rounded-md"
+      (drop)="onDrop($event)"
       (dragover)="onDragOver($event)"
       (dragleave)="onDragLeave($event)"
-      (dragenter)="onDragEnter($event)">
-      
-   
-
+      (dragenter)="onDragEnter($event)"
+    >
       <!-- scroll area -->
-      <section class="h-full overflow-auto p-8  h-full flex flex-col">
+      <section class="h-full overflow-auto p-8 h-full flex flex-col">
         <header class="border-dashed border-2 border-gray-400 py-12 flex flex-col justify-center items-center">
-             <!-- overlay -->
-      <div id="overlay" class="w-full h-full left-0 pointer-events-none z-50 flex flex-col items-center justify-center rounded-md">
-        <i>
-          <svg class="fill-current w-12 h-12 mb-3 text-blue-700" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-            <path d="M19.479 10.092c-.212-3.951-3.473-7.092-7.479-7.092-4.005 0-7.267 3.141-7.479 7.092-2.57.463-4.521 2.706-4.521 5.408 0 3.037 2.463 5.5 5.5 5.5h13c3.037 0 5.5-2.463 5.5-5.5 0-2.702-1.951-4.945-4.521-5.408zm-7.479-1.092l4 4h-3v4h-2v-4h-3l4-4z" />
-          </svg>
-        </i>
-        <p class="text-lg text-blue-700">Drop files to upload</p>
-      </div>
+          <!-- overlay -->
+          <div id="overlay" class="w-full h-full left-0 pointer-events-none z-50 flex flex-col items-center justify-center rounded-md">
+            <i>
+              <svg class="fill-current w-12 h-12 mb-3 text-blue-700" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                <path
+                  d="M19.479 10.092c-.212-3.951-3.473-7.092-7.479-7.092-4.005 0-7.267 3.141-7.479 7.092-2.57.463-4.521 2.706-4.521 5.408 0 3.037 2.463 5.5 5.5 5.5h13c3.037 0 5.5-2.463 5.5-5.5 0-2.702-1.951-4.945-4.521-5.408zm-7.479-1.092l4 4h-3v4h-2v-4h-3l4-4z"
+                />
+              </svg>
+            </i>
+            <p class="text-lg text-blue-700">Drop files to upload</p>
+          </div>
           <p class="mb-2 font-semibold text-gray-900 flex flex-wrap justify-center">
             <span>or</span>
           </p>
           <input #fileInput id="hidden-input" type="file" multiple class="hidden" (change)="onFileChange($event)" />
-          <button id="button" class=" rounded-sm px-3 py-1 bg-gray-200 hover:bg-gray-300 focus:shadow-outline focus:outline-none" (click)="onButtonClick()">
+          <button id="button" class="rounded-sm px-3 py-1 bg-gray-200 hover:bg-gray-300 focus:shadow-outline focus:outline-none" (click)="onButtonClick()">
             Upload a file
           </button>
           <span class="text-small text-gray-500 text-opacity-50 mt-1">XLSX, CSV, JSON, or GeoJSON</span>
         </header>
 
-     
         <ul id="gallery" class="mt-6 flex flex-1 flex-wrap -m-1">
           <li id="empty" class="h-full w-full text-center flex flex-col items-center justify-center items-center" *ngIf="files.length === 0">
             <img class="mx-auto w-32" src="nofileselected.png" alt="no data" />
@@ -52,7 +53,10 @@
                   <p class="p-1 size text-xs">{{ file.size }}</p>
                   <button class="delete ml-auto focus:outline-none hover:bg-gray-300 p-1 rounded-md text-gray-800" (click)="onDelete(file)">
                     <svg class="pointer-events-none fill-current w-4 h-4 ml-auto" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-                      <path class="pointer-events-none" d="M3 6l3 18h12l3-18h-18zm19-4v2h-20v-2h5.711c.9 0 1.631-1.099 1.631-2h5.316c0 .901.73 2 1.631 2h5.711z" />
+                      <path
+                        class="pointer-events-none"
+                        d="M3 6l3 18h12l3-18h-18zm19-4v2h-20v-2h5.711c.9 0 1.631-1.099 1.631-2h5.316c0 .901.73 2 1.631 2h5.711z"
+                      />
                     </svg>
                   </button>
                 </div>
@@ -61,26 +65,25 @@
           </li>
         </ul>
       </section>
-      </article>
-      </main>
-      </div>
-      
-      <div class="button-container flex items-center justify-center">
-        <button 
-          class="relative h-14 w-[12rem] flex items-center justify-center rounded-md bg-neutral-950 px-6 font-medium text-neutral-50 text-2xl shadow-neutral-500/20 transition active:scale-95 bg-nrel-second-dark-blue text-white hover:bg-nrel-dark-blue"
-          (click)="uploadInitialFileToServer()"
-          [disabled]="isLoading">
-          <ng-container *ngIf="!isLoading">
-            Get Started
-          </ng-container>
-    
-            <svg *ngIf="isLoading" class="animate-spin h-8 w-8 text-white absolute inset-0 m-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-            </svg>
- 
-        </button>
-      </div>
-      
+    </article>
+  </main>
+</div>
 
-       
+<div class="button-container flex items-center justify-center">
+  <button
+    class="relative h-14 w-[12rem] flex items-center justify-center rounded-md bg-neutral-950 px-6 font-medium text-neutral-50 text-2xl shadow-neutral-500/20 transition active:scale-95 bg-nrel-second-dark-blue text-white hover:bg-nrel-dark-blue"
+    (click)="uploadInitialFileToServer()"
+    [disabled]="isLoading"
+  >
+    <ng-container *ngIf="!isLoading"> Get Started </ng-container>
+
+    <svg *ngIf="isLoading" class="animate-spin h-8 w-8 text-white absolute inset-0 m-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+      <path
+        class="opacity-75"
+        fill="currentColor"
+        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+      ></path>
+    </svg>
+  </button>
+</div>

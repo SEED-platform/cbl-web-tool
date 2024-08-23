@@ -16,9 +16,6 @@
   border: 2px solid black;
 }
 
-
-
 .ag-theme-quartz {
-  --ag-wrapper-border-radius: 0px
+  --ag-wrapper-border-radius: 0px;
 }
-
