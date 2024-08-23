@@ -41,11 +41,11 @@ export class InfoButton implements mapboxgl.IControl {
     </li>
     <li class="flex items-center">
       <img src="editicon.png" alt="Update an existing building" class="w-8 h-8 mr-3">
-      <p class="text-[1.15rem]">Update existing building footprint.</p>
+      <p class="text-[1.15rem]">Update existing building footprint</p>
     </li>
     <li class="flex items-center">
       <img src="trashicon.png" alt="Delete an existing building" class="w-8 h-8 mr-3">
-      <p class="text-[1.15rem]">Delete existing building footprint.</p>
+      <p class="text-[1.15rem]">Delete existing building footprint</p>
     </li>
   </ul>
   <div class="flex justify-center mt-4">

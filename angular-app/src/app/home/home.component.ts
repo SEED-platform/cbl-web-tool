@@ -11,6 +11,7 @@ import { FileUploadComponent } from './file-upload/file-upload.component';
 import { FileExportService } from '../services/file-export.service';
 import { GeoJsonService } from '../services/geojson.service';
 import { FlaskRequests } from '../services/server.service';
+import { DropdownMenuComponent } from './dropdown-menu/dropdown-menu.component';
 import LZString from 'lz-string';
 
 
@@ -19,7 +20,7 @@ import LZString from 'lz-string';
   standalone: true,
   templateUrl: './home.component.html',
   styleUrl: './home.component.css',
-  imports: [ReactiveFormsModule, CommonModule, MapboxMapComponent, FirstTableComponent, CblTableComponent, FileUploadComponent]
+  imports: [ReactiveFormsModule, CommonModule, MapboxMapComponent, FirstTableComponent, CblTableComponent, FileUploadComponent, DropdownMenuComponent]
 })
 export class HomeComponent implements OnInit, OnDestroy {
   userFile: any;

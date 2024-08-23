@@ -54,7 +54,6 @@ td {
 #data-container {
   display: flex;
   flex-direction: row;
-  margin-top: 40px;
   width: 100vw;
   height: 90vh;
   overflow: hidden;

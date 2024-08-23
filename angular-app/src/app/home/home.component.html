@@ -68,7 +68,19 @@
 
 
 
-<div *ngIf="!isObjectEmpty(jsonData)" id="data-container" class="w-[100vw] flex  justify-center">
+<div class="flex mt-10 flex-col justify-center w-[100vw] max-h-[100vh] justify-center items-center">
+  <div class="w-[90%] h-12 rounded-tr-lg rounded-tl-lg bg-nrel-second-dark-blue flex items-center justify-between">
+    <app-dropdown-menu #dropdownMenu></app-dropdown-menu> 
+    <button class="inline-flex mr-5 justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50">Delete Selected Row</button>
+
+ 
+      
+     
+
+   
+  </div>
+<div *ngIf="!isObjectEmpty(jsonData)" id="data-container" class="flex mt-0 p-0 justify-center">
   <app-mapbox-map></app-mapbox-map>
   <app-cbl-table></app-cbl-table>
 </div> 
+</div>
