@@ -27,12 +27,13 @@ export class FirstTableComponent implements OnInit {
 
   defaultColDef = {
     flex: 1,
-    minWidth: 100,
+    minWidth: 200,
     sortable: false,
     filter: true,
     editable: true,
     suppressHeaderFilterButton: true,
-    headerComponent: CustomHeaderComponent //allows editable headers
+    headerComponent: CustomHeaderComponent,  //allows editable headers
+ 
   };
   private gridApi!: GridApi;
 

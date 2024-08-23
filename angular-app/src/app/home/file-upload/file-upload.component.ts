@@ -11,6 +11,7 @@ interface FileItem {
   name: string;
   size: string; // Size as string to handle display
   isImage: boolean;
+  data: File;
 }
 
 @Component({
@@ -79,15 +80,16 @@ export class FileUploadComponent {
 
   addFile(file: File) {
     if(this.isValidFile(file)){
+
     const isImage = file.type.startsWith('image/');
     const objectURL = URL.createObjectURL(file);
     this.files.push({
       objectURL,
       name: file.name,
       size: this.formatFileSize(file.size),
-      isImage
+      isImage,
+      data: file
     });
-    this.actualFiles.push(file); // Store actual File object
   }else{
     alert(file.name + ' is not a valid file');
   }
@@ -97,7 +99,7 @@ export class FileUploadComponent {
      const isValidType = this.allowedFileTypes.includes(file.type);
      const isGeoJsonFileName = file.name.toLowerCase().includes('.geojson');
      console.log(file.type)
-// Combine both checks
+  
     const isValid = isValidType || isGeoJsonFileName;
 
     
@@ -118,7 +120,9 @@ export class FileUploadComponent {
     if (this.files.length === 0) {
       // To show 'No files selected' message again
       this.files = [];
+      this.clearFileInput();
     }
+    console.log(this.files)
   }
 
   onSubmit() {
@@ -132,14 +136,21 @@ export class FileUploadComponent {
   }
 
 
+  clearFileInput() {
+    if (this.fileInput.nativeElement) {
+      this.fileInput.nativeElement.value = '';
+    }
+  }
+
+
 
   uploadInitialFileToServer() {
     const fileData = new FormData();
     this.isLoading = true;
     
 
-    this.actualFiles.forEach(file => {
-      fileData.append('userFiles[]', file, file.name); // Append actual File object
+    this.files.forEach(file => {
+      fileData.append('userFiles[]', file.data, file.name); // Append actual File object
     });
 
 

@@ -10,6 +10,7 @@ from utils.location_error import LocationError
 # dictionary may have keys like Address and Address.1
 def convert_file_to_dicts(file):
     file_type = file.content_type
+    print(file_type)
     newError = LocationError("Failed to read file.")
 
     if file_type == "application/json":
@@ -43,19 +44,23 @@ def convert_file_to_dicts(file):
 
     if file_type == "application/geo+json" or file_type =="application/octet-stream":
         try:
+          
             file_content = file.read().decode("utf-8")
+            print("asadsfdsfsadf")
+            print(json.loads(file_content))
+            print("dafdsfdsfdsafdsfdsf")
             file_data = json.loads(file_content)
         except:
             return newError
 
         # need to extract info from geoJSON to make regular dict object
         file_data = convert_geojson_to_dict(file_data)
+        
         return file_data
 
 
 def convert_geojson_to_dict(file_data):
     newError = LocationError("Improper GeoJSON format")
-
     if "type" not in file_data:
         return newError
 

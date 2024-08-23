@@ -138,7 +138,15 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
         let firstBuildingLongitude: number;
 
         if (this.isFirstLoad) {
-          const firstBuilding = this.buildingArray[0];
+          let firstBuilding = this.buildingArray[0];
+          console.log(firstBuilding)
+          let i = 0;
+          while(firstBuilding.properties.quality === 'Poor' || firstBuilding.properties.quality === 'Very Poor' && i < this.buildingArray.length){
+            i++;
+            firstBuilding = this.buildingArray[i]
+          }
+          firstBuildingLongitude = firstBuilding.properties.longitude;
+          firstBuildingLatitude = firstBuilding.properties.latitude;
           firstBuildingLongitude = firstBuilding.properties.longitude;
           firstBuildingLatitude = firstBuilding.properties.latitude;
           this.geoJsonService.setMapCoordinates(firstBuildingLatitude, firstBuildingLongitude);
@@ -169,7 +177,6 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
           this.addDrawFeatures(this.map, geoJsonObject);
         }
       });
-    } else {
     }
 
     this.map.on('click', (event) => this.handleClick(event, geoJsonObject));

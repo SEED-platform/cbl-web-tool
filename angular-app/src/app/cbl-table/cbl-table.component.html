@@ -1,5 +1,5 @@
+<!-- <button (click)="handleDelete()" class="delete-btn">Deleted Selected Row</button> -->
 <div class="cbl-table-container">
-  <button (click)="handleDelete()" class="delete-btn">Deleted Selected Row</button>
   <ag-grid-angular
     (gridReady)="onGridReady($event)"
     (rowClicked)="onRowClicked($event)"
@@ -8,6 +8,6 @@
     [rowData]="rowData"
     [rowSelection]="'single'"
     class="ag-theme-quartz"
-    style="height: 100%; width: 50vw"
+    style="height: 70%; width: 45vw"
   />
 </div>
