@@ -13,6 +13,7 @@ import { ToggleButton } from './custom-toggle-button';
 import '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { v4 as uuidv4 } from 'uuid';
+import { InfoButton } from './custom-info-button';
 
 @Component({
   selector: 'app-mapbox-map',
@@ -28,7 +29,7 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
   lat = 30.2672;
   lng = -97.7431;
   buildingArray: any[] = [];
-  private zoomLevel = 15;
+  private zoomLevel = 13;
   private isFirstLoad = true;
   private geoJsonSubscription: Subscription | undefined;
   private featureClickSubscription: Subscription | undefined;
@@ -443,11 +444,16 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
     const addTrashButton = new TrashButton(() => this.deletePolygon());
     const addEditButton = new EditButton(() => this.editEmptyData());
     const addToggleButton = new ToggleButton(() => this.changeStyle());
+    const addInfoButton = new InfoButton();
+    
+    map.addControl(addInfoButton, 'top-right');
     map.addControl(this.draw, 'top-right');
     map.addControl(addNewBuildingButton, 'top-right');
     map.addControl(addEditButton, 'top-right');
     map.addControl(addTrashButton, 'top-right');
     map.addControl(addToggleButton, 'bottom-left');
+  
+
 
     geoJsonObject.features.forEach((feature: any) => {
       if (
@@ -564,7 +570,7 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
 
   editEmptyData() {
     if (this.emptyBuildingId === 'none selected') {
-      alert('Please Select a Row with Empty or Poor Data');
+      alert('Please select a row with empty or poor data. To edit a building, first remove existing footprint.');
       return;
     }
 

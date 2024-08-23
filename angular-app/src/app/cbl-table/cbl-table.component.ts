@@ -26,7 +26,7 @@ export class CblTableComponent implements OnInit, OnDestroy {
   //ag grid set up
   defaultColDef = {
     flex: 1,
-    minWidth: 200,
+    minWidth: 127,
     sortable: false,
     filter: true,
     editable: true,
