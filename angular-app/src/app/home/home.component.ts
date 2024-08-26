@@ -4,14 +4,11 @@ import { Component } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import type { Subscription } from 'rxjs';
-import { CblTableComponent } from '../cbl-table/cbl-table.component';
 import { FirstTableComponent } from '../first-table/first-table.component';
-import { MapboxMapComponent } from '../mapbox-map/mapbox-map.component';
 import { FileUploadComponent } from './file-upload/file-upload.component';
 import { FileExportService } from '../services/file-export.service';
 import { GeoJsonService } from '../services/geojson.service';
 import { FlaskRequests } from '../services/server.service';
-import { DropdownMenuComponent } from './dropdown-menu/dropdown-menu.component';
 import LZString from 'lz-string';
 
 @Component({
@@ -19,7 +16,7 @@ import LZString from 'lz-string';
   standalone: true,
   templateUrl: './home.component.html',
   styleUrl: './home.component.css',
-  imports: [ReactiveFormsModule, CommonModule, MapboxMapComponent, FirstTableComponent, CblTableComponent, FileUploadComponent, DropdownMenuComponent]
+  imports: [ReactiveFormsModule, CommonModule, FirstTableComponent, FileUploadComponent]
 })
 export class HomeComponent implements OnInit, OnDestroy {
   userFile: any;

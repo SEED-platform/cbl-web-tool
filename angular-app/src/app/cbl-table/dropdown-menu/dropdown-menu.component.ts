@@ -5,7 +5,6 @@ import { CommonModule } from '@angular/common';
   standalone: true,
   imports: [CommonModule],
   templateUrl: './dropdown-menu.component.html',
-  styleUrl: './dropdown-menu.component.css'
 })
 export class DropdownMenuComponent {
   isOpen = false;

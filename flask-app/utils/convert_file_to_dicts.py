@@ -45,9 +45,6 @@ def convert_file_to_dicts(file):
     if file_type == "application/geo+json" or file_type == "application/octet-stream":
         try:
             file_content = file.read().decode("utf-8")
-            print("asadsfdsfsadf")
-            print(json.loads(file_content))
-            print("dafdsfdsfdsafdsfdsf")
             file_data = json.loads(file_content)
         except:
             return newError

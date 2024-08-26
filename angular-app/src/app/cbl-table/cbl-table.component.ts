@@ -6,13 +6,15 @@ import { AgGridAngular } from 'ag-grid-angular';
 import type { ColDef, ValueGetterParams, ValueSetterParams } from 'ag-grid-community';
 import Papa from 'papaparse';
 import type { Subscription } from 'rxjs';
+import { MapboxMapComponent } from '../mapbox-map/mapbox-map.component';
+import { DropdownMenuComponent } from './dropdown-menu/dropdown-menu.component';
 import { GeoJsonService } from '../services/geojson.service';
 import { FlaskRequests } from '../services/server.service';
 
 @Component({
   selector: 'app-cbl-table',
   standalone: true,
-  imports: [AgGridAngular, CommonModule],
+  imports: [AgGridAngular, CommonModule, MapboxMapComponent, DropdownMenuComponent],
   templateUrl: './cbl-table.component.html',
   styleUrl: './cbl-table.component.css',
   encapsulation: ViewEncapsulation.None
@@ -23,6 +25,15 @@ export class CblTableComponent implements OnInit, OnDestroy {
   geoJson: any;
   public duplicateMap: Record<string, number> = {};
   public rowData: any[] = [];
+
+
+  // for menu
+  isOpen = false;
+
+  toggleMenu() {
+    this.isOpen = !this.isOpen;
+  }
+
   //ag grid set up
   defaultColDef = {
     flex: 1,
@@ -166,32 +177,32 @@ export class CblTableComponent implements OnInit, OnDestroy {
     sessionStorage.setItem('COL', JSON.stringify(this.colDefs));
   }
 
-  exportAsJson() {
-    // Stop editing changes data without clicking off cell
-    this.gridApi.stopEditing();
+  // exportAsJson() {
+  //   // Stop editing changes data without clicking off cell
+  //   this.gridApi.stopEditing();
 
-    // Get the data as CSV
-    const csvUserData = this.gridApi.getDataAsCsv();
+  //   // Get the data as CSV
+  //   const csvUserData = this.gridApi.getDataAsCsv();
 
-    // Convert CSV to JSON using PapaParse
-    let jsonString: string;
-    try {
-      jsonString = JSON.stringify(Papa.parse(csvUserData, { header: true }).data);
-    } catch (error) {
-      console.error('Error parsing CSV to JSON:', error);
-      return; // Exit if parsing fails
-    }
+  //   // Convert CSV to JSON using PapaParse
+  //   let jsonString: string;
+  //   try {
+  //     jsonString = JSON.stringify(Papa.parse(csvUserData, { header: true }).data);
+  //   } catch (error) {
+  //     console.error('Error parsing CSV to JSON:', error);
+  //     return; // Exit if parsing fails
+  //   }
 
-    // Send JSON data to the API
-    this.apiHandler.sendFinalExportJsonData(jsonString).subscribe(
-      (response) => {
-        console.log('Export successful:', response.message);
-      },
-      (errorResponse) => {
-        console.error('API error:', errorResponse.error.message);
-      }
-    );
-  }
+  //   // Send JSON data to the API
+  //   this.apiHandler.sendFinalExportJsonData(jsonString).subscribe(
+  //     (response) => {
+  //       console.log('Export successful:', response.message);
+  //     },
+  //     (errorResponse) => {
+  //       console.error('API error:', errorResponse.error.message);
+  //     }
+  //   );
+  // }
 
   scrollToFeature(latitude: number, longitude: number) {
     if (longitude === -1 && latitude === -1) {
@@ -250,9 +261,7 @@ export class CblTableComponent implements OnInit, OnDestroy {
   onRowSelected(event: any) {
     if (event.node.isSelected()) {
       const data = event.node.data;
-      console.log('RICKY WHEN I CATCH YOU RICKY', data);
       const id = data.id;
-      console.log('this is selected in row', id);
       this.selectedRowIdStorage = id;
       sessionStorage.setItem('SELECTEDROW', JSON.stringify(this.selectedRowIdStorage));
       const latitude = data.properties.latitude;
@@ -306,13 +315,47 @@ export class CblTableComponent implements OnInit, OnDestroy {
     }
   }
 
-  findDuplicates(geoJson: any) {
-    geoJson.features.forEach((feature: any) => {
-      const ubid = feature.properties.ubid;
-      const streetAddress = feature.properties.street_address;
-      const uniqueString = `${ubid}-${streetAddress}`;
-
-      this.duplicateMap[uniqueString] = (this.duplicateMap[uniqueString] || 0) + 1;
-    });
+  exportAsExcel(event: Event){
+    event.preventDefault();
+    console.log('Exporting as Excel');
   }
+
+  exportAsCsv(event: Event) {
+    event.preventDefault();
+    console.log('Exporting as CSV');
+    
+    // Stop any ongoing editing in the grid
+    this.gridApi.stopEditing();
+  
+    // Retrieve the CSV data from the grid API
+    const csvUserData = this.gridApi.getDataAsCsv();
+    
+    // Create a Blob with the CSV data
+    const blob = new Blob([csvUserData], { type: 'text/csv;charset=utf-8;' });
+    
+    // Create a link element for the download
+    const link = document.createElement('a');
+    
+    if (link.download !== undefined) {
+      const url = URL.createObjectURL(blob);
+      link.setAttribute('href', url);
+      link.setAttribute('download', 'data.csv');
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  }
+  
+
+  exportAsJSON(event: Event){
+    event.preventDefault();
+    console.log('Exporting as JSON');
+  }
+
+  exportAsGeoJSON(event: Event){
+    event.preventDefault();
+    console.log('Exporting as GeoJSON');
+  }
+
 }

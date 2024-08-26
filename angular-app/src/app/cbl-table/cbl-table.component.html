@@ -1,13 +1,82 @@
 <!-- <button (click)="handleDelete()" class="delete-btn">Deleted Selected Row</button> -->
-<div class="cbl-table-container">
-  <ag-grid-angular
-    (gridReady)="onGridReady($event)"
-    (rowClicked)="onRowClicked($event)"
-    [columnDefs]="colDefs"
-    [defaultColDef]="defaultColDef"
-    [rowData]="rowData"
-    [rowSelection]="'single'"
-    class="ag-theme-quartz"
-    style="height: 90%; width: 45vw"
-  />
+<nav class="bg-white border-b-2 border-grey">
+  <div class="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
+    <div class="relative flex h-35 items-center justify-between">
+      <div class="absolute inset-y-0 left-0 flex items-center sm:hidden"></div>
+      <div class="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
+        <div class="flex flex-shrink-0 items-center">
+          <img class="h-[8rem] w-auto" src="nrel-logo-web.svg" alt="NREL Logo" />
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+
+
+
+
+<div *ngIf="geoJson" class="flex mt-10 flex-col justify-center w-[100vw] max-h-[100vh] justify-center items-center">
+  <div class="w-[90%] h-16 rounded-tr-lg rounded-tl-lg bg-nrel-second-dark-blue flex items-center justify-between">
+    <div class="relative inline-block text-left ml-5">
+      <div>
+        <button
+          (click)="toggleMenu()"
+          type="button"
+          class="inline-flex w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+          id="menu-button"
+          aria-expanded="true"
+          aria-haspopup="true"
+        >
+          Export
+          <svg class="-mr-1 h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+            <path
+              fill-rule="evenodd"
+              d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"
+              clip-rule="evenodd"
+            />
+          </svg>
+        </button>
+      </div>
+    </div>
+    
+    <!-- Dropdown menu -->
+    <div
+      *ngIf="isOpen"
+      class="absolute left-[5%] z-10 mt-52 w-40 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
+      role="menu"
+      aria-orientation="vertical"
+      aria-labelledby="menu-button"
+      tabindex="-1"
+    >
+      <div class="py-1" role="none">
+        <a href="" (click)="exportAsExcel($event)" class="block px-4 py-2 text-sm text-gray-700 border-b border-gray-200 hover:bg-gray-100" role="menuitem" tabindex="-1" id="menu-item-0">Excel</a>
+        <a href=""  (click)="exportAsCsv($event)" class="block px-4 py-2 text-sm text-gray-700 border-b border-gray-200 hover:bg-gray-100" role="menuitem" tabindex="-1" id="menu-item-1">CSV</a>
+        <a href="" (click)="exportAsJSON($event)" class="block px-4 py-2 text-sm text-gray-700 border-b border-gray-200 hover:bg-gray-100" role="menuitem" tabindex="-1" id="menu-item-2">JSON</a>
+        <a href="" (click)="exportAsGeoJSON($event)" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem" tabindex="-1" id="menu-item-3">GeoJSON</a>
+      </div>
+    </div>
+    
+    <button
+      class="inline-flex mr-5 justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+      (click)="handleDelete()"
+    >
+      Delete Selected Row
+    </button>
+  </div>
+  <div *ngIf="geoJson" id="data-container" class="flex mt-0 p-0 w-[90%] h-[100vh] justify-center">
+    <app-mapbox-map></app-mapbox-map>
+    <div class="cbl-table-container">
+      <ag-grid-angular
+        (gridReady)="onGridReady($event)"
+        (rowClicked)="onRowClicked($event)"
+        [columnDefs]="colDefs"
+        [defaultColDef]="defaultColDef"
+        [rowData]="rowData"
+        [rowSelection]="'single'"
+        class="ag-theme-quartz"
+        style="height: 90%; width: 45vw"
+      />
+    </div>
+  </div>
 </div>

@@ -568,7 +568,7 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
 
   editEmptyData() {
     if (this.emptyBuildingId === 'none selected') {
-      alert('Please select a row with empty or poor data. To edit a building, first remove existing footprint.');
+      alert('Please select a row with empty or poor data. To edit a building, first remove existing footprint using the trash can.');
       return;
     }
 
@@ -754,5 +754,10 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
       this.map.setCenter([longitude, latitude]);
       this.map.setZoom(this.zoomLevel);
     }
+  }
+
+
+  exportAsExcel(){
+    console.log('yurrr')
   }
 }
