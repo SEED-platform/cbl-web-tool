@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { AgGridAngular } from 'ag-grid-angular';
 import type { ColDef, ValueGetterParams, ValueSetterParams } from 'ag-grid-community';
 import Papa from 'papaparse';
+import * as XLSX from 'xlsx';
 import type { Subscription } from 'rxjs';
 import { MapboxMapComponent } from '../mapbox-map/mapbox-map.component';
 import { DropdownMenuComponent } from './dropdown-menu/dropdown-menu.component';
@@ -315,9 +316,9 @@ export class CblTableComponent implements OnInit, OnDestroy {
     }
   }
 
-  exportAsExcel(event: Event){
+  exportAsExcel(event: Event) {
     event.preventDefault();
-    console.log('Exporting as Excel');
+    console.log(this.rowData)
   }
 
   exportAsCsv(event: Event) {
