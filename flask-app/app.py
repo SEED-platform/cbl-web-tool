@@ -328,13 +328,15 @@ def edit_footprint():
 @app.route("/api/export_geojson", methods=["POST"])
 def export_geojson():
     json_string = request.json.get("value")
-    print(json_string)
     geojson_data = json.loads(json_string)
     list_of_features = []
 
     for data in geojson_data:
-        coords = data["Coordinates"].split(",")
-        coords = [(float(coords[i]), float(coords[i + 1])) for i in range(0, len(coords), 2)]
+        coords = ''
+        if (len(coords) > 1 and coords[0] != ''):
+            coords = data["Coordinates"].split(",")
+            coords = [(float(coords[i]), float(coords[i + 1])) for i in range(0, len(coords), 2)]
+        
         properties = data
         properties.pop("Coordinates", None)
 
@@ -352,19 +354,13 @@ def export_geojson():
     return jsonify({"message": "success", "user_data": final_geojson}), 200
 
 
+@app.route("/api/export_excel", methods=["POST"])
 def export_excel():
     json_string = request.json.get("value")
     pd.read_json(json_string).to_excel("output.xlsx")
 
     return jsonify({"message": "success"}), 200
 
-
-def export_json():
-    json_string = request.json.get("value")
-    with open('json_export.json', 'w') as f:
-        json.dump(json_string, f, indent=2)
-
-    return jsonify({"message": "success"}), 200
 
 
 if __name__ == "__main__":
