@@ -11,7 +11,7 @@ import json.scanner
 import pandas as pd
 import mercantile
 import requests
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, send_file
 from flask_cors import CORS
 from shapely.geometry import Point, Polygon
 
@@ -359,8 +359,7 @@ def export_excel():
     json_string = request.json.get("value")
     pd.read_json(json_string).to_excel("output.xlsx")
 
-    return jsonify({"message": "success"}), 200
-
+    return send_file("output.xlsx", as_attachment=True, download_name="output.xlsx", mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
 
 
 if __name__ == "__main__":
