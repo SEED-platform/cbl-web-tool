@@ -7,6 +7,8 @@ from pathlib import Path
 from typing import Any
 
 import geopandas as gpd
+import json.scanner
+import pandas as pd
 import mercantile
 import requests
 from flask import Flask, jsonify, request
@@ -347,6 +349,21 @@ def export_geojson():
 
     final_geojson = json.dumps(geojson)
     return jsonify({"message": "success", "user_data": final_geojson}), 200
+
+
+def export_excel():
+    json_string = request.json.get("value")
+    pd.read_json(json_string).to_excel("output.xlsx")
+
+    return jsonify({"message": "success"}), 200
+
+
+def export_json():
+    json_string = request.json.get("value")
+    with open('json_export.json', 'w') as f:
+        json.dump(json_string, f, indent=2)
+
+    return jsonify({"message": "success"}), 200
 
 
 if __name__ == "__main__":
