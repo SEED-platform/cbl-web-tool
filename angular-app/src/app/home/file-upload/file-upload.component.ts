@@ -154,6 +154,8 @@ export class FileUploadComponent {
         this.initialJsonData = response.user_data;
         sessionStorage.setItem('FIRSTTABLEDATA', LZString.compress(this.initialJsonData));
         if (JSON.parse(this.initialJsonData).length !== 0) {
+          sessionStorage.setItem('CURRENTPAGE', 'first-table');
+          sessionStorage.setItem('HOMEACCESS', JSON.stringify(false));
           this.router.navigate(['/first-table']);
         } else {
           alert('No File Submitted');
@@ -169,6 +171,8 @@ export class FileUploadComponent {
           sessionStorage.setItem('FIRSTTABLEDATA', LZString.compress(this.initialJsonData));
           setTimeout(() => {
             console.log(this.initialJsonData);
+            sessionStorage.setItem('CURRENTPAGE', 'first-table');
+            sessionStorage.setItem('HOMEACCESS', JSON.stringify(false));
             this.router.navigate(['/first-table']);
           }, 500);
         } else {

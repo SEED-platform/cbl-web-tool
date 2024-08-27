@@ -33,6 +33,8 @@ export class HomeComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
+    sessionStorage.setItem('HOMEACCESS', JSON.stringify(true));
+    sessionStorage.setItem('CURRENTPAGE', '');
     this.geoJsonSubscription = this.geoJsonService.getGeoJson().subscribe((data) => {
       this.jsonData = data;
       if (this.jsonData && this.jsonData.features && this.jsonData.features.length > 0 && this.jsonData.features[0].properties) {
@@ -50,33 +52,5 @@ export class HomeComponent implements OnInit, OnDestroy {
     return !obj || (Object.keys(obj).length === 0 && obj.constructor === Object);
   }
 
-  getUploadFileFromUser(event: any) {
-    this.userFile = event.target.files[0];
-  }
 
-  uploadInitialFileToServer() {
-    const fileData = new FormData();
-
-    fileData.append('userFile', this.userFile);
-    this.apiHandler.sendInitialData(fileData).subscribe(
-      (response) => {
-        console.log(response.message); // Handle successful response
-        this.initialJsonData = response.user_data;
-        sessionStorage.setItem('FIRSTTABLEDATA', LZString.compress(this.initialJsonData));
-        this.router.navigate(['/first-table']);
-      },
-      (errorResponse) => {
-        console.log(errorResponse.error.message); // Handle error response
-
-        if (this.userFile && !this.fatalErrorArray.includes(errorResponse.error.message)) {
-          this.initialJsonData = errorResponse.error.user_data;
-          sessionStorage.setItem('FIRSTTABLEDATA', LZString.compress(this.initialJsonData));
-          console.log(this.initialJsonData);
-          this.router.navigate(['/first-table']);
-        } else {
-          alert(errorResponse.error.message);
-        }
-      }
-    );
-  }
 }

@@ -32,6 +32,7 @@ export class FirstTableComponent implements OnInit {
     filter: true,
     editable: true,
     suppressHeaderFilterButton: true,
+    suppressMovable: true,
     headerComponent: CustomHeaderComponent //allows editable headers
   };
   private gridApi!: GridApi;
@@ -65,7 +66,7 @@ export class FirstTableComponent implements OnInit {
       const keys = Object.keys(this.userList[0]);
       this.colDefs = keys.map((key) => ({
         field: key,
-        headerName: key
+        headerName: key,
       }));
     }
     sessionStorage.setItem('COL', JSON.stringify(this.colDefs));
@@ -116,7 +117,8 @@ export class FirstTableComponent implements OnInit {
         const geoJson = JSON.parse(this.geoJsonString);
         this.geoJsonService.setGeoJson(geoJson);
         sessionStorage.setItem('GEOJSONDATA', LZString.compress(this.geoJsonString));
-        this.router.navigate(['']);
+        sessionStorage.setItem('CURRENTPAGE', 'cbl-table');
+        this.router.navigate(['/cbl-table']);
         this.isLoading = false;
         this.cdr.detectChanges();
       },

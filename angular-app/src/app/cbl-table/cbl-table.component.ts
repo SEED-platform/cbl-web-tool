@@ -146,7 +146,12 @@ export class CblTableComponent implements OnInit, OnDestroy {
 
   //dynamically sets grid for geojson values
   setColumnDefs() {
-    const keys = JSON.parse(sessionStorage.getItem('GEOJSONPROPERTYNAMES') || '[]');
+
+    
+      const geoJsonPropertyNames = Object.keys(this.geoJson.features[0].properties);
+    
+    
+    const keys = geoJsonPropertyNames;
     keys.push('coordinates');
 
     const nonEditableKeys = ['ubid', 'longitude', 'latitude'];
@@ -349,10 +354,36 @@ export class CblTableComponent implements OnInit, OnDestroy {
   }
   
 
-  exportAsJSON(event: Event){
-    event.preventDefault();
-    console.log('Exporting as JSON');
+    exportAsGeoJson(event: Event) {
+      event.preventDefault();
+    // Stop editing changes data without clicking off cell
+    this.gridApi.stopEditing();
+
+    // Get the data as CSV
+    const csvUserData = this.gridApi.getDataAsCsv();
+
+    // Convert CSV to JSON using PapaParse
+    let jsonString: string;
+    try {
+      jsonString = JSON.stringify(Papa.parse(csvUserData, { header: true }).data);
+      console.log(jsonString)
+    } catch (error) {
+      console.error('Error parsing CSV to JSON:', error);
+      return; // Exit if parsing fails
+    }
+
+    // Send JSON data to the API
+    this.apiHandler.sendFinalExportJsonData(jsonString).subscribe(
+      (response) => {
+        console.log('Export successful:', response.message);
+        console.log(response.user_data);
+      },
+      (errorResponse) => {
+        console.error('API error:', errorResponse.error.message);
+      }
+    );
   }
+
 
   exportAsGeoJSON(event: Event){
     event.preventDefault();
