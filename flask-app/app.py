@@ -325,12 +325,13 @@ def edit_footprint():
     return jsonify({"message": "success", "user_data": json.dumps(newPolygonData)}), 200
 
 
-@app.route("/api/export_geojson", methods=["POST"])
+@app.route("/api/export_geojson", methods=["GET", "POST"])
 def export_geojson():
     json_string = request.json.get("value")
+    json_data = json.loads(json_string)
+    print(json_data)
     geojson_data = json.loads(json_string)
     list_of_features = []
-
     for data in geojson_data:
         coords = ''
         if (len(coords) > 1 and coords[0] != ''):
@@ -345,7 +346,7 @@ def export_geojson():
         feature["properties"] = properties
         feature["geometry"] = {}
         feature["geometry"]["type"] = "Polygon"
-        feature["geometry"]["Coordinates"] = [coords]
+        feature["geometry"]["coordinates"] = [coords]
         list_of_features.append(feature)
 
     geojson = {"type": "FeatureCollection", "features": list_of_features}

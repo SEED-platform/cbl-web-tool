@@ -388,12 +388,11 @@ export class CblTableComponent implements OnInit, OnDestroy {
 
     // Get the data as CSV
     const csvUserData = this.gridApi.getDataAsCsv();
-
+    
     // Convert CSV to JSON using PapaParse
     let jsonString: string;
     try {
       jsonString = JSON.stringify(Papa.parse(csvUserData, { header: true }).data);
-      console.log(jsonString)
     } catch (error) {
       console.error('Error parsing CSV to JSON:', error);
       return; // Exit if parsing fails
