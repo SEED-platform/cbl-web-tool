@@ -328,21 +328,22 @@ def edit_footprint():
 @app.route("/api/export_geojson", methods=["POST"])
 def export_geojson():
     json_string = request.json.get("value")
+    print(json_string)
     geojson_data = json.loads(json_string)
     list_of_features = []
 
     for data in geojson_data:
-        coords = data["coordinates"].split(",")
+        coords = data["Coordinates"].split(",")
         coords = [(float(coords[i]), float(coords[i + 1])) for i in range(0, len(coords), 2)]
         properties = data
-        properties.pop("coordinates", None)
+        properties.pop("Coordinates", None)
 
         feature = {}
         feature["type"] = "Feature"
         feature["properties"] = properties
         feature["geometry"] = {}
         feature["geometry"]["type"] = "Polygon"
-        feature["geometry"]["coordinates"] = [coords]
+        feature["geometry"]["Coordinates"] = [coords]
         list_of_features.append(feature)
 
     geojson = {"type": "FeatureCollection", "features": list_of_features}

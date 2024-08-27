@@ -345,7 +345,7 @@ export class CblTableComponent implements OnInit, OnDestroy {
     if (link.download !== undefined) {
       const url = URL.createObjectURL(blob);
       link.setAttribute('href', url);
-      link.setAttribute('download', 'data.csv');
+      link.setAttribute('download', 'cbl_list.csv');
       link.style.visibility = 'hidden';
       document.body.appendChild(link);
       link.click();
@@ -385,9 +385,29 @@ export class CblTableComponent implements OnInit, OnDestroy {
   }
 
 
-  exportAsGeoJSON(event: Event){
+  exportAsJson(event: Event){
     event.preventDefault();
-    console.log('Exporting as GeoJSON');
+
+      const csvUserData = this.gridApi.getDataAsCsv();
+      const json = Papa.parse(csvUserData, { header: true }).data;
+
+      // Convert JSON data to a string
+      const jsonString = JSON.stringify(json, null, 2);
+
+      const blob = new Blob([jsonString], { type: 'application/json;charset=utf-8;' });
+
+      // Create a link element for the download
+      const link = document.createElement('a');
+
+      if (link.download !== undefined) {
+         const url = URL.createObjectURL(blob);
+          link.setAttribute('href', url);
+          link.setAttribute('download', 'cbl_list.json');
+          link.style.visibility = 'hidden';
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+}
   }
 
 }
