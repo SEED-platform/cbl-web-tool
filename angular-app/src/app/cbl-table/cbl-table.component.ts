@@ -323,7 +323,34 @@ export class CblTableComponent implements OnInit, OnDestroy {
 
   exportAsExcel(event: Event) {
     event.preventDefault();
-    console.log(this.rowData)
+    // Stop editing changes data without clicking off cell
+    this.gridApi.stopEditing();
+
+    // Get the data as CSV
+    const csvUserData = this.gridApi.getDataAsCsv();
+
+    // Convert CSV to JSON using PapaParse
+    let jsonString: string;
+    try {
+      jsonString = JSON.stringify(Papa.parse(csvUserData, { header: true }).data);
+      console.log(jsonString)
+    } catch (error) {
+      console.error('Error parsing CSV to JSON:', error);
+      return; // Exit if parsing fails
+    }
+
+    // Send JSON data to the API
+    this.apiHandler.sendFinalExportDataExcel(jsonString).subscribe(
+      (response) => {
+        console.log('Export successful:', response.message);
+        const excelFile = response.user_data;
+        console.log(excelFile)
+
+      },
+      (errorResponse) => {
+        console.error('API error:', errorResponse);
+      }
+    );
   }
 
   exportAsCsv(event: Event) {
@@ -376,7 +403,22 @@ export class CblTableComponent implements OnInit, OnDestroy {
     this.apiHandler.sendFinalExportJsonData(jsonString).subscribe(
       (response) => {
         console.log('Export successful:', response.message);
-        console.log(response.user_data);
+        const geoJson = response.user_data;
+        const blob = new Blob([geoJson], { type: 'application/geo+json;charset=utf-8;' });
+    
+    // Create a link element for the download
+    const link = document.createElement('a');
+    
+    if (link.download !== undefined) {
+      const url = URL.createObjectURL(blob);
+      link.setAttribute('href', url);
+      link.setAttribute('download', 'cbl_list.geojson');
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
       },
       (errorResponse) => {
         console.error('API error:', errorResponse.error.message);

@@ -61,7 +61,7 @@ CORS(app)
 @app.route("/api/submit_file", methods=["POST"])
 def get_and_check_file():
     files = request.files.getlist("userFiles[]")
-    print(files)
+    
     merged_data = []
     seen_filenames = set()
 
