@@ -128,13 +128,13 @@ def run_cbl_workflow():
     for loc in locations:
         loc["street"] = normalize_address(loc["street"])
 
-    # try:
-    #     data = geocode_addresses(locations, MAPQUEST_API_KEY)
-    # except Exception as e:
-    #     return jsonify({'message': 'Failed geocoding property states due to MapQuest error. " "Your MapQuest API Key is either invalid or at its limit.'}), 400
+    try:
+        data = geocode_addresses(locations, MAPQUEST_API_KEY)
+    except Exception as e:
+        return jsonify({'message': 'Failed geocoding property states due to MapQuest error. " "Your MapQuest API Key is either invalid or at its limit.'}), 400
 
-    with open("test_data/large_test.json") as fr:
-        data = json.load(fr)
+    # with open("test_data/large_test.json") as fr:
+    #     data = json.load(fr)
 
     # with open('large_test.json', 'w') as fr:
     #     json.dump(data, fr, indent=2)
@@ -354,14 +354,14 @@ def export_geojson():
     return jsonify({"message": "success", "user_data": final_geojson}), 200
 
 
-@app.route("/api/export_excel", methods=["POST"])
-def export_excel():
-    json_string = request.json.get("value")
-    df = pd.read_json(json_string)
-    output_file = "output.xlsx"
-    df.to_excel(output_file, index=False)
+# @app.route("/api/export_excel", methods=["POST"])
+# def export_excel():
+#     json_string = request.json.get("value")
+#     df = pd.read_json(json_string)
+#     output_file = "output.xlsx"
+#     df.to_excel(output_file, index=False)
 
-    return send_file("output.xlsx", as_attachment=True, download_name="output.xlsx")
+#     return send_file("output.xlsx", as_attachment=True, download_name="output.xlsx")
 
 
 if __name__ == "__main__":

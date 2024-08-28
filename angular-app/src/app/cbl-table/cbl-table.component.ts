@@ -330,27 +330,18 @@ export class CblTableComponent implements OnInit, OnDestroy {
     const csvUserData = this.gridApi.getDataAsCsv();
 
     // Convert CSV to JSON using PapaParse
-    let jsonString: string;
-    try {
-      jsonString = JSON.stringify(Papa.parse(csvUserData, { header: true }).data);
-      console.log(jsonString)
-    } catch (error) {
-      console.error('Error parsing CSV to JSON:', error);
-      return; // Exit if parsing fails
-    }
+   
+    Papa.parse(csvUserData,{
+      complete: function(result){
+      const worksheet = XLSX.utils.json_to_sheet(result.data);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet 1');
 
-    // Send JSON data to the API
-    this.apiHandler.sendFinalExportDataExcel(jsonString).subscribe(
-      (response) => {
-        console.log('Export successful:', response.message);
-        const excelFile = response.user_data;
-        console.log(excelFile)
-
-      },
-      (errorResponse) => {
-        console.error('API error:', errorResponse);
+      //save
+      XLSX.writeFile(workbook, 'cbl_list.xlsx');
       }
-    );
+    })
+   
   }
 
   exportAsCsv(event: Event) {
