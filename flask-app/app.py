@@ -357,9 +357,11 @@ def export_geojson():
 @app.route("/api/export_excel", methods=["POST"])
 def export_excel():
     json_string = request.json.get("value")
-    pd.read_json(json_string).to_excel("output.xlsx")
+    df = pd.read_json(json_string)
+    output_file = "output.xlsx"
+    df.to_excel(output_file, index=False)
 
-    return send_file("output.xlsx", as_attachment=True, download_name="output.xlsx", mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+    return send_file("output.xlsx", as_attachment=True, download_name="output.xlsx")
 
 
 if __name__ == "__main__":
