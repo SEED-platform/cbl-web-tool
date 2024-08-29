@@ -129,10 +129,10 @@ export class CblTableComponent implements OnInit, OnDestroy {
       return;
     }
 
-    if (this.geoJson.features.length > 0) {
+    
       this.featuresArray = this.geoJson.features;
       this.rowData = this.featuresArray;
-    }
+    
     this.setColumnDefs();
 
     if (this.gridApi) {
@@ -159,7 +159,7 @@ export class CblTableComponent implements OnInit, OnDestroy {
       editable: !nonEditableKeys.includes(key),
       headerName: this.capitalizeFirstLetter(key),
       valueGetter: (params: ValueGetterParams) => {
-        if (this.geoJson.features.length > 0) {
+        if (this.geoJson.features.length !== 0) {
           if (key === 'coordinates') {
             return params.data.geometry?.coordinates;
           }
@@ -167,7 +167,7 @@ export class CblTableComponent implements OnInit, OnDestroy {
         }
       },
       valueSetter: (params: ValueSetterParams) => {
-        if (this.geoJson.features.length > 0) {
+        if (this.geoJson.features.length !== 0) {
           if (key === 'coordinates') {
             params.data.geometry = params.data.geometry || {};
             params.data.geometry.coordinates = params.newValue;
@@ -184,12 +184,14 @@ export class CblTableComponent implements OnInit, OnDestroy {
 
   
   scrollToTop() {
+    if(this.rowData.length > 0){
     this.gridApi.ensureIndexVisible(0, 'top');
     const rowNode1 = this.gridApi!.getDisplayedRowAtIndex(0)!;
     this.gridApi!.flashCells({ rowNodes: [rowNode1] });
     if (rowNode1) {
       rowNode1.setSelected(true);
     }
+  }
   }
 
   scrollToFeatureById(id: string) {
@@ -252,9 +254,10 @@ export class CblTableComponent implements OnInit, OnDestroy {
     
       console.log('THIS IS BEING SENT FROM THE MAP TO TABLE', res.remove[0].data);
       this.geoJsonService.removeEntirePolygonRefInMap(res.remove[0].data.id);
-      
+    
       this.updateTable();
-
+      
+   
     }
   }
 
