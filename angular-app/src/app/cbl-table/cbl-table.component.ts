@@ -65,6 +65,10 @@ export class CblTableComponent implements OnInit, OnDestroy {
       this.geoJson = data;
       if (this.initialLoad) {
         //keeps it from rendering every change..better performance
+        if(!sessionStorage.getItem('PROPERTYNAMES')){
+        const geoJsonPropertyNames = Object.keys(this.geoJson.features[0].properties);
+          sessionStorage.setItem('PROPERTYNAMES', JSON.stringify(geoJsonPropertyNames));
+        }
         this.updateTable(); // Update table only on initial load
         this.initialLoad = false; // Set the flag to false after the initial load
       }
@@ -85,11 +89,11 @@ export class CblTableComponent implements OnInit, OnDestroy {
     //inserts new building in table and geojson
     this.newBuilingSubscription = this.geoJsonService.newBuilding$.subscribe((newBuilding) => {
       if (newBuilding) {
-        this.gridApi.applyTransaction({ add: [newBuilding], addIndex: 0 });
+       
         this.geoJsonService.insertNewBuildingInGeoJson(newBuilding); //updates the original geojson
-        setTimeout(() => {
-          this.updateTable(), 10;
-        }); //needed to keep in sync with map
+        setTimeout(() => {this.updateTable()});//needed to keep in sync with map
+        this.gridApi.applyTransaction({ add: [newBuilding], addIndex: 0 });
+        
       }
     });
 
@@ -99,7 +103,7 @@ export class CblTableComponent implements OnInit, OnDestroy {
         this.updateModifiedRow(modBuilding);
         setTimeout(() => {
           this.geoJsonService.modifyBuildingInGeoJson(modBuilding);
-        }, 300);
+        });
       }
     });
   }
@@ -132,10 +136,8 @@ export class CblTableComponent implements OnInit, OnDestroy {
     this.setColumnDefs();
 
     if (this.gridApi) {
-      setTimeout(() => {
         this.gridApi.deselectAll();
         this.scrollToTop();
-      }, 100);
     }
   }
 
@@ -146,12 +148,8 @@ export class CblTableComponent implements OnInit, OnDestroy {
 
   //dynamically sets grid for geojson values
   setColumnDefs() {
-
     
-      const geoJsonPropertyNames = Object.keys(this.geoJson.features[0].properties);
-    
-    
-    const keys = geoJsonPropertyNames;
+    const keys = JSON.parse(sessionStorage.getItem('PROPERTYNAMES') || '{}');
     keys.push('coordinates');
 
     const nonEditableKeys = ['ubid', 'longitude', 'latitude'];
@@ -183,56 +181,15 @@ export class CblTableComponent implements OnInit, OnDestroy {
     sessionStorage.setItem('COL', JSON.stringify(this.colDefs));
   }
 
-  // exportAsJson() {
-  //   // Stop editing changes data without clicking off cell
-  //   this.gridApi.stopEditing();
 
-  //   // Get the data as CSV
-  //   const csvUserData = this.gridApi.getDataAsCsv();
-
-  //   // Convert CSV to JSON using PapaParse
-  //   let jsonString: string;
-  //   try {
-  //     jsonString = JSON.stringify(Papa.parse(csvUserData, { header: true }).data);
-  //   } catch (error) {
-  //     console.error('Error parsing CSV to JSON:', error);
-  //     return; // Exit if parsing fails
-  //   }
-
-  //   // Send JSON data to the API
-  //   this.apiHandler.sendFinalExportJsonData(jsonString).subscribe(
-  //     (response) => {
-  //       console.log('Export successful:', response.message);
-  //     },
-  //     (errorResponse) => {
-  //       console.error('API error:', errorResponse.error.message);
-  //     }
-  //   );
-  // }
-
-  scrollToFeature(latitude: number, longitude: number) {
-    if (longitude === -1 && latitude === -1) {
-      this.scrollToTop();
-      this.gridApi.deselectAll();
-      return;
-    }
-
-    const feature = this.rowData.find((f: any) => f.properties.latitude === latitude && f.properties.longitude === longitude);
-
-    if (feature && this.gridApi) {
-      this.gridApi.ensureIndexVisible(this.rowData.indexOf(feature), 'middle');
-      const index = this.rowData.indexOf(feature);
-      const rowNode = this.gridApi.getDisplayedRowAtIndex(index);
-      if (rowNode) {
-        rowNode.setSelected(true);
-      }
-    }
-  }
-
+  
   scrollToTop() {
     this.gridApi.ensureIndexVisible(0, 'top');
     const rowNode1 = this.gridApi!.getDisplayedRowAtIndex(0)!;
     this.gridApi!.flashCells({ rowNodes: [rowNode1] });
+    if (rowNode1) {
+      rowNode1.setSelected(true);
+    }
   }
 
   scrollToFeatureById(id: string) {
@@ -291,12 +248,13 @@ export class CblTableComponent implements OnInit, OnDestroy {
   handleDelete() {
     if (this.rowData.length !== 0) {
       const selectedData = this.gridApi.getSelectedRows();
-
       const res = this.gridApi.applyTransaction({ remove: selectedData })!;
-
+    
       console.log('THIS IS BEING SENT FROM THE MAP TO TABLE', res.remove[0].data);
       this.geoJsonService.removeEntirePolygonRefInMap(res.remove[0].data.id);
+      
       this.updateTable();
+
     }
   }
 
@@ -332,8 +290,11 @@ export class CblTableComponent implements OnInit, OnDestroy {
     // Convert CSV to JSON using PapaParse
    
     Papa.parse(csvUserData,{
+      header: true,
       complete: function(result){
-      const worksheet = XLSX.utils.json_to_sheet(result.data);
+      const data = result.data;
+      console.log(data)
+      const worksheet = XLSX.utils.json_to_sheet(data);
       const workbook = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet 1');
 

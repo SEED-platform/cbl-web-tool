@@ -61,7 +61,6 @@ def _process_result(result):
 def geocode_addresses(locations: list[Location], mapquest_api_key: str):
     # Alternatively, use GeoPandas: https://geopandas.org/en/stable/docs/reference/api/geopandas.tools.geocode.html
     results = []
-
     # MapQuest is limited to 100 locations per request
     for location_chunk in chunk(locations):
         response = requests.post(
@@ -73,7 +72,10 @@ def geocode_addresses(locations: list[Location], mapquest_api_key: str):
                     "thumbMaps": False,
                 },
             },
+             verify=False  # Disable SSL verification (not recommended for production)
         )
+
+       
 
         try:
             # Catch invalid API key error before parsing the response

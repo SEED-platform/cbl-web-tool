@@ -124,6 +124,7 @@ export class FirstTableComponent implements OnInit {
       },
       (errorResponse) => {
         console.error(errorResponse.error.message); // Handle error response
+        alert(errorResponse.error.message);
         this.isLoading = false;
         this.cdr.detectChanges();
       }
