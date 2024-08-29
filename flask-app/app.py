@@ -23,6 +23,7 @@ from utils.location_error import LocationError
 from utils.merge_dicts import merge_dicts
 from utils.normalize_address import normalize_address
 from utils.normalize_state import normalize_state
+from utils.geocode_addresses import geocode_addresses
 from utils.ubid import encode_ubid
 from utils.update_dataset_links import update_dataset_links
 from utils.update_quadkeys import update_quadkeys
@@ -131,7 +132,7 @@ def run_cbl_workflow():
     try:
         data = geocode_addresses(locations, MAPQUEST_API_KEY)
     except Exception as e:
-        return jsonify({'message': 'Failed geocoding property states due to MapQuest error. " "Your MapQuest API Key is either invalid or at its limit.'}), 400
+        return jsonify({'message': 'Failed geocoding property states due to MapQuest error. Your MapQuest API Key is either invalid or at its limit.'}), 400
 
     # with open("test_data/large_test.json") as fr:
     #     data = json.load(fr)
