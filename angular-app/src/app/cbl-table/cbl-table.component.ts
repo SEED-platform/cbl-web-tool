@@ -66,7 +66,16 @@ export class CblTableComponent implements OnInit, OnDestroy {
       if (this.initialLoad) {
         //keeps it from rendering every change..better performance
         if(!sessionStorage.getItem('PROPERTYNAMES')){
-        const geoJsonPropertyNames = Object.keys(this.geoJson.features[0].properties);
+          const buildingArray = this.geoJson.features;
+          let ValidBuilding = buildingArray[0];
+
+          let i = 0;
+          while (ValidBuilding.properties.quality === 'Poor' || (ValidBuilding.properties.quality === 'Very Poor' && i < buildingArray.length)) {
+            i++;
+            ValidBuilding = buildingArray[i];
+          }
+      
+        const geoJsonPropertyNames = Object.keys(ValidBuilding.properties);
           sessionStorage.setItem('PROPERTYNAMES', JSON.stringify(geoJsonPropertyNames));
         }
         this.updateTable(); // Update table only on initial load
@@ -410,15 +419,19 @@ export class CblTableComponent implements OnInit, OnDestroy {
 
 
 
-
   jsonConverter() {
     const data = this.rowData;
     const jsonArray = [];
   
     for (const building of data) {
-      // Create a new object with properties spread and add coordinates separately
+      // Create a new object with properties in the desired order
       const buildingObject = {
-        ...building.properties, // Spread the properties
+        street_address: building.properties.street_address,
+        city: building.properties.city,
+        state: building.properties.state,
+        quality: building.properties.quality,
+        ubid: building.properties.ubid,
+        ...building.properties, // Spread the remaining properties after the desired ones
         coordinates: building.geometry.coordinates // Add the coordinates
       };
       
@@ -428,6 +441,7 @@ export class CblTableComponent implements OnInit, OnDestroy {
   
     // Optionally, return the jsonArray if needed
     return jsonArray;
-  }
+}
+
   
 }

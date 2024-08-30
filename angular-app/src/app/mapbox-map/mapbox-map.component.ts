@@ -54,7 +54,7 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
     this.geoJsonSubscription = this.geoJsonService.getGeoJson().subscribe((geoJsonObject) => {
       this.initializeMapWithGeoJson(geoJsonObject);
       this.globalGeoJsonObject = geoJsonObject;
-      this.geoJsonPropertyNames = JSON.parse(sessionStorage.getItem('GEOJSONPROPERTYNAMES') || '[]');
+      this.geoJsonPropertyNames = JSON.parse(sessionStorage.getItem('PROPERTYNAMES') || '[]');
     });
 
     this.featureClickSubscription = this.geoJsonService.selectedFeature$.subscribe((feature) => {
@@ -584,6 +584,7 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
         featuresLength: this.globalGeoJsonObject.features.length
       };
 
+      console.log("yurrrr", this.geoJsonPropertyNames);
       const jsonDataString = JSON.stringify(jsonData);
       this.apiHandler.sendReverseGeoCodeData(jsonDataString).subscribe(
         (response) => {
