@@ -355,7 +355,7 @@ export class CblTableComponent implements OnInit, OnDestroy {
 
     let jsonString: string;
     try {
-      jsonString = JSON.stringify(geojson);
+      jsonString = JSON.stringify(geojson, null, 2);
     } catch (error) {
       console.error('Error parsing CSV to JSON:', error);
       return; // Exit if parsing fails
