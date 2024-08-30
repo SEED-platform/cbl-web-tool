@@ -89,7 +89,9 @@ export class CblTableComponent implements OnInit, OnDestroy {
     //inserts new building in table and geojson
     this.newBuilingSubscription = this.geoJsonService.newBuilding$.subscribe((newBuilding) => {
       if (newBuilding) {
-       
+        console.log(newBuilding)
+        newBuilding.properties['latitude'] = Number(newBuilding.properties['latitude']);
+        newBuilding.properties['longitude'] = Number(newBuilding.properties['longitude']);
         this.geoJsonService.insertNewBuildingInGeoJson(newBuilding); //updates the original geojson
         setTimeout(() => {this.updateTable()});//needed to keep in sync with map
         this.gridApi.applyTransaction({ add: [newBuilding], addIndex: 0 });
@@ -283,28 +285,26 @@ export class CblTableComponent implements OnInit, OnDestroy {
   }
 
   exportAsExcel(event: Event) {
+    
     event.preventDefault();
     // Stop editing changes data without clicking off cell
     this.gridApi.stopEditing();
 
     // Get the data as CSV
-    const csvUserData = this.gridApi.getDataAsCsv();
+  
+
+    const json = this.jsonConverter();
 
     // Convert CSV to JSON using PapaParse
    
-    Papa.parse(csvUserData,{
-      header: true,
-      complete: function(result){
-      const data = result.data;
-      console.log(data)
-      const worksheet = XLSX.utils.json_to_sheet(data);
+   
+      const worksheet = XLSX.utils.json_to_sheet(json);
       const workbook = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet 1');
 
       //save
       XLSX.writeFile(workbook, 'cbl_list.xlsx');
-      }
-    })
+
    
   }
 
@@ -315,9 +315,10 @@ export class CblTableComponent implements OnInit, OnDestroy {
     // Stop any ongoing editing in the grid
     this.gridApi.stopEditing();
   
+
+    const json = this.jsonConverter();
     // Retrieve the CSV data from the grid API
-    const csvUserData = this.gridApi.getDataAsCsv();
-    
+    const csvUserData = Papa.unparse(json);
     // Create a Blob with the CSV data
     const blob = new Blob([csvUserData], { type: 'text/csv;charset=utf-8;' });
     
@@ -342,23 +343,27 @@ export class CblTableComponent implements OnInit, OnDestroy {
     this.gridApi.stopEditing();
 
     // Get the data as CSV
-    const csvUserData = this.gridApi.getDataAsCsv();
+  
     
     // Convert CSV to JSON using PapaParse
+    
+    
+     
+
+    const geojson = {"type": "FeatureCollection", "features": this.rowData}
+    // Send JSON data to the API
+
     let jsonString: string;
     try {
-      jsonString = JSON.stringify(Papa.parse(csvUserData, { header: true }).data);
+      jsonString = JSON.stringify(geojson);
     } catch (error) {
       console.error('Error parsing CSV to JSON:', error);
       return; // Exit if parsing fails
     }
-
-    // Send JSON data to the API
-    this.apiHandler.sendFinalExportJsonData(jsonString).subscribe(
-      (response) => {
-        console.log('Export successful:', response.message);
-        const geoJson = response.user_data;
-        const blob = new Blob([geoJson], { type: 'application/geo+json;charset=utf-8;' });
+  
+    console.log(this.rowData)
+  
+        const blob = new Blob([jsonString], { type: 'application/geo+json;charset=utf-8;' });
     
     // Create a link element for the download
     const link = document.createElement('a');
@@ -373,21 +378,18 @@ export class CblTableComponent implements OnInit, OnDestroy {
       document.body.removeChild(link);
     }
 
-      },
-      (errorResponse) => {
-        console.error('API error:', errorResponse.error.message);
-      }
-    );
   }
 
 
   exportAsJson(event: Event){
     event.preventDefault();
+    this.gridApi.stopEditing();
 
-      const csvUserData = this.gridApi.getDataAsCsv();
-      const json = Papa.parse(csvUserData, { header: true }).data;
 
-      // Convert JSON data to a string
+      const json = this.jsonConverter();
+      console.log(json);
+
+    
       const jsonString = JSON.stringify(json, null, 2);
 
       const blob = new Blob([jsonString], { type: 'application/json;charset=utf-8;' });
@@ -406,4 +408,26 @@ export class CblTableComponent implements OnInit, OnDestroy {
 }
   }
 
+
+
+
+  jsonConverter() {
+    const data = this.rowData;
+    const jsonArray = [];
+  
+    for (const building of data) {
+      // Create a new object with properties spread and add coordinates separately
+      const buildingObject = {
+        ...building.properties, // Spread the properties
+        coordinates: building.geometry.coordinates // Add the coordinates
+      };
+      
+      // Add the object to the jsonArray
+      jsonArray.push(buildingObject);
+    }
+  
+    // Optionally, return the jsonArray if needed
+    return jsonArray;
+  }
+  
 }

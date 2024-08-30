@@ -590,8 +590,8 @@ export class MapboxMapComponent implements OnInit, OnDestroy {
           console.log(response.message); // Handle successful response
           this.newGeoJson = JSON.parse(response.user_data);
           this.newGeoJson.id = uuidv4();
-          const newBuildinglongitude = this.newGeoJson.properties.longitude;
-          const newBuildingLatitude = this.newGeoJson.properties.latitude;
+          const newBuildinglongitude = Number(this.newGeoJson.properties.longitude);
+          const newBuildingLatitude = Number(this.newGeoJson.properties.latitude);
           const featureId = e.features[0].id;
 
           draw.delete(featureId);
