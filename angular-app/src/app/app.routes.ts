@@ -6,6 +6,6 @@ import { authGuard } from './services/auth.guard';
 
 export const routes: Routes = [
   { path: '', component: HomeComponent, canActivate: [authGuard] },
-  { path: 'first-table', component: FirstTableComponent},
+  { path: 'first-table', component: FirstTableComponent },
   { path: 'cbl-table', component: CblTableComponent }
 ];

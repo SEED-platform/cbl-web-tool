@@ -72,10 +72,8 @@ def geocode_addresses(locations: list[Location], mapquest_api_key: str):
                     "thumbMaps": False,
                 },
             },
-             verify=False  # Disable SSL verification (not recommended for production)
+            verify=False,  # Disable SSL verification (not recommended for production)
         )
-
-       
 
         try:
             # Catch invalid API key error before parsing the response

@@ -1,5 +1,6 @@
 import gzip
 import json
+import json.scanner
 import os
 import sys
 import warnings
@@ -7,11 +8,9 @@ from pathlib import Path
 from typing import Any
 
 import geopandas as gpd
-import json.scanner
-import pandas as pd
 import mercantile
 import requests
-from flask import Flask, jsonify, request, send_file
+from flask import Flask, jsonify, request
 from flask_cors import CORS
 from shapely.geometry import Point, Polygon
 
@@ -19,15 +18,14 @@ from utils.check_data_quality import check_data_quality
 from utils.common import Location
 from utils.convert_file_to_dicts import convert_file_to_dicts
 from utils.generate_locations_list import generate_locations_list
+from utils.geocode_addresses import geocode_addresses
 from utils.location_error import LocationError
 from utils.merge_dicts import merge_dicts
 from utils.normalize_address import normalize_address
 from utils.normalize_state import normalize_state
-from utils.geocode_addresses import geocode_addresses
 from utils.ubid import encode_ubid
 from utils.update_dataset_links import update_dataset_links
 from utils.update_quadkeys import update_quadkeys
-from utils.geocode_addresses import geocode_addresses
 
 warnings.filterwarnings("ignore", category=RuntimeWarning)
 warnings.filterwarnings("ignore", category=UserWarning)
@@ -63,7 +61,7 @@ CORS(app)
 @app.route("/api/submit_file", methods=["POST"])
 def get_and_check_file():
     files = request.files.getlist("userFiles[]")
-    
+
     merged_data = []
     seen_filenames = set()
 
@@ -132,9 +130,11 @@ def run_cbl_workflow():
 
     try:
         data = geocode_addresses(locations, MAPQUEST_API_KEY)
-        
-    except Exception as e:
-        return jsonify({'message': 'Failed geocoding property states due to MapQuest error. Your MapQuest API Key is either invalid or at its limit.'}), 400
+
+    except Exception:
+        return jsonify(
+            {"message": "Failed geocoding property states due to MapQuest error. Your MapQuest API Key is either invalid or at its limit."}
+        ), 400
 
     # with open("test_data/large_test.json") as fr:
     #     data = json.load(fr)
@@ -335,11 +335,11 @@ def export_geojson():
 
     list_of_features = []
     for data in geojson_data:
-        coords = ''
-        if (len(data["Coordinates"]) > 1 and data["Coordinates"][0] != ''):
+        coords = ""
+        if len(data["Coordinates"]) > 1 and data["Coordinates"][0] != "":
             coords = data["Coordinates"].split(",")
             coords = [(float(coords[i]), float(coords[i + 1])) for i in range(0, len(coords), 2)]
-        
+
         properties = data
         properties.pop("Coordinates", None)
 

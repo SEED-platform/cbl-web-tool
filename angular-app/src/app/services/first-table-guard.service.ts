@@ -5,12 +5,10 @@ import { CanActivate, Router } from '@angular/router';
   providedIn: 'root'
 })
 export class FirstTableGuardService implements CanActivate {
-
- 
   constructor(private router: Router) {
     this.initializeState();
   }
-   
+
   canActivate(): boolean {
     return this.getLoadedState();
   }
@@ -27,6 +25,4 @@ export class FirstTableGuardService implements CanActivate {
   setLoadedState(loaded: boolean) {
     sessionStorage.setItem('firstTableLoaded', String(loaded));
   }
-
-
 }

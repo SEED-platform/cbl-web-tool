@@ -11,20 +11,31 @@
   </div>
 </nav>
 
-<div class="w-[100vw] flex flex-col items-center justify-center">
-  <div class="w-[90vw] inline-flex justify-between mt-10 ">
-    <h5 class="text-5xl font-bold mb-4">Data Validation Table</h5>
-   
-     
-          <div class="flex flex-row items-center">
-              <label for="api_key" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"></label>
-              <input type="text" id="api_key" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block text-md h-10 w-[17rem] p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 mr-[10px]" placeholder="Enter your MapQuest API key" required />
-      <button type="submit" class="relative h-8 flex items-center justify-center rounded-md bg-neutral-950 px-6 font-medium text-neutral-50 text-sm shadow-neutral-500/20 transition active:scale-95 bg-nrel-second-dark-blue text-white hover:bg-nrel-dark-blue">Submit</button>
-          </div>
-      
+<div class="w-[100vw] flex flex-col items-center justify-center mt-10">
+  <div class="w-[90vw] h-16 rounded-tr-lg rounded-tl-lg bg-nrel-second-dark-blue flex items-center justify-between">
+    <div class="flex flex-row items-center h-full">
+      <h5 class="text-4xl text-white font-bold ml-4 mb-4 mt-2">Data Validation Table</h5>
+    </div>
+
+    <div class="flex flex-row items-center">
+      <label for="api_key" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"></label>
+      <input
+        type="text"
+        id="api_key"
+        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block text-md h-10 w-[17rem] p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 mr-[10px]"
+        placeholder="Enter your MapQuest API key"
+        required
+      />
+      <button
+        type="submit"
+        class="relative h-8 flex items-center justify-center rounded-md px-6 font-medium text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 mr-4"
+      >
+        Submit
+      </button>
+    </div>
   </div>
   <div class="row">
-    <div class="col-12 ">
+    <div class="col-12">
       <ag-grid-angular
         (gridReady)="onGridReady($event)"
         [columnDefs]="colDefs"

@@ -15,6 +15,7 @@ import LZString from 'lz-string';
   selector: 'app-first-table',
   standalone: true,
   templateUrl: './first-table.component.html',
+  styleUrl: 'first-table.component.css',
   imports: [AgGridAngular, FormsModule, CommonModule]
 })
 export class FirstTableComponent implements OnInit {
@@ -66,7 +67,7 @@ export class FirstTableComponent implements OnInit {
       const keys = Object.keys(this.userList[0]);
       this.colDefs = keys.map((key) => ({
         field: key,
-        headerName: key,
+        headerName: key
       }));
     }
     sessionStorage.setItem('COL', JSON.stringify(this.colDefs));

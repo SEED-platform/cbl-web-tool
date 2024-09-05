@@ -27,7 +27,6 @@ export class CblTableComponent implements OnInit, OnDestroy {
   public duplicateMap: Record<string, number> = {};
   public rowData: any[] = [];
 
-
   // for menu
   isOpen = false;
 
@@ -65,7 +64,7 @@ export class CblTableComponent implements OnInit, OnDestroy {
       this.geoJson = data;
       if (this.initialLoad) {
         //keeps it from rendering every change..better performance
-        if(!sessionStorage.getItem('PROPERTYNAMES')){
+        if (!sessionStorage.getItem('PROPERTYNAMES')) {
           const buildingArray = this.geoJson.features;
           let ValidBuilding = buildingArray[0];
 
@@ -74,8 +73,8 @@ export class CblTableComponent implements OnInit, OnDestroy {
             i++;
             ValidBuilding = buildingArray[i];
           }
-      
-        const geoJsonPropertyNames = Object.keys(ValidBuilding.properties);
+
+          const geoJsonPropertyNames = Object.keys(ValidBuilding.properties);
           sessionStorage.setItem('PROPERTYNAMES', JSON.stringify(geoJsonPropertyNames));
         }
         this.updateTable(); // Update table only on initial load
@@ -98,13 +97,14 @@ export class CblTableComponent implements OnInit, OnDestroy {
     //inserts new building in table and geojson
     this.newBuilingSubscription = this.geoJsonService.newBuilding$.subscribe((newBuilding) => {
       if (newBuilding) {
-        console.log(newBuilding)
+        console.log(newBuilding);
         newBuilding.properties['latitude'] = Number(newBuilding.properties['latitude']);
         newBuilding.properties['longitude'] = Number(newBuilding.properties['longitude']);
         this.geoJsonService.insertNewBuildingInGeoJson(newBuilding); //updates the original geojson
-        setTimeout(() => {this.updateTable()});//needed to keep in sync with map
+        setTimeout(() => {
+          this.updateTable();
+        }); //needed to keep in sync with map
         this.gridApi.applyTransaction({ add: [newBuilding], addIndex: 0 });
-        
       }
     });
 
@@ -140,15 +140,14 @@ export class CblTableComponent implements OnInit, OnDestroy {
       return;
     }
 
-    
-      this.featuresArray = this.geoJson.features;
-      this.rowData = this.featuresArray;
-    
+    this.featuresArray = this.geoJson.features;
+    this.rowData = this.featuresArray;
+
     this.setColumnDefs();
 
     if (this.gridApi) {
-        this.gridApi.deselectAll();
-        this.scrollToTop();
+      this.gridApi.deselectAll();
+      this.scrollToTop();
     }
   }
 
@@ -159,7 +158,6 @@ export class CblTableComponent implements OnInit, OnDestroy {
 
   //dynamically sets grid for geojson values
   setColumnDefs() {
-    
     const keys = JSON.parse(sessionStorage.getItem('PROPERTYNAMES') || '{}');
     keys.push('coordinates');
 
@@ -192,17 +190,15 @@ export class CblTableComponent implements OnInit, OnDestroy {
     sessionStorage.setItem('COL', JSON.stringify(this.colDefs));
   }
 
-
-  
   scrollToTop() {
-    if(this.rowData.length > 0){
-    this.gridApi.ensureIndexVisible(0, 'top');
-    const rowNode1 = this.gridApi!.getDisplayedRowAtIndex(0)!;
-    this.gridApi!.flashCells({ rowNodes: [rowNode1] });
-    if (rowNode1) {
-      rowNode1.setSelected(true);
+    if (this.rowData.length > 0) {
+      this.gridApi.ensureIndexVisible(0, 'top');
+      const rowNode1 = this.gridApi!.getDisplayedRowAtIndex(0)!;
+      this.gridApi!.flashCells({ rowNodes: [rowNode1] });
+      if (rowNode1) {
+        rowNode1.setSelected(true);
+      }
     }
-  }
   }
 
   scrollToFeatureById(id: string) {
@@ -262,13 +258,11 @@ export class CblTableComponent implements OnInit, OnDestroy {
     if (this.rowData.length !== 0) {
       const selectedData = this.gridApi.getSelectedRows();
       const res = this.gridApi.applyTransaction({ remove: selectedData })!;
-    
+
       console.log('THIS IS BEING SENT FROM THE MAP TO TABLE', res.remove[0].data);
       this.geoJsonService.removeEntirePolygonRefInMap(res.remove[0].data.id);
-    
+
       this.updateTable();
-      
-   
     }
   }
 
@@ -294,46 +288,44 @@ export class CblTableComponent implements OnInit, OnDestroy {
   }
 
   exportAsExcel(event: Event) {
-    
     event.preventDefault();
     // Stop editing changes data without clicking off cell
     this.gridApi.stopEditing();
 
     // Get the data as CSV
-  
 
     const json = this.jsonConverter();
 
-    // Convert CSV to JSON using PapaParse
-   
-   
-      const worksheet = XLSX.utils.json_to_sheet(json);
-      const workbook = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet 1');
+    // Retrieve the CSV data from the grid API
+    const csvUserData = Papa.unparse(json);
 
-      //save
-      XLSX.writeFile(workbook, 'cbl_list.xlsx');
-
-   
+    Papa.parse(csvUserData, {
+      header: true,
+      complete: function (result) {
+        const worksheet = XLSX.utils.json_to_sheet(result.data);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet 1');
+        XLSX.writeFile(workbook, 'cbl_list.xlsx');
+      }
+    });
   }
 
   exportAsCsv(event: Event) {
     event.preventDefault();
     console.log('Exporting as CSV');
-    
+
     // Stop any ongoing editing in the grid
     this.gridApi.stopEditing();
-  
 
     const json = this.jsonConverter();
     // Retrieve the CSV data from the grid API
     const csvUserData = Papa.unparse(json);
     // Create a Blob with the CSV data
     const blob = new Blob([csvUserData], { type: 'text/csv;charset=utf-8;' });
-    
+
     // Create a link element for the download
     const link = document.createElement('a');
-    
+
     if (link.download !== undefined) {
       const url = URL.createObjectURL(blob);
       link.setAttribute('href', url);
@@ -344,22 +336,17 @@ export class CblTableComponent implements OnInit, OnDestroy {
       document.body.removeChild(link);
     }
   }
-  
 
-    exportAsGeoJson(event: Event) {
-      event.preventDefault();
+  exportAsGeoJson(event: Event) {
+    event.preventDefault();
     // Stop editing changes data without clicking off cell
     this.gridApi.stopEditing();
 
     // Get the data as CSV
-  
-    
-    // Convert CSV to JSON using PapaParse
-    
-    
-     
 
-    const geojson = {"type": "FeatureCollection", "features": this.rowData}
+    // Convert CSV to JSON using PapaParse
+
+    const geojson = { type: 'FeatureCollection', features: this.rowData };
     // Send JSON data to the API
 
     let jsonString: string;
@@ -369,14 +356,14 @@ export class CblTableComponent implements OnInit, OnDestroy {
       console.error('Error parsing CSV to JSON:', error);
       return; // Exit if parsing fails
     }
-  
-    console.log(this.rowData)
-  
-        const blob = new Blob([jsonString], { type: 'application/geo+json;charset=utf-8;' });
-    
+
+    console.log(this.rowData);
+
+    const blob = new Blob([jsonString], { type: 'application/geo+json;charset=utf-8;' });
+
     // Create a link element for the download
     const link = document.createElement('a');
-    
+
     if (link.download !== undefined) {
       const url = URL.createObjectURL(blob);
       link.setAttribute('href', url);
@@ -386,62 +373,69 @@ export class CblTableComponent implements OnInit, OnDestroy {
       link.click();
       document.body.removeChild(link);
     }
-
   }
 
-
-  exportAsJson(event: Event){
+  exportAsJson(event: Event) {
     event.preventDefault();
     this.gridApi.stopEditing();
 
+    const json = this.jsonConverter();
+    console.log(json);
 
-      const json = this.jsonConverter();
-      console.log(json);
+    const jsonString = JSON.stringify(json, null, 2);
 
-    
-      const jsonString = JSON.stringify(json, null, 2);
+    const blob = new Blob([jsonString], { type: 'application/json;charset=utf-8;' });
 
-      const blob = new Blob([jsonString], { type: 'application/json;charset=utf-8;' });
+    // Create a link element for the download
+    const link = document.createElement('a');
 
-      // Create a link element for the download
-      const link = document.createElement('a');
-
-      if (link.download !== undefined) {
-         const url = URL.createObjectURL(blob);
-          link.setAttribute('href', url);
-          link.setAttribute('download', 'cbl_list.json');
-          link.style.visibility = 'hidden';
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
-}
+    if (link.download !== undefined) {
+      const url = URL.createObjectURL(blob);
+      link.setAttribute('href', url);
+      link.setAttribute('download', 'cbl_list.json');
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
   }
-
-
 
   jsonConverter() {
     const data = this.rowData;
     const jsonArray = [];
-  
+
     for (const building of data) {
       // Create a new object with properties in the desired order
-      const buildingObject = {
-        street_address: building.properties.street_address,
-        city: building.properties.city,
-        state: building.properties.state,
-        quality: building.properties.quality,
-        ubid: building.properties.ubid,
-        ...building.properties, // Spread the remaining properties after the desired ones
-        coordinates: building.geometry.coordinates // Add the coordinates
-      };
-      
+
+      let buildingObject;
+
+      if (building?.geometry) {
+        buildingObject = {
+          street_address: building.properties.street_address,
+          city: building.properties.city,
+          state: building.properties.state,
+          quality: building.properties.quality,
+          ubid: building.properties.ubid,
+          ...building.properties, // Spread the remaining properties after the desired ones
+          coordinates: building.geometry?.coordinates || null // Add the coordinates
+        };
+      } else {
+        buildingObject = {
+          street_address: building.properties.street_address,
+          city: building.properties.city,
+          state: building.properties.state,
+          quality: building.properties.quality,
+          ubid: building.properties.ubid,
+          ...building.properties, // Spread the remaining properties after the desired ones
+          coordinates: null // Add the coordinates
+        };
+      }
+
       // Add the object to the jsonArray
       jsonArray.push(buildingObject);
     }
-  
+
     // Optionally, return the jsonArray if needed
     return jsonArray;
-}
-
-  
+  }
 }
