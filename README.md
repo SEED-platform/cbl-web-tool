@@ -25,14 +25,13 @@ Given a list of addresses uploaded in JSON, CSV, or Excel format, this tool will
 	1. To install the correct version: `nvm install 20.11.1`
 5. In the angular-app directory, install angular by running `npm install -g @angular/cli@17`
 	1. Make sure that you are running Node v20.9.0 or later: `node -v`
-6. Copy these lines in a new file, replacing the mapboxToken with your own. This new file should be saved in two places:
+6. Copy these lines in a new file, replacing the mapboxToken with your own. This new file should be saved in:
     ```
     export const environment = {
     production: false,
     mapboxToken: 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'
    };
     ```
-	1. `angular-app/src/environment.ts`
 	1. `angular-app/src/environments/environment.ts`
 
 ### Running the Web App
