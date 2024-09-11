@@ -10,6 +10,7 @@ from typing import Any
 import geopandas as gpd
 import mercantile
 import requests
+from dotenv import load_dotenv
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 from shapely.geometry import Point, Polygon
@@ -117,9 +118,13 @@ def run_cbl_workflow():
 
     locations = generate_locations_list(file_data)
 
+    load_dotenv()
     MAPQUEST_API_KEY = os.getenv("MAPQUEST_API_KEY")  # will need to change this to retrieve user's api key
+    print(MAPQUEST_API_KEY)
+
     if not MAPQUEST_API_KEY:
         sys.exit("Missing MapQuest API key")
+
 
     quadkey_path = Path("data/quadkeys")
     if not quadkey_path.exists():
