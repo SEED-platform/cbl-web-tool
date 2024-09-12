@@ -3,3 +3,5 @@
 node_modules/
 current-workflow.txt
 package-lock.json
+flask-app/myenv/
+angular-app/src/environment.ts
