@@ -66,4 +66,11 @@ export class FlaskRequests {
       { headers: { 'Content-Type': 'application/json' } }
     );
   }
+
+  sendMapQuestKey(apiKey: string): Observable<any> {
+    return this.http.post<any>(
+      'http://127.0.0.1:5001/api/update-api-key',
+      {apiKey: apiKey}
+    );
+  }
 }

@@ -2,7 +2,6 @@ import gzip
 import json
 import json.scanner
 import os
-import sys
 import warnings
 from pathlib import Path
 from typing import Any
@@ -33,30 +32,9 @@ warnings.filterwarnings("ignore", category=UserWarning)
 
 app = Flask(__name__)
 CORS(app)
+load_dotenv()
 
-
-# @app.route("/api/merge_files", methods=["POST"])
-# def merge_files():
-#     files = []
-#     merged_data = []
-
-#     for file in files:
-#         file_data = convert_file_to_dicts(file)
-#         if not file_data or len(file_data) == 0:
-#             return jsonify({"message": "Uploaded a file in the wrong format. Please upload different format"}), 400
-
-#         if isinstance(file_data, LocationError):
-#             return jsonify({"message": f"{file_data.message}"}), 400
-
-#         merged_data.extend(file_data)
-
-#     json_data = json.dumps(merged_data)
-#     isGoodData = check_data_quality(merged_data)
-
-#     if isinstance(isGoodData, LocationError):
-#         return jsonify({"message": f"{isGoodData.message}", "user_data": json_data}), 400
-
-#     return jsonify({"message": "success", "user_data": json_data}), 200
+api_key = ""
 
 
 @app.route("/api/submit_file", methods=["POST"])
@@ -119,14 +97,14 @@ def run_cbl_workflow():
     locations = generate_locations_list(file_data)
 
     load_dotenv()
-    MAPQUEST_API_KEY = os.getenv("MAPQUEST_API_KEY")  # will need to change this to retrieve user's api key
+    MAPQUEST_API_KEY = os.getenv("MAPQUEST_API_KEY")
     print(MAPQUEST_API_KEY)
 
     if not MAPQUEST_API_KEY:
-        sys.exit("Missing MapQuest API key")
-
+        print("Missing MapQuest API key")
 
     quadkey_path = Path("data/quadkeys")
+
     if not quadkey_path.exists():
         quadkey_path.mkdir(parents=True, exist_ok=True)
 
@@ -333,43 +311,16 @@ def edit_footprint():
     return jsonify({"message": "success", "user_data": json.dumps(newPolygonData)}), 200
 
 
-@app.route("/api/export_geojson", methods=["GET", "POST"])
-def export_geojson():
-    json_string = request.json.get("value")
-    geojson_data = json.loads(json_string)
+@app.route("/api/update-api-key", methods=["POST"])
+def update_api_key():
+    data = request.get_json()
+    api_key = data["apiKey"]
 
-    list_of_features = []
-    for data in geojson_data:
-        coords = ""
-        if len(data["Coordinates"]) > 1 and data["Coordinates"][0] != "":
-            coords = data["Coordinates"].split(",")
-            coords = [(float(coords[i]), float(coords[i + 1])) for i in range(0, len(coords), 2)]
-
-        properties = data
-        properties.pop("Coordinates", None)
-
-        feature = {}
-        feature["type"] = "Feature"
-        feature["properties"] = properties
-        feature["geometry"] = {}
-        feature["geometry"]["type"] = "Polygon"
-        feature["geometry"]["coordinates"] = [coords]
-        list_of_features.append(feature)
-
-    geojson = {"type": "FeatureCollection", "features": list_of_features}
-
-    final_geojson = json.dumps(geojson)
-    return jsonify({"message": "success", "user_data": final_geojson}), 200
-
-
-# @app.route("/api/export_excel", methods=["POST"])
-# def export_excel():
-#     json_string = request.json.get("value")
-#     df = pd.read_json(json_string)
-#     output_file = "output.xlsx"
-#     df.to_excel(output_file, index=False)
-
-#     return send_file("output.xlsx", as_attachment=True, download_name="output.xlsx")
+    if api_key:
+        os.environ["MAPQUEST_API_KEY"] = api_key
+        return jsonify({"message": "API key updated successfully!"}), 200
+    else:
+        return jsonify({"message": "No API key provided!"}), 400
 
 
 if __name__ == "__main__":

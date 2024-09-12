@@ -61,6 +61,7 @@ def _process_result(result):
 def geocode_addresses(locations: list[Location], mapquest_api_key: str):
     # Alternatively, use GeoPandas: https://geopandas.org/en/stable/docs/reference/api/geopandas.tools.geocode.html
     results = []
+    print(mapquest_api_key)
     # MapQuest is limited to 100 locations per request
     for location_chunk in chunk(locations):
         response = requests.post(
@@ -78,12 +79,14 @@ def geocode_addresses(locations: list[Location], mapquest_api_key: str):
         try:
             # Catch invalid API key error before parsing the response
             if response.status_code == 401:
+                print("dsfdsf")
                 raise MapQuestAPIKeyError(
                     "Failed geocoding property states due to MapQuest error. " "API Key is invalid with message: {response.content}."
                 )
             results += response.json().get("results")
         except Exception as e:
             if response.status_code == 403:
+                print("fdasfads")
                 raise MapQuestAPIKeyError(
                     "Failed geocoding property states due to MapQuest error. " "Your MapQuest API Key is either invalid or at its limit."
                 )

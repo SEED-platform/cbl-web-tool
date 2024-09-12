@@ -2,7 +2,6 @@
   "$id": "https://gdal.org/gdalmdiminfo_output.schema.json",
   "$schema": "http://json-schema.org/draft-07/schema#",
   "description": "Validate the output of the gdalmdiminfo utility",
-
   "anyOf": [
     {
       "$ref": "#/definitions/group"
@@ -11,9 +10,7 @@
       "$ref": "#/definitions/array"
     }
   ],
-
   "definitions": {
-
     "array": {
       "type": "object",
       "properties": {
@@ -71,7 +68,6 @@
       },
       "additionalProperties": false
     },
-
     "arrays": {
       "type": "object",
       "properties": {},
@@ -79,7 +75,6 @@
         "$ref": "#/definitions/array"
       }
     },
-
     "attribute": {
       "anyOf": [
         {
@@ -108,7 +103,6 @@
         }
       ]
     },
-
     "attributes": {
       "anyOf": [
         {
@@ -126,40 +120,36 @@
         }
       ]
     },
-
     "compound_datatype": {
       "type": "object",
-      "properties":
-          {
-            "name": {
-              "type": "string"
-            },
-            "size": {
-              "type": "integer"
-            },
-            "components": {
-              "type": "array",
-              "items": {
-                "type": "object",
-                "properties":
-                    {
-                      "name": {
-                        "type": "string"
-                      },
-                      "offset": {
-                        "type": "integer"
-                      },
-                      "type": {
-                        "$ref": "#/definitions/datatype"
-                      }
-                    },
-                "additionalProperties": false
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "size": {
+          "type": "integer"
+        },
+        "components": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "offset": {
+                "type": "integer"
+              },
+              "type": {
+                "$ref": "#/definitions/datatype"
               }
-            }
-          },
+            },
+            "additionalProperties": false
+          }
+        }
+      },
       "additionalProperties": false
     },
-
     "datatype": {
       "anyOf": [
         {
@@ -184,7 +174,6 @@
         }
       ]
     },
-
     "dimension": {
       "type": "object",
       "properties": {
@@ -209,7 +198,6 @@
       },
       "additionalProperties": false
     },
-
     "dimensions": {
       "type": "array",
       "items": {
@@ -224,7 +212,6 @@
         ]
       }
     },
-
     "group": {
       "type": "object",
       "properties": {
@@ -258,7 +245,6 @@
       },
       "additionalProperties": false
     },
-
     "groups": {
       "anyOf": [
         {
@@ -276,7 +262,6 @@
         }
       ]
     },
-
     "srs": {
       "type": "object",
       "properties": {
@@ -292,7 +277,6 @@
       },
       "additionalProperties": false
     },
-
     "structural_info": {
       "type": "object",
       "properties": {},
@@ -300,7 +284,6 @@
         "type": "string"
       }
     },
-
     "value": {
       "anyOf": [
         {
