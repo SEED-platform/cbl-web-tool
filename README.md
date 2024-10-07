@@ -72,3 +72,7 @@ Given a list of addresses uploaded in JSON, CSV, or Excel format, this tool will
 
 - Flagging duplicate buildings
 - Re-import cbl
+
+### Disclaimer
+
+When using this tool with the MapQuest geocoding API (or any other geocoder) always confirm that the terms of service allow for using and storing geocoding results (as with the MapQuest Enterprise license)
