@@ -4,3 +4,6 @@ node_modules/
 current-workflow.txt
 package-lock.json
 flask-app/myenv/
+
+# Jupyter Notebook
+.ipynb_checkpoints

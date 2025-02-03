@@ -1,0 +1,17 @@
+[
+  {
+    "Street_Address": "100 W 14th Ave Pkwy",
+    "city": "Denver",
+    "state": "CO"
+  },
+  {
+    "Street_Address": "200 E Colfax Ave",
+    "city": "Denver",
+    "state": "CO"
+  },
+  {
+    "Street_Address": "320 W Colfax Ave",
+    "city": "Denver",
+    "state": "CO"
+  }
+]
