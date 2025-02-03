@@ -125,12 +125,12 @@ def run_cbl_workflow():
     # with open('large_test.json', 'w') as fr:
     #     json.dump(data, fr, indent=2)
 
-    poorQualityCodes = ["Ambiguous", "P1CAA", "B1CAA", "B1ACA", "A5XAX", "L1CAA", "B1AAA", "L1BCA"]
+    poorQualityCodes = ["Ambiguous", "P1CAA", "B1CAA", "B1ACA", "A5XAX", "L1CAA", "B1AAA", "L1BCA", "L1CBA"]
 
     # Find all quadkeys that the coordinates fall within
     quadkeys = set()
     for datum in data:
-        if datum["quality"] not in poorQualityCodes:
+        if datum["quality"] not in poorQualityCodes: # todo: check that "longitude" field is present
             print(datum)
             tile = mercantile.tile(datum["longitude"], datum["latitude"], 9)
             quadkey = int(mercantile.quadkey(tile))
