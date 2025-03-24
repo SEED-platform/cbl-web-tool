@@ -36,7 +36,6 @@ load_dotenv()
 
 api_key = ""
 
-
 @app.route("/api/submit_file", methods=["POST"])
 def get_and_check_file():
     files = request.files.getlist("userFiles[]")
@@ -98,10 +97,9 @@ def run_cbl_workflow():
 
     load_dotenv()
     MAPQUEST_API_KEY = os.getenv("MAPQUEST_API_KEY")
-    print(MAPQUEST_API_KEY)
 
     if not MAPQUEST_API_KEY:
-        print("Missing MapQuest API key")
+        app.logger.warning("Missing MapQuest API key")
 
     quadkey_path = Path("data/quadkeys")
 
@@ -131,7 +129,6 @@ def run_cbl_workflow():
     quadkeys = set()
     for datum in data:
         if datum["quality"] not in poorQualityCodes: # todo: check that "longitude" field is present
-            print(datum)
             tile = mercantile.tile(datum["longitude"], datum["latitude"], 9)
             quadkey = int(mercantile.quadkey(tile))
             quadkeys.add(quadkey)
@@ -149,11 +146,11 @@ def run_cbl_workflow():
         if datum["quality"] not in poorQualityCodes:
             quadkey = datum["quadkey"]
             if quadkey not in loaded_quadkeys:
-                print(f"Loading {quadkey}")
+                app.logger.info(f"Loading {quadkey}")
 
                 with gzip.open(f"data/quadkeys/{quadkey}.geojsonl.gz", "rb") as f:
                     loaded_quadkeys[quadkey] = gpd.read_file(f)
-                    print(f"  {len(loaded_quadkeys[quadkey])} footprints in quadkey")
+                    app.logger.info(f"  {len(loaded_quadkeys[quadkey])} footprints in quadkey")
 
             geojson = loaded_quadkeys[quadkey]
             point = Point(datum["longitude"], datum["latitude"])
@@ -276,7 +273,7 @@ def reverse_geocode():
 
         properties["street_address"] = normalize_address(features[0]["place_name"])
     except Exception:
-        print("missing data from reverse geocoding")
+        app.logger.warning("missing data from reverse geocoding")
 
     if not properties or len(properties) == 0:
         return jsonify({"message": "Error: Reverse geocoding returned poor data."}), 400
