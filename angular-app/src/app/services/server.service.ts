@@ -69,7 +69,7 @@ export class FlaskRequests {
 
   sendMapQuestKey(apiKey: string): Observable<any> {
     return this.http.post<any>(
-      'http://127.0.0.1:5001/api/update-api-key',
+      'http://127.0.0.1:5001/api/update_api_key',
       {apiKey: apiKey}
     );
   }

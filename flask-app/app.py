@@ -36,8 +36,16 @@ load_dotenv()
 
 api_key = ""
 
+
 @app.route("/api/submit_file", methods=["POST"])
-def get_and_check_file():
+def submit_file():
+    """
+    Read uploaded file(s), confirm file names are different, confirm file names the same, return user data.
+
+    This function is called with the "Get Started" button on the homepage is clicked and when edited data is saved.
+    In Angular, sendInitialData() and sendData()
+    """
+
     files = request.files.getlist("userFiles[]")
 
     merged_data = []
@@ -69,8 +77,13 @@ def get_and_check_file():
     return jsonify({"message": "success", "user_data": all_data}), 200
 
 
+
 @app.route("/api/check_data", methods=["POST"])
-def check_edited_data():
+def check_data():
+    """
+    Check that request has the required column names Street_Address, City, and State
+    """
+
     json_string = request.json.get("value")
     file_data = json.loads(json_string)
     json_data = json.dumps(file_data)
@@ -82,8 +95,13 @@ def check_edited_data():
     return jsonify({"message": "success", "user_data": json_data}), 200
 
 
+
 @app.route("/api/generate_cbl", methods=["POST"])
-def run_cbl_workflow():
+def generate_cbl():
+    """
+    Runs when user clicks "Generate CBL" button.
+    """
+
     file_data = []
     locations: list[Location] = []
 
@@ -216,8 +234,13 @@ def run_cbl_workflow():
     return jsonify({"message": "success", "user_data": final_geojson}), 200
 
 
+
 @app.route("/api/reverse_geocode", methods=["POST"])
 def reverse_geocode():
+    """
+    Given lat/lon in request, look up the address using Mapbox and return the resulting data.
+    """
+
     json_string = request.json.get("value")
     json_data = json.loads(json_string)
 
@@ -284,8 +307,13 @@ def reverse_geocode():
     return jsonify({"message": "success", "user_data": json.dumps(returned_feature)}), 200
 
 
+
 @app.route("/api/edit_footprint", methods=["POST"])
 def edit_footprint():
+    """
+    Receive a new footprint in the request, add UBID, return new lat, lon, and UBID.
+    """
+
     json_string = request.json.get("value")
     json_data = json.loads(json_string)
     coords = json_data["coordinates"]
@@ -308,8 +336,13 @@ def edit_footprint():
     return jsonify({"message": "success", "user_data": json.dumps(newPolygonData)}), 200
 
 
-@app.route("/api/update-api-key", methods=["POST"])
+
+@app.route("/api/update_api_key", methods=["POST"])
 def update_api_key():
+    """
+    Receive a new API key for Mapquest in the request and save it
+    """
+
     data = request.get_json()
     api_key = data["apiKey"]
 
