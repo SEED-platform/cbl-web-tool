@@ -241,6 +241,10 @@ def reverse_geocode():
     Given lat/lon in request, look up the address using Mapbox and return the resulting data.
     """
 
+    # todo: make sure this is the best way to handle this error. Nothing is being displayed to the user.
+    if "MAPBOX_ACCESS_TOKEN" not in os.environ:
+        return jsonify({"message": "MAPBOX_ACCESS_TOKEN not present in env file"}), 400
+
     json_string = request.json.get("value")
     json_data = json.loads(json_string)
 
@@ -266,7 +270,7 @@ def reverse_geocode():
         return jsonify({"message": "Invalid longitude coordinates"}), 400
 
     url = f"https://api.mapbox.com/geocoding/v5/mapbox.places/{lon},{lat}.json"
-    params = {"access_token": "pk.eyJ1Ijoicm1pYW4tbnJlbCIsImEiOiJjbHlvc2lkNm8wbG1uMmlwcHR1aDZlMTR0In0.dZtyvX6DjlnEF8FVL7FV4Q", "limit": 1}
+    params = {"access_token": os.environ["MAPBOX_ACCESS_TOKEN"], "limit": 1}
 
     # TODO: remove verify
     response = requests.get(url, params=params, verify=False)
@@ -341,6 +345,8 @@ def edit_footprint():
 def update_api_key():
     """
     Receive a new API key for Mapquest in the request and save it
+
+    todo: generalize for other services
     """
 
     data = request.get_json()
