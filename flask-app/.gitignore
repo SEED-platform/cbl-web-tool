@@ -10,6 +10,7 @@ dist
 data/
 .venv/
 .DS_Store
+.ipynb_checkpoints
 
 # temporary files used for referencing/testing
 santa_monica_file_merger.py

@@ -27,6 +27,8 @@ from utils.ubid import encode_ubid
 from utils.update_dataset_links import update_dataset_links
 from utils.update_quadkeys import update_quadkeys
 
+import config
+
 warnings.filterwarnings("ignore", category=RuntimeWarning)
 warnings.filterwarnings("ignore", category=UserWarning)
 
@@ -35,6 +37,8 @@ CORS(app)
 load_dotenv()
 
 api_key = ""
+
+
 
 
 @app.route("/api/submit_file", methods=["POST"])
@@ -119,11 +123,6 @@ def generate_cbl():
     if not MAPQUEST_API_KEY:
         app.logger.warning("Missing MapQuest API key")
 
-    quadkey_path = Path("data/quadkeys")
-
-    if not quadkey_path.exists():
-        quadkey_path.mkdir(parents=True, exist_ok=True)
-
     for loc in locations:
         loc["street"] = normalize_address(loc["street"])
 
@@ -166,7 +165,7 @@ def generate_cbl():
             if quadkey not in loaded_quadkeys:
                 app.logger.info(f"Loading {quadkey}")
 
-                with gzip.open(f"data/quadkeys/{quadkey}.geojsonl.gz", "rb") as f:
+                with gzip.open(config.ms_footprint_dir / f"{quadkey}.geojsonl.gz", "rb") as f:
                     loaded_quadkeys[quadkey] = gpd.read_file(f)
                     app.logger.info(f"  {len(loaded_quadkeys[quadkey])} footprints in quadkey")
 
