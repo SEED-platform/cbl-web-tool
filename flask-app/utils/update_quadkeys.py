@@ -10,8 +10,10 @@ import pandas as pd
 import requests
 from tqdm import tqdm
 
+import config
 
-def update_quadkeys(quadkeys: list[int], save_directory: Path = Path("data/quadkeys")):
+
+def update_quadkeys(quadkeys: list[int], save_directory: Path = config.ms_footprint_dir):
     """Downloads a list of quadkeys.
     Skip the download if it has already been downloaded, and it is up-to-date
     """
