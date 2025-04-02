@@ -72,7 +72,7 @@ def geocode_addresses(locations: list[Location], mapquest_api_key: str):
                     "thumbMaps": False,
                 },
             },
-            verify=False,  # Disable SSL verification (not recommended for production)
+            verify=True
         )
 
         try:

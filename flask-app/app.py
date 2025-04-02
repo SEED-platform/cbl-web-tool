@@ -262,7 +262,7 @@ def reverse_geocode():
     params = {"access_token": os.environ["MAPBOX_ACCESS_TOKEN"], "limit": 1}
 
     # TODO: remove verify
-    response = requests.get(url, params=params, verify=False)
+    response = requests.get(url, params=params, verify=True)
     if response.status_code in {401, 403}:
         return jsonify({"message": "Error: Could not reverse geocode using the mapbox API."}), 400
 

@@ -8,7 +8,6 @@ from pathlib import Path
 
 import pandas as pd
 import requests
-from tqdm import tqdm
 
 import config
 
@@ -20,7 +19,8 @@ def update_quadkeys(quadkeys: list[int], save_directory: Path = config.ms_footpr
     save_directory.mkdir(parents=True, exist_ok=True)
     df_update = pd.read_csv(save_directory / "dataset-links.csv")
 
-    for quadkey in tqdm(quadkeys):
+    for quadkey in quadkeys:
+        # app.logger.info(f'Checking if quadkey {quadkey} is up to date.')
         download = True
         quadkey_file = save_directory / f"{quadkey}.geojsonl.gz"
         rows = df_update[df_update["QuadKey"] == quadkey]
@@ -38,5 +38,8 @@ def update_quadkeys(quadkeys: list[int], save_directory: Path = config.ms_footpr
             download = local_size != remote_size
 
         if download:
+            # app.logger.info(f'Downloading new data from Microsoft for quadkey {quadkey}')
             with open(quadkey_file, "wb") as f:
                 f.write(requests.get(url).content)
+
+
