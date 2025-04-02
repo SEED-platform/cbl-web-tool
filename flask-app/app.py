@@ -3,7 +3,6 @@ import json
 import json.scanner
 import os
 import warnings
-from pathlib import Path
 from typing import Any
 
 import geopandas as gpd
@@ -14,6 +13,7 @@ from flask import Flask, jsonify, request
 from flask_cors import CORS
 from shapely.geometry import Point, Polygon
 
+import config
 from utils.check_data_quality import check_data_quality
 from utils.common import Location
 from utils.convert_file_to_dicts import convert_file_to_dicts
@@ -27,8 +27,6 @@ from utils.ubid import encode_ubid
 from utils.update_dataset_links import update_dataset_links
 from utils.update_quadkeys import update_quadkeys
 
-import config
-
 warnings.filterwarnings("ignore", category=RuntimeWarning)
 warnings.filterwarnings("ignore", category=UserWarning)
 
@@ -39,8 +37,6 @@ load_dotenv()
 api_key = ""
 
 
-
-
 @app.route("/api/submit_file", methods=["POST"])
 def submit_file():
     """
@@ -49,6 +45,7 @@ def submit_file():
     This function is called with the "Get Started" button on the homepage is clicked and when edited data is saved.
     In Angular, sendInitialData() and sendData()
     """
+    app.logger.info("function: submit_file")
 
     files = request.files.getlist("userFiles[]")
 
@@ -69,17 +66,16 @@ def submit_file():
 
         merged_data.extend(file_data)
 
-    if len(files) > 1:
-        for dict1 in merged_data:
-            for dict2 in merged_data:
-                if set(dict1.keys()) != set(dict2.keys()):
-                    return jsonify(
-                        {"message": "Uploaded files with conflicting column names. Please upload files with identical column names."}
-                    ), 400
+    # if len(files) > 1:
+    #     for dict1 in merged_data:
+    #         for dict2 in merged_data:
+    #             if set(dict1.keys()) != set(dict2.keys()):
+    #                 return jsonify(
+    #                     {"message": "Uploaded files with conflicting column names. Please upload files with identical column names."}
+    #                 ), 400
 
     all_data = json.dumps(merged_data)
     return jsonify({"message": "success", "user_data": all_data}), 200
-
 
 
 @app.route("/api/check_data", methods=["POST"])
@@ -87,6 +83,7 @@ def check_data():
     """
     Check that request has the required column names Street_Address, City, and State
     """
+    app.logger.info("function: check_data")
 
     json_string = request.json.get("value")
     file_data = json.loads(json_string)
@@ -99,12 +96,12 @@ def check_data():
     return jsonify({"message": "success", "user_data": json_data}), 200
 
 
-
 @app.route("/api/generate_cbl", methods=["POST"])
 def generate_cbl():
     """
     Runs when user clicks "Generate CBL" button.
     """
+    app.logger.info("function: generate_cbl")
 
     file_data = []
     locations: list[Location] = []
@@ -117,7 +114,6 @@ def generate_cbl():
 
     locations = generate_locations_list(file_data)
 
-    load_dotenv()
     MAPQUEST_API_KEY = os.getenv("MAPQUEST_API_KEY")
 
     if not MAPQUEST_API_KEY:
@@ -133,12 +129,6 @@ def generate_cbl():
         return jsonify(
             {"message": "Failed geocoding property states due to MapQuest error. Your MapQuest API Key is either invalid or at its limit."}
         ), 400
-
-    # with open("test_data/large_test.json") as fr:
-    #     data = json.load(fr)
-
-    # with open('large_test.json', 'w') as fr:
-    #     json.dump(data, fr, indent=2)
 
     poorQualityCodes = ["Ambiguous", "P1CAA", "B1CAA", "B1ACA", "A5XAX", "L1CAA", "B1AAA", "L1BCA", "L1CBA"]
 
@@ -233,12 +223,12 @@ def generate_cbl():
     return jsonify({"message": "success", "user_data": final_geojson}), 200
 
 
-
 @app.route("/api/reverse_geocode", methods=["POST"])
 def reverse_geocode():
     """
     Given lat/lon in request, look up the address using Mapbox and return the resulting data.
     """
+    app.logger.info("function: reverse_geocode")
 
     # todo: make sure this is the best way to handle this error. Nothing is being displayed to the user.
     if "MAPBOX_ACCESS_TOKEN" not in os.environ:
@@ -310,12 +300,12 @@ def reverse_geocode():
     return jsonify({"message": "success", "user_data": json.dumps(returned_feature)}), 200
 
 
-
 @app.route("/api/edit_footprint", methods=["POST"])
 def edit_footprint():
     """
     Receive a new footprint in the request, add UBID, return new lat, lon, and UBID.
     """
+    app.logger.info("function: edit_footprint")
 
     json_string = request.json.get("value")
     json_data = json.loads(json_string)
@@ -339,7 +329,6 @@ def edit_footprint():
     return jsonify({"message": "success", "user_data": json.dumps(newPolygonData)}), 200
 
 
-
 @app.route("/api/update_api_key", methods=["POST"])
 def update_api_key():
     """
@@ -347,6 +336,7 @@ def update_api_key():
 
     todo: generalize for other services
     """
+    app.logger.info("function: update_api_key")
 
     data = request.get_json()
     api_key = data["apiKey"]
