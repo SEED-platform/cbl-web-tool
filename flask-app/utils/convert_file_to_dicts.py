@@ -17,7 +17,7 @@ def convert_file_to_dicts(file):
         try:
             file_content = file.read().decode("utf-8")
             file_data = json.loads(file_content)
-        except:
+        except Exception:
             return newError
 
         return file_data
@@ -27,7 +27,7 @@ def convert_file_to_dicts(file):
             data_frame = pd.read_excel(file)
             json_data = data_frame.to_json(orient="records")
             file_data = json.loads(json_data)
-        except:
+        except Exception:
             return newError
 
         return file_data
@@ -37,16 +37,16 @@ def convert_file_to_dicts(file):
             data_frame = pd.read_csv(file)
             json_data = data_frame.to_json(orient="records")
             file_data = json.loads(json_data)
-        except:
+        except Exception:
             return newError
 
         return file_data
 
-    if file_type == "application/geo+json" or file_type == "application/octet-stream":
+    if file_type in {"application/geo+json", "application/octet-stream"}:
         try:
             file_content = file.read().decode("utf-8")
             file_data = json.loads(file_content)
-        except:
+        except Exception:
             return newError
 
         # need to extract info from geoJSON to make regular dict object

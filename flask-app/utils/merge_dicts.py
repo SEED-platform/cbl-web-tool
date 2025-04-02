@@ -2,7 +2,7 @@ def merge_dicts(file_dict, data_dict):
     merged_dict = {}
     for key, value in data_dict.items():
         if key.lower() == "address":
-            if value == None:
+            if value is None:
                 merged_dict["street_address"] = "Missing Address"
             else:
                 merged_dict["street_address"] = value
