@@ -348,5 +348,10 @@ def update_api_key():
         return jsonify({"message": "No API key provided!"}), 400
 
 
+def return_one():
+
+    return 1
+
+
 if __name__ == "__main__":
     app.run(port=5001)
