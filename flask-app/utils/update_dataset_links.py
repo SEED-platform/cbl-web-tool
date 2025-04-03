@@ -10,10 +10,12 @@ from pathlib import Path
 
 import requests
 
+import config
+
 DATASET_URL = "https://minedbuildings.z5.web.core.windows.net/global-buildings/dataset-links.csv"
 
 
-def update_dataset_links(save_directory: Path = Path("data/quadkeys")):
+def update_dataset_links(save_directory: Path = config.ms_footprint_dir):
     """
     Downloads the csv with URLs for all quadkeys
     Skip the download if it has already been downloaded, and it is up-to-date

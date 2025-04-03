@@ -1,0 +1,6 @@
+﻿Name,Owner,Purpose,Fields,Data Source,Link,Link 2
+Global ML Building Footprints,Microsoft,Display building shapes on Bing Maps,"2D building footprint polygons, building height estimates","Aerial imagery, processed",https://github.com/microsoft/GlobalMLBuildingFootprints,https://planetarycomputer.microsoft.com/dataset/ms-buildings/
+OpenStreetMap,OSM Foundation,Publicly-editable database of places,"Points and building shapes, user-supplied building uses",Hand-drawn building footprints,https://www.openstreetmap.org/about,
+National Structure Inventory,US Army Corps of Engineers,Evaluate potential consequences of natural and man-made hazards,"Latitude/longitude points, building categories, damage categories",,https://www.hec.usace.army.mil/confluence/nsi,
+USA Structures,Federal Emergency Management Agency,identifying buildings that may be affected by an emergency,"Footprints, building categories (Building Occupancy Classification standard)",,https://gis-fema.hub.arcgis.com/pages/usa-structures,
+LandScan,Oak Ridge National Laboratory,"""to address the need for improved estimates of population for consequence assessment.""",Raster images showing population density,,https://landscan.ornl.gov/about,

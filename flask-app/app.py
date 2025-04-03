@@ -3,7 +3,6 @@ import json
 import json.scanner
 import os
 import warnings
-from pathlib import Path
 from typing import Any
 
 import geopandas as gpd
@@ -14,6 +13,7 @@ from flask import Flask, jsonify, request
 from flask_cors import CORS
 from shapely.geometry import Point, Polygon
 
+import config
 from utils.check_data_quality import check_data_quality
 from utils.common import Location
 from utils.convert_file_to_dicts import convert_file_to_dicts
@@ -38,7 +38,15 @@ api_key = ""
 
 
 @app.route("/api/submit_file", methods=["POST"])
-def get_and_check_file():
+def submit_file():
+    """
+    Read uploaded file(s), confirm file names are different, confirm file names the same, return user data.
+
+    This function is called with the "Get Started" button on the homepage is clicked and when edited data is saved.
+    In Angular, sendInitialData() and sendData()
+    """
+    app.logger.info("function: submit_file")
+
     files = request.files.getlist("userFiles[]")
 
     merged_data = []
@@ -58,20 +66,25 @@ def get_and_check_file():
 
         merged_data.extend(file_data)
 
-    if len(files) > 1:
-        for dict1 in merged_data:
-            for dict2 in merged_data:
-                if set(dict1.keys()) != set(dict2.keys()):
-                    return jsonify(
-                        {"message": "Uploaded files with conflicting column names. Please upload files with identical column names."}
-                    ), 400
+    # if len(files) > 1:
+    #     for dict1 in merged_data:
+    #         for dict2 in merged_data:
+    #             if set(dict1.keys()) != set(dict2.keys()):
+    #                 return jsonify(
+    #                     {"message": "Uploaded files with conflicting column names. Please upload files with identical column names."}
+    #                 ), 400
 
     all_data = json.dumps(merged_data)
     return jsonify({"message": "success", "user_data": all_data}), 200
 
 
 @app.route("/api/check_data", methods=["POST"])
-def check_edited_data():
+def check_data():
+    """
+    Check that request has the required column names Street_Address, City, and State
+    """
+    app.logger.info("function: check_data")
+
     json_string = request.json.get("value")
     file_data = json.loads(json_string)
     json_data = json.dumps(file_data)
@@ -84,7 +97,12 @@ def check_edited_data():
 
 
 @app.route("/api/generate_cbl", methods=["POST"])
-def run_cbl_workflow():
+def generate_cbl():
+    """
+    Runs when user clicks "Generate CBL" button.
+    """
+    app.logger.info("function: generate_cbl")
+
     file_data = []
     locations: list[Location] = []
 
@@ -96,17 +114,10 @@ def run_cbl_workflow():
 
     locations = generate_locations_list(file_data)
 
-    load_dotenv()
     MAPQUEST_API_KEY = os.getenv("MAPQUEST_API_KEY")
-    print(MAPQUEST_API_KEY)
 
     if not MAPQUEST_API_KEY:
-        print("Missing MapQuest API key")
-
-    quadkey_path = Path("data/quadkeys")
-
-    if not quadkey_path.exists():
-        quadkey_path.mkdir(parents=True, exist_ok=True)
+        app.logger.warning("Missing MapQuest API key")
 
     for loc in locations:
         loc["street"] = normalize_address(loc["street"])
@@ -119,19 +130,12 @@ def run_cbl_workflow():
             {"message": "Failed geocoding property states due to MapQuest error. Your MapQuest API Key is either invalid or at its limit."}
         ), 400
 
-    # with open("test_data/large_test.json") as fr:
-    #     data = json.load(fr)
-
-    # with open('large_test.json', 'w') as fr:
-    #     json.dump(data, fr, indent=2)
-
-    poorQualityCodes = ["Ambiguous", "P1CAA", "B1CAA", "B1ACA", "A5XAX", "L1CAA", "B1AAA", "L1BCA"]
+    poorQualityCodes = ["Ambiguous", "P1CAA", "B1CAA", "B1ACA", "A5XAX", "L1CAA", "B1AAA", "L1BCA", "L1CBA"]
 
     # Find all quadkeys that the coordinates fall within
     quadkeys = set()
     for datum in data:
-        if datum["quality"] not in poorQualityCodes:
-            print(datum)
+        if datum["quality"] not in poorQualityCodes: # todo: check that "longitude" field is present
             tile = mercantile.tile(datum["longitude"], datum["latitude"], 9)
             quadkey = int(mercantile.quadkey(tile))
             quadkeys.add(quadkey)
@@ -149,11 +153,11 @@ def run_cbl_workflow():
         if datum["quality"] not in poorQualityCodes:
             quadkey = datum["quadkey"]
             if quadkey not in loaded_quadkeys:
-                print(f"Loading {quadkey}")
+                app.logger.info(f"Loading {quadkey}")
 
-                with gzip.open(f"data/quadkeys/{quadkey}.geojsonl.gz", "rb") as f:
+                with gzip.open(config.ms_footprint_dir / f"{quadkey}.geojsonl.gz", "rb") as f:
                     loaded_quadkeys[quadkey] = gpd.read_file(f)
-                    print(f"  {len(loaded_quadkeys[quadkey])} footprints in quadkey")
+                    app.logger.info(f"  {len(loaded_quadkeys[quadkey])} footprints in quadkey")
 
             geojson = loaded_quadkeys[quadkey]
             point = Point(datum["longitude"], datum["latitude"])
@@ -221,6 +225,15 @@ def run_cbl_workflow():
 
 @app.route("/api/reverse_geocode", methods=["POST"])
 def reverse_geocode():
+    """
+    Given lat/lon in request, look up the address using Mapbox and return the resulting data.
+    """
+    app.logger.info("function: reverse_geocode")
+
+    # todo: make sure this is the best way to handle this error. Nothing is being displayed to the user.
+    if "MAPBOX_ACCESS_TOKEN" not in os.environ:
+        return jsonify({"message": "MAPBOX_ACCESS_TOKEN not present in env file"}), 400
+
     json_string = request.json.get("value")
     json_data = json.loads(json_string)
 
@@ -246,10 +259,10 @@ def reverse_geocode():
         return jsonify({"message": "Invalid longitude coordinates"}), 400
 
     url = f"https://api.mapbox.com/geocoding/v5/mapbox.places/{lon},{lat}.json"
-    params = {"access_token": "pk.eyJ1Ijoicm1pYW4tbnJlbCIsImEiOiJjbHlvc2lkNm8wbG1uMmlwcHR1aDZlMTR0In0.dZtyvX6DjlnEF8FVL7FV4Q", "limit": 1}
+    params = {"access_token": os.environ["MAPBOX_ACCESS_TOKEN"], "limit": 1}
 
     # TODO: remove verify
-    response = requests.get(url, params=params, verify=False)
+    response = requests.get(url, params=params, verify=True)
     if response.status_code in {401, 403}:
         return jsonify({"message": "Error: Could not reverse geocode using the mapbox API."}), 400
 
@@ -276,7 +289,7 @@ def reverse_geocode():
 
         properties["street_address"] = normalize_address(features[0]["place_name"])
     except Exception:
-        print("missing data from reverse geocoding")
+        app.logger.warning("missing data from reverse geocoding")
 
     if not properties or len(properties) == 0:
         return jsonify({"message": "Error: Reverse geocoding returned poor data."}), 400
@@ -289,6 +302,11 @@ def reverse_geocode():
 
 @app.route("/api/edit_footprint", methods=["POST"])
 def edit_footprint():
+    """
+    Receive a new footprint in the request, add UBID, return new lat, lon, and UBID.
+    """
+    app.logger.info("function: edit_footprint")
+
     json_string = request.json.get("value")
     json_data = json.loads(json_string)
     coords = json_data["coordinates"]
@@ -311,8 +329,15 @@ def edit_footprint():
     return jsonify({"message": "success", "user_data": json.dumps(newPolygonData)}), 200
 
 
-@app.route("/api/update-api-key", methods=["POST"])
+@app.route("/api/update_api_key", methods=["POST"])
 def update_api_key():
+    """
+    Receive a new API key for Mapquest in the request and save it
+
+    todo: generalize for other services
+    """
+    app.logger.info("function: update_api_key")
+
     data = request.get_json()
     api_key = data["apiKey"]
 
