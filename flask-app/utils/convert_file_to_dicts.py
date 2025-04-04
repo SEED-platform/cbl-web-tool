@@ -1,5 +1,5 @@
+import geopandas as gpd
 import json
-
 import pandas as pd
 
 from utils.location_error import LocationError
@@ -17,28 +17,60 @@ def convert_file_to_dicts(file):
     """
     file_type = file.content_type
 
-    if file_type == "application/json":
-        file_content = file.read().decode("utf-8")
-        file_data = json.loads(file_content)
+    if file_type in {"application/json"}:
+        data_string = file.read().decode("utf-8")
 
     elif file_type == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
-        data_frame = pd.read_excel(file)
-        json_data = data_frame.to_json(orient="records")
-        file_data = json.loads(json_data)
+        data_df = pd.read_excel(file)
+        data_string = data_df.to_json(orient="records")
 
     elif file_type in {"application/csv", "text/csv"}:
-        data_frame = pd.read_csv(file)
-        json_data = data_frame.to_json(orient="records")
-        file_data = json.loads(json_data)
+        data_df = pd.read_csv(file)
+        data_string = data_df.to_json(orient="records")
+        print('\n\ncsv')
+        print(type(data_string))
+        print(data_string)
 
     elif file_type in {"application/geo+json", "application/octet-stream"}:
+        # todo: bring this in line with geodataframe_to_json
         file_content = file.read().decode("utf-8")
-        file_data = json.loads(file_content)
+        data_gdf = gpd.read_file(file_content)
+        data_gdf = convert_timestamps_to_strings(data_gdf)
+        data_string = data_gdf.to_json()
+        print('\n\ngeojson')
+        print(type(data_string))
+        print(data_string)
 
-        # need to extract info from geoJSON to make regular dict object
-        file_data = convert_geojson_to_dict(file_data)
+    file_data = json.loads(data_string)
 
     return file_data
+
+
+def geodataframe_to_json(geojson_gdf):
+    """
+    Convert a GeoDataFrame to text json so that it can be sent to user_data in the Angular app
+
+    # todo: sort the geodataframe here, not the dict later
+    # todo: sort this by east and north first, not street address, which may not be present
+    """
+
+    geojson_str = geojson_gdf.to_json()
+    geojson_dict = json.loads(geojson_str)
+    geojson_dict["features"].sort(key=lambda feature: feature["properties"].get("street_address", ""))
+
+    return json.dumps(geojson_dict)
+
+
+def convert_timestamps_to_strings(input_df):
+    """
+    Convert timestamp columns to strings so we can serialize them in JSON
+    """
+
+    for column in input_df.columns:
+        if pd.api.types.is_datetime64_any_dtype(input_df[column]):
+            input_df[column] = input_df[column].dt.strftime('%Y-%m-%d %H:%M:%S')
+
+    return input_df
 
 
 def convert_geojson_to_dict(file_data):
