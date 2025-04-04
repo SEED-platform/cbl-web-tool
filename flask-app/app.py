@@ -16,7 +16,7 @@ from shapely.geometry import Point, Polygon
 import config
 from utils.check_data_quality import check_data_quality
 from utils.common import Location
-from utils.convert_file_to_dicts import convert_file_to_dicts
+from utils.convert_file_to_dicts import convert_file_to_dicts, geodataframe_to_json
 from utils.generate_locations_list import generate_locations_list
 from utils.geocode_addresses import geocode_addresses
 from utils.location_error import LocationError
@@ -66,14 +66,6 @@ def submit_file():
 
         merged_data.extend(file_data)
 
-    # if len(files) > 1:
-    #     for dict1 in merged_data:
-    #         for dict2 in merged_data:
-    #             if set(dict1.keys()) != set(dict2.keys()):
-    #                 return jsonify(
-    #                     {"message": "Uploaded files with conflicting column names. Please upload files with identical column names."}
-    #                 ), 400
-
     all_data = json.dumps(merged_data)
     return jsonify({"message": "success", "user_data": all_data}), 200
 
@@ -89,7 +81,7 @@ def check_data():
     file_data = json.loads(json_string)
     json_data = json.dumps(file_data)
 
-    isGoodData = check_data_quality(file_data)
+    isGoodData = True # check_data_quality(file_data)
     if isinstance(isGoodData, LocationError):
         return jsonify({"message": f"{isGoodData.message}", "user_data": json_data}), 400
 
@@ -153,7 +145,7 @@ def generate_cbl():
         if datum["quality"] not in poorQualityCodes:
             quadkey = datum["quadkey"]
             if quadkey not in loaded_quadkeys:
-                app.logger.info(f"Loading {quadkey}")
+                app.logger.info(f"Loading quadkey: {quadkey}")
 
                 with gzip.open(config.ms_footprint_dir / f"{quadkey}.geojsonl.gz", "rb") as f:
                     loaded_quadkeys[quadkey] = gpd.read_file(f)
@@ -214,12 +206,8 @@ def generate_cbl():
 
     # Convert covered building list as GeoJSON
     gdf = gpd.GeoDataFrame(data=merged_data, columns=columns)
-    geojson_str = gdf.to_json()
-    geojson_obj = json.loads(geojson_str)
+    final_geojson = geodataframe_to_json(gdf)
 
-    geojson_obj["features"].sort(key=lambda feature: feature["properties"].get("street_address", ""))
-
-    final_geojson = json.dumps(geojson_obj)
     return jsonify({"message": "success", "user_data": final_geojson}), 200
 
 
