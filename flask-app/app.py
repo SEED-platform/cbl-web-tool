@@ -4,6 +4,7 @@ import json.scanner
 import os
 import warnings
 from typing import Any
+from collections import OrderedDict
 
 import geopandas as gpd
 import mercantile
@@ -48,14 +49,11 @@ def submit_file():
     app.logger.info("function: submit_file")
 
     files = request.files.getlist("userFiles[]")
-
-    merged_data = []
-    seen_filenames = set()
+    input_dict = OrderedDict() # will this order be maintained when sending JSON back and forth to the front end? 
 
     for file in files:
-        if file.filename in seen_filenames:
-            return jsonify({"message": "Uploaded two of the same file. Please upload non-duplicate files."}), 400
-        seen_filenames.add(file.filename)
+        if file.filename in input_dict:
+            return jsonify({"message": "Uploaded two files with the same filename. Please upload non-duplicate files."}), 400
 
         file_data = convert_file_to_dicts(file)
         if not file_data or len(file_data) == 0:
@@ -64,10 +62,10 @@ def submit_file():
         if isinstance(file_data, LocationError):
             return jsonify({"message": f"{file_data.message}"}), 400
 
-        merged_data.extend(file_data)
+        input_dict[file.filename] = file_data
 
-    all_data = json.dumps(merged_data)
-    return jsonify({"message": "success", "user_data": all_data}), 200
+    input_json_str = json.dumps(input_dict)
+    return jsonify({"message": "success", "user_data": input_json_str}), 200
 
 
 @app.route("/api/check_data", methods=["POST"])

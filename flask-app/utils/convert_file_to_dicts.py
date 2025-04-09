@@ -17,6 +17,43 @@ def convert_file_to_dicts(file):
     """
     file_type = file.content_type
 
+    if file_type == "application/json":
+        file_content = file.read().decode("utf-8")
+        file_data = json.loads(file_content)
+
+    elif file_type == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
+        data_frame = pd.read_excel(file)
+        json_data = data_frame.to_json(orient="records")
+        file_data = json.loads(json_data)
+
+    elif file_type in {"application/csv", "text/csv"}:
+        data_frame = pd.read_csv(file)
+        json_data = data_frame.to_json(orient="records")
+        file_data = json.loads(json_data)
+
+    elif file_type in {"application/geo+json", "application/octet-stream"}:
+        file_content = file.read().decode("utf-8")
+        file_data = json.loads(file_content)
+
+        # need to extract info from geoJSON to make regular dict object
+        file_data = convert_geojson_to_dict(file_data)
+
+        # data_gdf = gpd.read_file(file)
+        # data_string = data_gdf.to_json()
+        # file_data = json.loads(data_string)
+
+    return file_data
+
+
+def convert_file_to_dicts_new(file):
+    """
+    Convert a file into a series of dicts, depending on the file type
+
+    File types are checked here: angular-app/src/app/home/file-upload/file-upload.component.ts
+    An error is displayed to the user if they attempt to upload a file of a different type.
+    """
+    file_type = file.content_type
+
     if file_type in {"application/json"}:
         data_string = file.read().decode("utf-8")
 
@@ -33,9 +70,11 @@ def convert_file_to_dicts(file):
 
     elif file_type in {"application/geo+json", "application/octet-stream"}:
         # todo: bring this in line with geodataframe_to_json
+        # a problem here is that the geopandas to_json behaves differently than the pandas to_json
+
         file_content = file.read().decode("utf-8")
         data_gdf = gpd.read_file(file_content)
-        data_gdf = convert_timestamps_to_strings(data_gdf)
+        # data_gdf = convert_timestamps_to_strings(data_gdf)
         data_string = data_gdf.to_json()
         print('\n\ngeojson')
         print(type(data_string))
@@ -68,15 +107,16 @@ def convert_timestamps_to_strings(input_df):
 
     for column in input_df.columns:
         if pd.api.types.is_datetime64_any_dtype(input_df[column]):
-            input_df[column] = input_df[column].dt.strftime('%Y-%m-%d %H:%M:%S')
+            input_df[column] = input_df[column].dt.strftime('%Y-%m-%d %H:%M:%S') # todo: could this be str() instead? more format-agnostic
 
     return input_df
 
 
 def convert_geojson_to_dict(file_data):
-    newError = LocationError("Improper GeoJSON format")
+    """
+    """
     if "type" not in file_data:
-        return newError
+        return LocationError("`type` key not present in the GeoJSON input.")
 
     geojson_types = [
         "Point",
@@ -90,17 +130,25 @@ def convert_geojson_to_dict(file_data):
         "FeatureCollection",
     ]
 
-    if file_data["type"] not in geojson_types:
-        return newError
+    geojson_type = file_data["type"]
+    if geojson_type not in geojson_types:
+        return LocationError(f"GeoJSON type {geojson_type} not recognized.")
 
     new_dict_list = []
     if file_data["type"] == "FeatureCollection":
         if "features" not in file_data:
-            return newError
+            return LocationError("`features` key not present in the GeoJSON input.")
+
         for feature in file_data["features"]:
+
             if "properties" in feature:
                 new_dict_list.append(feature["properties"])
             else:
-                return newError
+                return LocationError("A feature in the GeoJSON input did not have any properties.")
+
+            # if "geometry" in feature:
+            #     new_dict_list.append(feature["properties"])
+            # else:
+            #     return LocationError("A feature in the GeoJSON input did not have any properties.")
 
     return new_dict_list
