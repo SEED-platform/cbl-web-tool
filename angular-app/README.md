@@ -30,5 +30,5 @@ Run `npm run build:stats` and drop the `dist/stats.json` file onto the site http
 
 # Typescript and Angular
 
-To learn more about Typescript configuration file (tsconfig.*.json): https://www.typescriptlang.org/docs/handbook/tsconfig-json.html.
+To learn more about Typescript configuration file (tsconfig.\*.json): https://www.typescriptlang.org/docs/handbook/tsconfig-json.html.
 To learn more about Angular compiler options: https://angular.dev/reference/configs/angular-compiler-options.
