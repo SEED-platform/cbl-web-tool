@@ -1,5 +1,6 @@
 import json
 
+import geopandas as gpd
 import pandas as pd
 
 from utils.location_error import LocationError
@@ -32,19 +33,44 @@ def convert_file_to_dicts(file):
         file_data = json.loads(json_data)
 
     elif file_type in {"application/geo+json", "application/octet-stream"}:
-        file_content = file.read().decode("utf-8")
-        file_data = json.loads(file_content)
-
-        # need to extract info from geoJSON to make regular dict object
-        file_data = convert_geojson_to_dict(file_data)
+        data_gdf = gpd.read_file(file)
+        data_string = data_gdf.to_json()
+        file_data = json.loads(data_string)
 
     return file_data
 
 
+def geodataframe_to_json(geojson_gdf):
+    """
+    Convert a GeoDataFrame to text json so that it can be sent to user_data in the Angular app
+
+    # todo: sort the geodataframe here, not the dict later
+    # todo: sort this by east and north first, not street address, which may not be present
+    """
+
+    geojson_str = geojson_gdf.to_json()
+    geojson_dict = json.loads(geojson_str)
+    geojson_dict["features"].sort(key=lambda feature: feature["properties"].get("street_address", ""))
+
+    return json.dumps(geojson_dict)
+
+
+def convert_timestamps_to_strings(input_df):
+    """
+    Convert timestamp columns to strings so we can serialize them in JSON
+    """
+
+    for column in input_df.columns:
+        if pd.api.types.is_datetime64_any_dtype(input_df[column]):
+            input_df[column] = input_df[column].dt.strftime("%Y-%m-%d %H:%M:%S")  # todo: could this be str() instead? more format-agnostic
+
+    return input_df
+
+
 def convert_geojson_to_dict(file_data):
-    newError = LocationError("Improper GeoJSON format")
+    """ """
     if "type" not in file_data:
-        return newError
+        return LocationError("`type` key not present in the GeoJSON input.")
 
     geojson_types = [
         "Point",
@@ -58,17 +84,24 @@ def convert_geojson_to_dict(file_data):
         "FeatureCollection",
     ]
 
-    if file_data["type"] not in geojson_types:
-        return newError
+    geojson_type = file_data["type"]
+    if geojson_type not in geojson_types:
+        return LocationError(f"GeoJSON type {geojson_type} not recognized.")
 
     new_dict_list = []
     if file_data["type"] == "FeatureCollection":
         if "features" not in file_data:
-            return newError
+            return LocationError("`features` key not present in the GeoJSON input.")
+
         for feature in file_data["features"]:
             if "properties" in feature:
                 new_dict_list.append(feature["properties"])
             else:
-                return newError
+                return LocationError("A feature in the GeoJSON input did not have any properties.")
+
+            # if "geometry" in feature:
+            #     new_dict_list.append(feature["properties"])
+            # else:
+            #     return LocationError("A feature in the GeoJSON input did not have any geometry.")
 
     return new_dict_list
