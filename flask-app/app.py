@@ -135,7 +135,7 @@ def generate_cbl():
     # Find all quadkeys that the coordinates fall within
     quadkeys = set()
     for datum in data:
-        if datum["quality"] not in poorQualityCodes: # todo: check that "longitude" field is present
+        if datum["quality"] not in poorQualityCodes:  # todo: check that "longitude" field is present
             tile = mercantile.tile(datum["longitude"], datum["latitude"], 9)
             quadkey = int(mercantile.quadkey(tile))
             quadkeys.add(quadkey)
@@ -349,7 +349,6 @@ def update_api_key():
 
 
 def return_one():
-
     return 1
 
 

@@ -1,6 +1,6 @@
 # How to Use This Tool
 
-Welcome to the Covered Buildings List Web Tool! 
+Welcome to the Covered Buildings List Web Tool!
 
 ## Mission Statement
 The goal of this tool is to enhance your data about buildings with additional sources, give you tools to edit this mix of data, and export a clean Covered Buildings List for a new building efficiency program in your jurisdiction.
@@ -9,7 +9,7 @@ The goal of this tool is to enhance your data about buildings with additional so
 
 ### 1. Upload data
 
-Data can be uploaded into the CBL Web Tool in these formats. 
+Data can be uploaded into the CBL Web Tool in these formats.
 
 1. Excel spreadsheet: .xlsx
 1. Comma-seperated values: .csv
@@ -23,7 +23,7 @@ All data will be shown on a map. This means that data must have mappable compone
     1. city
     1. state
 1. Latitude and Longitude columns
-1. Geography column that can be read by GeoPandas. This could consist of building outlines (polygons or multipolygons) or points. 
+1. Geography column that can be read by GeoPandas. This could consist of building outlines (polygons or multipolygons) or points.
 
 All geographic data must be in the projection EPSG:4326.
 
@@ -39,7 +39,7 @@ All geographic data must be in the projection EPSG:4326.
 
 ### 3. Add public data
 
-In this step, you will have the option to download building footprints from the [Microsoft Footprints dataset](https://github.com/microsoft/GlobalMLBuildingFootprints). 
+In this step, you will have the option to download building footprints from the [Microsoft Footprints dataset](https://github.com/microsoft/GlobalMLBuildingFootprints).
 
 Data source is loaded and buildings near the user data saved in memory
 
