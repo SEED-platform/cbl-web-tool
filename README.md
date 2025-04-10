@@ -49,7 +49,7 @@ There are multiple workflows for generating or validating a covered buildings li
 ### Running the Web App
 
 1. Run the web app by opening two terminals: one with the working directory as angular-app and running `ng serve -o` and the other with the working directory as flask-app(in your virtual environment) and running `python app.py`
-1. After connecting to the web application using the following link http://localhost:4200/, upload a file in the format of a json (example below) or excel/csv with columns for street_address, city, and state:
+1. After connecting to the web application using the following link <http://localhost:4200/>, upload a file in the format of a json (example below) or excel/csv with columns for street_address, city, and state:
 
     ```json
     [
