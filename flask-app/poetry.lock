@@ -926,7 +926,7 @@ test = ["coverage", "nose"]
 
 [package.source]
 type = "git"
-url = "ssh://git@github.com/seed-platform/buildingid.git"
+url = "https://github.com/seed-platform/buildingid.git"
 reference = "master"
 resolved_reference = "df04c152d2cb3745b4c93a27ecdf97cfe45add13"
 
@@ -1814,4 +1814,4 @@ type = ["pytest-mypy"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.9, <3.13"
-content-hash = "9e1efae864ca09f026a80737795c8792878d05c32f7eb566a7e51ece6da01737"
+content-hash = "e9daeddf138bdf1dd1f92fc3f1e44eb651c319d994aff6a3b3f84065c9017cfe"
