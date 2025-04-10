@@ -41,5 +41,3 @@ def update_quadkeys(quadkeys: list[int], save_directory: Path = config.ms_footpr
             # app.logger.info(f'Downloading new data from Microsoft for quadkey {quadkey}')
             with open(quadkey_file, "wb") as f:
                 f.write(requests.get(url).content)
-
-

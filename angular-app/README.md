@@ -27,3 +27,8 @@ Run `npm run lint` or `npm run lint:fix` to check for eslint, prettier, and styl
 ## Analyzing the Webpack Bundle
 
 Run `npm run build:stats` and drop the `dist/stats.json` file onto the site https://esbuild.github.io/analyze/
+
+# Typescript and Angular
+
+To learn more about Typescript configuration file (tsconfig.*.json): https://www.typescriptlang.org/docs/handbook/tsconfig-json.html.
+To learn more about Angular compiler options: https://angular.dev/reference/configs/angular-compiler-options.

@@ -1,7 +1,7 @@
 """
------------------------
-Config File Instuctions
------------------------
+------------------------
+Config File Instructions
+------------------------
 
 This file contains configuration variables for the entire project.
 

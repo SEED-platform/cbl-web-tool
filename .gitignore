@@ -1,8 +1,11 @@
 .DS_Store
 .idea/
-node_modules/
+.python-version
+
 current-workflow.txt
 package-lock.json
+
+node_modules/
 flask-app/myenv/
 flask-app/.pytest_cache
 
