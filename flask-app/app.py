@@ -3,8 +3,8 @@ import json
 import json.scanner
 import os
 import warnings
-from typing import Any
 from collections import OrderedDict
+from typing import Any
 
 import geopandas as gpd
 import mercantile
@@ -15,7 +15,6 @@ from flask_cors import CORS
 from shapely.geometry import Point, Polygon
 
 import config
-from utils.check_data_quality import check_data_quality
 from utils.common import Location
 from utils.convert_file_to_dicts import convert_file_to_dicts, geodataframe_to_json
 from utils.generate_locations_list import generate_locations_list
@@ -49,7 +48,7 @@ def submit_file():
     app.logger.info("function: submit_file")
 
     files = request.files.getlist("userFiles[]")
-    input_dict = OrderedDict() # will this order be maintained when sending JSON back and forth to the front end? 
+    input_dict = OrderedDict()  # will this order be maintained when sending JSON back and forth to the front end?
 
     for file in files:
         if file.filename in input_dict:
@@ -79,7 +78,7 @@ def check_data():
     file_data = json.loads(json_string)
     json_data = json.dumps(file_data)
 
-    isGoodData = True # check_data_quality(file_data)
+    isGoodData = True  # check_data_quality(file_data)
     if isinstance(isGoodData, LocationError):
         return jsonify({"message": f"{isGoodData.message}", "user_data": json_data}), 400
 
@@ -125,7 +124,7 @@ def generate_cbl():
     # Find all quadkeys that the coordinates fall within
     quadkeys = set()
     for datum in data:
-        if datum["quality"] not in poorQualityCodes: # todo: check that "longitude" field is present
+        if datum["quality"] not in poorQualityCodes:  # todo: check that "longitude" field is present
             tile = mercantile.tile(datum["longitude"], datum["latitude"], 9)
             quadkey = int(mercantile.quadkey(tile))
             quadkeys.add(quadkey)
@@ -335,7 +334,6 @@ def update_api_key():
 
 
 def return_one():
-
     return 1
 
 

@@ -1,5 +1,6 @@
-import geopandas as gpd
 import json
+
+import geopandas as gpd
 import pandas as pd
 
 from utils.location_error import LocationError
@@ -61,14 +62,13 @@ def convert_timestamps_to_strings(input_df):
 
     for column in input_df.columns:
         if pd.api.types.is_datetime64_any_dtype(input_df[column]):
-            input_df[column] = input_df[column].dt.strftime('%Y-%m-%d %H:%M:%S') # todo: could this be str() instead? more format-agnostic
+            input_df[column] = input_df[column].dt.strftime("%Y-%m-%d %H:%M:%S")  # todo: could this be str() instead? more format-agnostic
 
     return input_df
 
 
 def convert_geojson_to_dict(file_data):
-    """
-    """
+    """ """
     if "type" not in file_data:
         return LocationError("`type` key not present in the GeoJSON input.")
 
@@ -94,7 +94,6 @@ def convert_geojson_to_dict(file_data):
             return LocationError("`features` key not present in the GeoJSON input.")
 
         for feature in file_data["features"]:
-
             if "properties" in feature:
                 new_dict_list.append(feature["properties"])
             else:

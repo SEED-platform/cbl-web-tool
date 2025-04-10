@@ -2,7 +2,7 @@
 name = "cbl-web-tool"
 version = "0.1.0"
 description = ""
-authors = ["Alex Swindler <alex.swinder@nrel.gov>", "Nicholas Long <nicholas.long@nrel.gov>", "Roger Braun <roger.braun@nrel.gov>", "Rahman Mian <rahman.mian@nrel.gov>"]
+authors = ["Devin Brady <devin.brady@nrel.gov>", "Alex Swindler <axelstudios>", "Nicholas Long <nllong>", "Roger Braun <roger.braun@nrel.gov>", "Rahman Mian <rahman.mian@nrel.gov>"]
 readme = "README.md"
 # should probably rename utils to cbl_workflow, then place
 # the utils in that folder.
@@ -23,9 +23,11 @@ street-address = "0.4.0"
 usaddress = "0.5.13"
 python-dotenv = "^1.0.0"
 pytest = "8.3.5"
+setuptools = "^78.1.0"
 
 [tool.poetry.group.dev.dependencies]
 pre-commit = "^3.8.0"
+nbformat = "^5.10.4"
 
 [build-system]
 # Need to provide the build system information for the package to be built

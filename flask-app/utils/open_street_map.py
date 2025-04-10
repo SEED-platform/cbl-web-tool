@@ -245,7 +245,7 @@ def process_dataframe_for_osm_buildings(
 
     Args:
         geodataframe (GeoDataFrame): Dataframe to process and add results to.
-        method (str, optional): Which field contains the geo data. Defaults to 'geometry_centoid'.
+        method (str, optional): Which field contains the geo data. Defaults to 'geometry_centroid'.
         copy_source_columns (bool, optional): Copy the source columns to the result. Defaults to False.
 
     Returns:
