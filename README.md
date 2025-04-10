@@ -45,14 +45,7 @@ There are multiple workflows for generating or validating a covered buildings li
 1. Ensure you are running Node v20.11.1: `node -v`, if not run `nvm install 20.11.1`
 1. Install angular and other dependencies by running `npm install`
 1. Install angular's CLI in a global location by running `npm install -g @angular/cli@17`
-1. Copy these lines in a new file named `angular-app/src/environments/environment.ts`. Replace the mapboxToken with your own.
-
-    ```bash
-    export const environment = {
-    production: false,
-    mapboxToken: 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'
-   };
-    ```
+2. Copy the environment template in `angular-app/src/environments/environment.ts.template` to a new file named `angular-app/src/environments/environment.ts`. Replace the mapboxToken with your own.
 
 
 ### Running the Web App
