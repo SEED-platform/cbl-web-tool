@@ -1,8 +1,5 @@
 {
-  "dependencies": {
-    "lz-string": "^1.5.0",
-    "prettier": "^3.5.3",
-    "prettier-plugin-organize-attributes": "^1.0.0",
-    "prettier-plugin-tailwindcss": "^0.6.11"
-  }
+  "workspaces": [
+    "angular-app"
+  ]
 }

@@ -24,6 +24,13 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           poetry install
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      # run npm install
+      - name: Install node dependencies
+        run: |
+          npm install
       - name: Run pre-commit
         working-directory: flask-app
         run: poetry run pre-commit run --all-files
