@@ -22,6 +22,9 @@ There are multiple workflows for generating or validating a covered buildings li
 
 ### Prerequisites
 
+* Create a MapBox account and create new key, a free tier should suffice <https://www.mapbox.com/>
+* Create a MapQuest account and create a new key, a free tier should suffice <https://www.mapquest.com/>
+
 #### flask-app
 
 1. A virtual environment is recommended: create a Virtual Environment in the **flask-app** directory:

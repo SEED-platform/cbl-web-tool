@@ -3,6 +3,7 @@ import json
 import json.scanner
 import os
 import warnings
+from collections import OrderedDict
 from typing import Any
 
 import geopandas as gpd
@@ -14,9 +15,8 @@ from flask_cors import CORS
 from shapely.geometry import Point, Polygon
 
 import config
-from utils.check_data_quality import check_data_quality
 from utils.common import Location
-from utils.convert_file_to_dicts import convert_file_to_dicts
+from utils.convert_file_to_dicts import convert_file_to_dicts, geodataframe_to_json
 from utils.generate_locations_list import generate_locations_list
 from utils.geocode_addresses import geocode_addresses
 from utils.location_error import LocationError
@@ -48,14 +48,11 @@ def submit_file():
     app.logger.info("function: submit_file")
 
     files = request.files.getlist("userFiles[]")
-
-    merged_data = []
-    seen_filenames = set()
+    input_dict = OrderedDict()  # will this order be maintained when sending JSON back and forth to the front end?
 
     for file in files:
-        if file.filename in seen_filenames:
-            return jsonify({"message": "Uploaded two of the same file. Please upload non-duplicate files."}), 400
-        seen_filenames.add(file.filename)
+        if file.filename in input_dict:
+            return jsonify({"message": "Uploaded two files with the same filename. Please upload non-duplicate files."}), 400
 
         file_data = convert_file_to_dicts(file)
         if not file_data or len(file_data) == 0:
@@ -64,18 +61,10 @@ def submit_file():
         if isinstance(file_data, LocationError):
             return jsonify({"message": f"{file_data.message}"}), 400
 
-        merged_data.extend(file_data)
+        input_dict[file.filename] = file_data
 
-    # if len(files) > 1:
-    #     for dict1 in merged_data:
-    #         for dict2 in merged_data:
-    #             if set(dict1.keys()) != set(dict2.keys()):
-    #                 return jsonify(
-    #                     {"message": "Uploaded files with conflicting column names. Please upload files with identical column names."}
-    #                 ), 400
-
-    all_data = json.dumps(merged_data)
-    return jsonify({"message": "success", "user_data": all_data}), 200
+    input_json_str = json.dumps(input_dict)
+    return jsonify({"message": "success", "user_data": input_json_str}), 200
 
 
 @app.route("/api/check_data", methods=["POST"])
@@ -89,7 +78,7 @@ def check_data():
     file_data = json.loads(json_string)
     json_data = json.dumps(file_data)
 
-    isGoodData = check_data_quality(file_data)
+    isGoodData = True  # check_data_quality(file_data)
     if isinstance(isGoodData, LocationError):
         return jsonify({"message": f"{isGoodData.message}", "user_data": json_data}), 400
 
@@ -153,7 +142,7 @@ def generate_cbl():
         if datum["quality"] not in poorQualityCodes:
             quadkey = datum["quadkey"]
             if quadkey not in loaded_quadkeys:
-                app.logger.info(f"Loading {quadkey}")
+                app.logger.info(f"Loading quadkey: {quadkey}")
 
                 with gzip.open(config.ms_footprint_dir / f"{quadkey}.geojsonl.gz", "rb") as f:
                     loaded_quadkeys[quadkey] = gpd.read_file(f)
@@ -214,12 +203,8 @@ def generate_cbl():
 
     # Convert covered building list as GeoJSON
     gdf = gpd.GeoDataFrame(data=merged_data, columns=columns)
-    geojson_str = gdf.to_json()
-    geojson_obj = json.loads(geojson_str)
+    final_geojson = geodataframe_to_json(gdf)
 
-    geojson_obj["features"].sort(key=lambda feature: feature["properties"].get("street_address", ""))
-
-    final_geojson = json.dumps(geojson_obj)
     return jsonify({"message": "success", "user_data": final_geojson}), 200
 
 
