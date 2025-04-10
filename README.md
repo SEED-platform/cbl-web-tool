@@ -46,7 +46,6 @@ There are multiple workflows for generating or validating a covered buildings li
 1. Install angular's CLI in a global location by running `npm install -g @angular/cli@17`
 1. Copy the environment template in `angular-app/src/environments/environment.ts.template` to a new file named `angular-app/src/environments/environment.ts`. Replace the mapboxToken with your own.
 
-
 ### Running the Web App
 
 1. Run the web app by opening two terminals: one with the working directory as angular-app and running `ng serve -o` and the other with the working directory as flask-app(in your virtual environment) and running `python app.py`
