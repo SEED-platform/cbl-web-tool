@@ -22,6 +22,9 @@ There are multiple workflows for generating or validating a covered buildings li
 
 ### Prerequisites
 
+* Create a MapBox account and create new key, a free tier should suffice <https://www.mapbox.com/>
+* Create a MapQuest account and create a new key, a free tier should suffice <https://www.mapquest.com/>
+
 #### flask-app
 
 1. A virtual environment is recommended: create a Virtual Environment in the **flask-app** directory:
@@ -71,6 +74,7 @@ There are multiple workflows for generating or validating a covered buildings li
    ]
    ```
 
+
 1. Once the file is uploaded and your data appears in a table on the web page, click the `Check Data` button to ensure that the data in the file meets the format requirements for the tool.
    There are three required column names that can be edited in the table: street_address, city, and state
 1. If the data conforms to the data check requirements, a button labeled `Run CBL Workflow` will appear. Click this button to generate a covered buildings list. Note: it will take some time to generate the list and display it.
@@ -84,10 +88,10 @@ There are multiple workflows for generating or validating a covered buildings li
 
 ### Future Ideas
 
-- supporting multiple files
-- flagging duplicate buildings, selecting which building to use (in some cases a dataset will have different building boundaries)
-- adding building heights from heuristics and multiple datasets
-- reimporting CBL lists
+* supporting multiple files
+* flagging duplicate buildings, selecting which building to use (in some cases a dataset will have different building boundaries)
+* adding building heights from heuristics and multiple datasets
+* reimporting CBL lists
 
 ### Disclaimer
 
