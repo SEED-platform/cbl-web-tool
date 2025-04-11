@@ -33,5 +33,9 @@ jobs:
           npm install
       - name: Run pre-commit
         run: poetry run pre-commit run --all-files
-      - name: Run pytest
+      - name: Run Python Tests
         run: poetry run pytest
+      - name: Run Angular Tests
+        working-directory: angular-app
+        run: |
+          ng test
