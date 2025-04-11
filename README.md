@@ -24,6 +24,9 @@ There are multiple workflows for generating or validating a covered buildings li
 
 #### flask_app
 
+- Create a MapBox account and create new key, a free tier should suffice <https://www.mapbox.com/>
+- Create a MapQuest account and create a new key, a free tier should suffice <https://www.mapquest.com/>
+
 1. A virtual environment is recommended: create a Virtual Environment in the root directory:
    - `python -m venv myenv` or `pyenv virtualenv 3.12.7 venv-name`
    - `source myenv/bin/activate` (macOS/Linux) or `myenv\Scripts\activate` (Windows) to enter your virtual environment
