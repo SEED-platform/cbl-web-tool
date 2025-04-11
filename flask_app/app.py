@@ -15,9 +15,8 @@ from flask_cors import CORS
 from shapely.geometry import Point, Polygon
 
 import flask_app.config as config
-from flask_app.utils.check_data_quality import check_data_quality
 from flask_app.utils.common import Location
-from flask_app.utils.convert_file_to_dicts import convert_file_to_dicts
+from flask_app.utils.convert_file_to_dicts import convert_file_to_dicts, geodataframe_to_json
 from flask_app.utils.generate_locations_list import generate_locations_list
 from flask_app.utils.geocode_addresses import geocode_addresses
 from flask_app.utils.location_error import LocationError
