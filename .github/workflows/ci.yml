@@ -35,6 +35,8 @@ jobs:
           # Need chrome for Angular tests
           sudo apt-get update
           sudo apt-get install -y google-chrome-stable
+          # copy over the environment.ts 
+          cp src/environments/environment.ts.template src/environments/environment.ts
       - name: Run pre-commit
         run: poetry run pre-commit run --all-files
       - name: Run Python Tests
