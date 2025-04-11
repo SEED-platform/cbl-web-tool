@@ -29,6 +29,7 @@ jobs:
           node-version: 20
       # run npm install
       - name: Install node dependencies and Google Chrome
+        working-directory: angular-app
         run: |
           npm install
           # Need chrome for Angular tests
