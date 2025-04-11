@@ -32,5 +32,6 @@ jobs:
         run: |
           npm install
       - name: Run pre-commit
-        working-directory: flask_app
         run: poetry run pre-commit run --all-files
+      - name: Run pytest
+        run: poetry run pytest

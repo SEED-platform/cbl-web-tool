@@ -30,7 +30,7 @@ There are multiple workflows for generating or validating a covered buildings li
 1. Install poetry in your virtual environment with `pip install poetry`
 1. Install dependencies in your virtual environment with `poetry install`
 1. Change to the **flask_app** directory
-2. Create a `.env` file in your MapQuest API key in the format:
+1. Create a `.env` file in your MapQuest API key in the format:
 
    ```dotenv
    MAPQUEST_API_KEY=XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
