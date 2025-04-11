@@ -38,4 +38,6 @@ jobs:
       - name: Run Angular Tests
         working-directory: angular-app
         run: |
+          # install angular cli
+          npm install -g @angular/cli@17
           ng test
