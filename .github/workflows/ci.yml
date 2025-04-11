@@ -41,9 +41,11 @@ jobs:
         run: poetry run pre-commit run --all-files
       - name: Run Python Tests
         run: poetry run pytest
-      - name: Run Angular Tests
-        working-directory: angular-app
-        run: |
-          # install angular cli
-          npm install -g @angular/cli@17
-          ng test --watch=false --browsers=ChromeHeadless
+      # Don't run angular tests for now, we will need to have a valid
+      # TOKEN, and not sure on how many requests we will be getting yet.
+      # - name: Run Angular Tests
+      #   working-directory: angular-app
+      #   run: |
+      #     # install angular cli
+      #     npm install -g @angular/cli@17
+      #     ng test --watch=false --browsers=ChromeHeadless
