@@ -23,6 +23,8 @@ There are multiple workflows for generating or validating a covered buildings li
 ### Prerequisites
 
 #### flask_app
+* Create a MapBox account and create new key, a free tier should suffice <https://www.mapbox.com/>
+* Create a MapQuest account and create a new key, a free tier should suffice <https://www.mapquest.com/>
 
 1. A virtual environment is recommended: create a Virtual Environment in the root directory:
    - `python -m venv myenv` or `pyenv virtualenv 3.12.7 venv-name`
@@ -85,10 +87,10 @@ There are multiple workflows for generating or validating a covered buildings li
 
 ### Future Ideas
 
-- supporting multiple files
-- flagging duplicate buildings, selecting which building to use (in some cases a dataset will have different building boundaries)
-- adding building heights from heuristics and multiple datasets
-- reimporting CBL lists
+* supporting multiple files
+* flagging duplicate buildings, selecting which building to use (in some cases a dataset will have different building boundaries)
+* adding building heights from heuristics and multiple datasets
+* reimporting CBL lists
 
 ### Disclaimer
 
