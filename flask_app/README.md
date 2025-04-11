@@ -491,7 +491,7 @@ Given a list of addresses, this workflow will automatically:
 ### Linting with Pre-commit
 
 ```shell
-cd flask-app
+cd flask_app
 pre-commit run --all-files
 ```
 

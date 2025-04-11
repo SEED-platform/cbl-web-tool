@@ -6,8 +6,8 @@ See also https://github.com/SEED-platform/seed/blob/main/LICENSE.md
 
 import requests
 
-from utils.chunk import chunk
-from utils.common import Location
+from flask_app.utils.chunk import chunk
+from flask_app.utils.common import Location
 
 
 class MapQuestAPIKeyError(Exception):

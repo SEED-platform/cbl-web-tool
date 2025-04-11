@@ -1,4 +1,4 @@
-from utils.location_error import LocationError
+from flask_app.utils.location_error import LocationError
 
 
 # Enforcing the required unique column names

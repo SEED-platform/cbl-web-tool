@@ -13,19 +13,19 @@ from flask import Flask, jsonify, request
 from flask_cors import CORS
 from shapely.geometry import Point, Polygon
 
-import config
-from utils.check_data_quality import check_data_quality
-from utils.common import Location
-from utils.convert_file_to_dicts import convert_file_to_dicts
-from utils.generate_locations_list import generate_locations_list
-from utils.geocode_addresses import geocode_addresses
-from utils.location_error import LocationError
-from utils.merge_dicts import merge_dicts
-from utils.normalize_address import normalize_address
-from utils.normalize_state import normalize_state
-from utils.ubid import encode_ubid
-from utils.update_dataset_links import update_dataset_links
-from utils.update_quadkeys import update_quadkeys
+import flask_app.config as config
+from flask_app.utils.check_data_quality import check_data_quality
+from flask_app.utils.common import Location
+from flask_app.utils.convert_file_to_dicts import convert_file_to_dicts
+from flask_app.utils.generate_locations_list import generate_locations_list
+from flask_app.utils.geocode_addresses import geocode_addresses
+from flask_app.utils.location_error import LocationError
+from flask_app.utils.merge_dicts import merge_dicts
+from flask_app.utils.normalize_address import normalize_address
+from flask_app.utils.normalize_state import normalize_state
+from flask_app.utils.ubid import encode_ubid
+from flask_app.utils.update_dataset_links import update_dataset_links
+from flask_app.utils.update_quadkeys import update_quadkeys
 
 warnings.filterwarnings("ignore", category=RuntimeWarning)
 warnings.filterwarnings("ignore", category=UserWarning)
