@@ -1,11 +1,12 @@
 # !/usr/bin/env python
 """
 SEED Platform (TM), Copyright (c) Alliance for Sustainable Energy, LLC, and other contributors.
-See also https://github.com/SEED-platform/seed/blob/main/LICENSE.md
+See also https://github.com/SEED-platform/cbl-web-tool/blob/main/LICENSE.md
 """
 
 from buildingid.code import decode, encode
 from geopandas import GeoDataFrame
+from openlocationcode.openlocationcode import PAIR_CODE_LENGTH_
 from shapely.geometry import Point, Polygon
 
 
