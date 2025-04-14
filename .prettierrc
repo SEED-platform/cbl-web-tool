@@ -1,0 +1,42 @@
+{
+  "arrowParens": "always",
+  "bracketSameLine": false,
+  "bracketSpacing": true,
+  "plugins": [
+    "prettier-plugin-organize-attributes",
+    "prettier-plugin-tailwindcss"
+  ],
+  "printWidth": 140,
+  "semi": false,
+  "singleQuote": true,
+  "tabWidth": 2,
+  "trailingComma": "all",
+  "useTabs": false,
+  "overrides": [
+    {
+      "files": "*.html",
+      "options": {
+        "printWidth": 200
+      }
+    },
+    {
+      "files": "*.js",
+      "options": {
+        "printWidth": 200,
+        "trailingComma": "none"
+      }
+    },
+    {
+      "files": "*.scss",
+      "options": {
+        "printWidth": 200
+      }
+    },
+    {
+      "files": ["*.yaml", "*.yml"],
+      "options": {
+        "singleQuote": false
+      }
+    }
+  ]
+}

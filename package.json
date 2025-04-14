@@ -1,5 +1,5 @@
 {
-  "dependencies": {
-    "lz-string": "^1.5.0"
-  }
+  "workspaces": [
+    "angular-app"
+  ]
 }
