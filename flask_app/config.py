@@ -5,7 +5,7 @@ Config File Instructions
 
 This file contains configuration variables for the entire project.
 
-Any script can use these variables by calling `import config` then
+Any script can use these variables by calling `import flask_app.config` then
 referencing the variable, such as `config.ms_footprint_dir`
 """
 

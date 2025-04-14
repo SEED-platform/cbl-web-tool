@@ -1,4 +1,4 @@
-from app import return_one
+from flask_app.app import return_one
 
 
 class TestFlaskApp:

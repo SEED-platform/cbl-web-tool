@@ -22,17 +22,18 @@ There are multiple workflows for generating or validating a covered buildings li
 
 ### Prerequisites
 
+#### flask_app
+
 - Create a MapBox account and create new key, a free tier should suffice <https://www.mapbox.com/>
 - Create a MapQuest account and create a new key, a free tier should suffice <https://www.mapquest.com/>
 
-#### flask-app
-
-1. A virtual environment is recommended: create a Virtual Environment in the **flask-app** directory:
+1. A virtual environment is recommended: create a Virtual Environment in the root directory:
    - `python -m venv myenv` or `pyenv virtualenv 3.12.7 venv-name`
    - `source myenv/bin/activate` (macOS/Linux) or `myenv\Scripts\activate` (Windows) to enter your virtual environment
 1. Install poetry in your virtual environment with `pip install poetry`
 1. Install dependencies in your virtual environment with `poetry install`
-1. Create a `.env` file in the flask-app directory with your MapQuest API key in the format:
+1. Change to the **flask_app** directory
+1. Create a `.env` file in your MapQuest API key in the format:
 
    ```dotenv
    MAPQUEST_API_KEY=XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
@@ -51,7 +52,7 @@ There are multiple workflows for generating or validating a covered buildings li
 
 ### Running the Web App
 
-1. Run the web app by opening two terminals: one with the working directory as angular-app and running `ng serve -o` and the other with the working directory as flask-app(in your virtual environment) and running `python app.py`
+1. Run the web app by opening two terminals: one with the working directory as angular-app and running `ng serve -o` and the other with the working directory as flask_app(in your virtual environment) and running `python app.py`
 1. After connecting to the web application using the following link <http://localhost:4200/>, upload a file in the format of a json (example below) or excel/csv with columns for street_address, city, and state:
 
    ```json

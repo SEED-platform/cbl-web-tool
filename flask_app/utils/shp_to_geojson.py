@@ -9,7 +9,7 @@ import os
 import geopandas as gpd
 from pyproj import CRS
 
-from utils.ubid import add_ubid_to_geodataframe
+from flask_app.utils.ubid import add_ubid_to_geodataframe
 
 
 def shp_to_geojson(shapefile: str):

@@ -3,7 +3,7 @@ import json
 import geopandas as gpd
 import pandas as pd
 
-from utils.location_error import LocationError
+from flask_app.utils.location_error import LocationError
 
 
 # NOTE: When converting to a data_frame, duplicate columns will be renamed (i.e Address and Address

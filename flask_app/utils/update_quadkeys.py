@@ -9,7 +9,7 @@ from pathlib import Path
 import pandas as pd
 import requests
 
-import config
+import flask_app.config as config
 
 
 def update_quadkeys(quadkeys: list[int], save_directory: Path = config.ms_footprint_dir):

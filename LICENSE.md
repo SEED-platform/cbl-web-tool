@@ -1,4 +1,4 @@
-Copyright (c) 2024, Alliance for Sustainable Energy, LLC. All rights reserved.
+Copyright (c) 2025, Alliance for Sustainable Energy, LLC. All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the
 following conditions are met:
@@ -11,6 +11,16 @@ disclaimer in the documentation and/or other materials provided with the distrib
 
 (3) Neither the name of the copyright holder nor the names of any contributors may be used to endorse or promote products
 derived from this software without specific prior written permission from the respective party.
+
+(4) Other than as required in clauses (1) and (2), distributions in any form of modifications
+or other derivative works may not use the "SEED Platform" trademark, "Standard Energy
+Efficiency Data Platform", "Standard Energy Efficiency Data", "SEED", or any other confusingly
+similar designation without specific prior written permission from the U.S. Department of Energy.
+
+(5) The name of the copyright holder(s), any contributors, the United States Government, the
+United States Department of Energy, or any of their employees may not be used to endorse or
+promote products derived from this software without specific prior written permission from the
+respective party.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDER(S) AND ANY CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
 INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE

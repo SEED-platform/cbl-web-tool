@@ -10,7 +10,7 @@ from pathlib import Path
 
 import requests
 
-import config
+import flask_app.config as config
 
 DATASET_URL = "https://minedbuildings.z5.web.core.windows.net/global-buildings/dataset-links.csv"
 
