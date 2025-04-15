@@ -10,7 +10,7 @@ import geopandas as gpd
 import mercantile
 import requests
 from dotenv import load_dotenv
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, session
 from flask_cors import CORS
 from shapely.geometry import Point, Polygon
 
@@ -33,6 +33,7 @@ warnings.filterwarnings("ignore", category=UserWarning)
 app = Flask(__name__)
 CORS(app)
 load_dotenv()
+app.secret_key = os.getenv("FLASK_SECRET_KEY") # Use secret key from .env file for user session
 
 api_key = ""
 
@@ -47,11 +48,14 @@ def submit_file():
     """
     app.logger.info("function: submit_file")
 
+    if "input_data" not in session:
+        # Initialize a empty, ordered dictionary as a session variable to store input files
+        session["input_data"] = OrderedDict()
+
     files = request.files.getlist("userFiles[]")
-    input_dict = OrderedDict()  # will this order be maintained when sending JSON back and forth to the front end?
 
     for file in files:
-        if file.filename in input_dict:
+        if file.filename in session["input_data"]:
             return jsonify({"message": "Uploaded two files with the same filename. Please upload non-duplicate files."}), 400
 
         file_data = convert_file_to_dicts(file)
@@ -61,10 +65,27 @@ def submit_file():
         if isinstance(file_data, LocationError):
             return jsonify({"message": f"{file_data.message}"}), 400
 
-        input_dict[file.filename] = file_data
+        session["input_data"][file.filename] = file_data
 
-    input_json_str = json.dumps(input_dict)
-    return jsonify({"message": "success", "user_data": input_json_str}), 200
+    return jsonify({"message": "success"}), 200
+
+
+@app.route("/api/get_data", methods=["GET"])
+def get_data():
+    """
+    Return the data stored in the session variable input_data as a JSON object.
+    This function is called when the "Get Started" button on the homepage is clicked.
+    In Angular, this is called by getInitialData()
+    """
+    app.logger.info("function: get_data")
+
+    if "input_data" not in session:
+        return jsonify({"message": "No data found"}), 400
+
+    # Convert the session variable to a JSON object
+    json_data = json.dumps(session["input_data"])
+
+    return jsonify({"message": "success", "user_data": json_data}), 200
 
 
 @app.route("/api/check_data", methods=["POST"])
