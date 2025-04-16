@@ -16,7 +16,7 @@ import LZString from 'lz-string';
   standalone: true,
   templateUrl: './home.component.html',
   styleUrl: './home.component.css',
-  imports: [ReactiveFormsModule, CommonModule, FirstTableComponent, FileUploadComponent]
+  imports: [ReactiveFormsModule, CommonModule, FileUploadComponent]
 })
 export class HomeComponent implements OnInit, OnDestroy {
   userFile: any;
@@ -50,5 +50,10 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   isObjectEmpty(obj: object): boolean {
     return !obj || (Object.keys(obj).length === 0 && obj.constructor === Object);
+  }
+
+  // create a new page for searching in a map
+  navigateToMapWorkflow() {
+    this.router.navigate(['/map-workflow']);
   }
 }
