@@ -1,13 +1,14 @@
 # !/usr/bin/env python
 """
 SEED Platform (TM), Copyright (c) Alliance for Sustainable Energy, LLC, and other contributors.
-See also https://github.com/SEED-platform/seed/blob/main/LICENSE.md
+See also https://github.com/SEED-platform/cbl-web-tool/blob/main/LICENSE.md
 """
 
 from pathlib import Path
 
 import pandas as pd
 import requests
+from tqdm import tqdm
 
 import flask_app.config as config
 
@@ -19,8 +20,7 @@ def update_quadkeys(quadkeys: list[int], save_directory: Path = config.ms_footpr
     save_directory.mkdir(parents=True, exist_ok=True)
     df_update = pd.read_csv(save_directory / "dataset-links.csv")
 
-    for quadkey in quadkeys:
-        # app.logger.info(f'Checking if quadkey {quadkey} is up to date.')
+    for quadkey in tqdm(quadkeys):
         download = True
         quadkey_file = save_directory / f"{quadkey}.geojsonl.gz"
         rows = df_update[df_update["QuadKey"] == quadkey]
