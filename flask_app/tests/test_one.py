@@ -1,7 +1,7 @@
-from flask_app.app import return_one
+from flask_app.app import submit_file
 
 
 class TestFlaskApp:
-    def test_two(self):
-        x = return_one()
+    def test_submit_file(self):
+        small_test = "tests/test_files/small_test.txt"
         assert x == 1

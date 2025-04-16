@@ -2,6 +2,7 @@ import gzip
 import json
 import json.scanner
 import os
+import secrets
 import warnings
 from collections import OrderedDict
 from typing import Any
@@ -33,7 +34,7 @@ warnings.filterwarnings("ignore", category=UserWarning)
 app = Flask(__name__)
 CORS(app)
 load_dotenv()
-app.secret_key = os.getenv("FLASK_SECRET_KEY") # Use secret key from .env file for user session
+app.secret_key = secrets.token_hex() # Generate a secret key for user session
 
 api_key = ""
 
@@ -41,7 +42,7 @@ api_key = ""
 @app.route("/api/submit_file", methods=["POST"])
 def submit_file():
     """
-    Read uploaded file(s), confirm file names are different, confirm file names the same, return user data.
+    Read uploaded file(s), confirm file names are different, confirm file names the same.
 
     This function is called with the "Get Started" button on the homepage is clicked and when edited data is saved.
     In Angular, sendInitialData() and sendData()
