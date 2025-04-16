@@ -1,6 +1,6 @@
+import json
 import io
 import pytest
-from flask import session
 from flask_app.app import app
 
 
@@ -22,7 +22,7 @@ def test_submit_file_success(client, monkeypatch):
 
     # Create a mock file to upload
     data = {
-        "userFiles[]": (io.BytesIO(b"mock file content"), "test_file.csv"),
+        "userFiles[]": (io.BytesIO(b"field_a,field_b\n1,2"), "test_file.csv"),
     }
 
     response = client.post("/api/submit_file", data=data, content_type="multipart/form-data")
