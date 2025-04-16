@@ -22,6 +22,7 @@
     "jsonify",
     "kernelspec",
     "mapbox",
+    "mapboxgl",
     "mapquest",
     "MAPQUEST",
     "Mian",

@@ -27,20 +27,24 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-      # run npm install
       - name: Install node dependencies and Google Chrome
+        working-directory: angular-app
         run: |
           npm install
           # Need chrome for Angular tests
           sudo apt-get update
           sudo apt-get install -y google-chrome-stable
+          # copy over the environment.ts, otherwise tests will fail.
+          cp src/environments/environment.ts.template src/environments/environment.ts
       - name: Run pre-commit
         run: poetry run pre-commit run --all-files
       - name: Run Python Tests
         run: poetry run pytest
-      - name: Run Angular Tests
-        working-directory: angular-app
-        run: |
-          # install angular cli
-          npm install -g @angular/cli@17
-          ng test --watch=false --browsers=ChromeHeadless
+      # Don't run angular tests for now, we will need to have a valid
+      # TOKEN, and not sure on how many requests we will be getting yet.
+      # - name: Run Angular Tests
+      #   working-directory: angular-app
+      #   run: |
+      #     # install angular cli
+      #     npm install -g @angular/cli@17
+      #     ng test --watch=false --browsers=ChromeHeadless
