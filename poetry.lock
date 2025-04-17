@@ -33,6 +33,33 @@ files = [
 ]
 
 [[package]]
+name = "cbl-workflow"
+version = "0.1.0"
+description = ""
+optional = false
+python-versions = ">=3.9, <3.13"
+groups = ["main"]
+files = []
+develop = true
+
+[package.dependencies]
+geopandas = "^1.0.1"
+geopy = "^2.4.1"
+mercantile = "^1.2.1"
+nominatim = "^0.1"
+pnnl-buildingid = {git = "https://github.com/seed-platform/buildingid.git", rev = "master"}
+python-dotenv = "^1.0.1"
+requests = "^2.32.3"
+setuptools = "^78.1.0"
+shapely = "^2.0.6"
+street-address = "0.4.0"
+usaddress = "0.5.13"
+
+[package.source]
+type = "directory"
+url = "../cbl-workflow"
+
+[[package]]
 name = "certifi"
 version = "2025.1.31"
 description = "Python package for providing Mozilla's CA Bundle."
@@ -194,12 +221,12 @@ version = "0.4.6"
 description = "Cross-platform colored terminal text."
 optional = false
 python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,!=3.5.*,!=3.6.*,>=2.7"
-groups = ["main"]
-markers = "platform_system == \"Windows\" or sys_platform == \"win32\""
+groups = ["main", "dev"]
 files = [
     {file = "colorama-0.4.6-py2.py3-none-any.whl", hash = "sha256:4f1d9991f5acc0ca119f9d443620b77f9d6b33703e51011c16baf57afb285fc6"},
     {file = "colorama-0.4.6.tar.gz", hash = "sha256:08695f5cb7ed6e0531a20572697297273c47b8cae5a63ffc6d6ed5c201be6e44"},
 ]
+markers = {main = "platform_system == \"Windows\"", dev = "sys_platform == \"win32\""}
 
 [[package]]
 name = "distlib"
@@ -231,7 +258,7 @@ version = "1.2.2"
 description = "Backport of PEP 654 (exception groups)"
 optional = false
 python-versions = ">=3.7"
-groups = ["main"]
+groups = ["dev"]
 markers = "python_version < \"3.11\""
 files = [
     {file = "exceptiongroup-1.2.2-py3-none-any.whl", hash = "sha256:3111b9d131c238bec2f8f516e123e14ba243563fb135d3fe885990585aa7795b"},
@@ -313,6 +340,18 @@ files = [
 Flask = ">=0.9"
 
 [[package]]
+name = "geographiclib"
+version = "2.0"
+description = "The geodesic routines from GeographicLib"
+optional = false
+python-versions = ">=3.7"
+groups = ["main"]
+files = [
+    {file = "geographiclib-2.0-py3-none-any.whl", hash = "sha256:6b7225248e45ff7edcee32becc4e0a1504c606ac5ee163a5656d482e0cd38734"},
+    {file = "geographiclib-2.0.tar.gz", hash = "sha256:f7f41c85dc3e1c2d3d935ec86660dc3b2c848c83e17f9a9e51ba9d5146a15859"},
+]
+
+[[package]]
 name = "geopandas"
 version = "1.0.1"
 description = "Geographic pandas extensions"
@@ -335,6 +374,30 @@ shapely = ">=2.0.0"
 [package.extras]
 all = ["GeoAlchemy2", "SQLAlchemy (>=1.3)", "folium", "geopy", "mapclassify", "matplotlib (>=3.5.0)", "psycopg-binary (>=3.1.0)", "pyarrow (>=8.0.0)", "xyzservices"]
 dev = ["black", "codecov", "pre-commit", "pytest (>=3.1.0)", "pytest-cov", "pytest-xdist"]
+
+[[package]]
+name = "geopy"
+version = "2.4.1"
+description = "Python Geocoding Toolbox"
+optional = false
+python-versions = ">=3.7"
+groups = ["main"]
+files = [
+    {file = "geopy-2.4.1-py3-none-any.whl", hash = "sha256:ae8b4bc5c1131820f4d75fce9d4aaaca0c85189b3aa5d64c3dcaf5e3b7b882a7"},
+    {file = "geopy-2.4.1.tar.gz", hash = "sha256:50283d8e7ad07d89be5cb027338c6365a32044df3ae2556ad3f52f4840b3d0d1"},
+]
+
+[package.dependencies]
+geographiclib = ">=1.52,<3"
+
+[package.extras]
+aiohttp = ["aiohttp"]
+dev = ["coverage", "flake8 (>=5.0,<5.1)", "isort (>=5.10.0,<5.11.0)", "pytest (>=3.10)", "pytest-asyncio (>=0.17)", "readme-renderer", "sphinx (<=4.3.2)", "sphinx-issues", "sphinx-rtd-theme (>=0.5.0)"]
+dev-docs = ["readme-renderer", "sphinx (<=4.3.2)", "sphinx-issues", "sphinx-rtd-theme (>=0.5.0)"]
+dev-lint = ["flake8 (>=5.0,<5.1)", "isort (>=5.10.0,<5.11.0)"]
+dev-test = ["coverage", "pytest (>=3.10)", "pytest-asyncio (>=0.17)", "sphinx (<=4.3.2)"]
+requests = ["requests (>=2.16.2)", "urllib3 (>=1.24.2)"]
+timezone = ["pytz"]
 
 [[package]]
 name = "identify"
@@ -397,7 +460,7 @@ version = "2.1.0"
 description = "brain-dead simple config-ini parsing"
 optional = false
 python-versions = ">=3.8"
-groups = ["main"]
+groups = ["dev"]
 files = [
     {file = "iniconfig-2.1.0-py3-none-any.whl", hash = "sha256:9deba5723312380e77435581c6bf4935c94cbfab9b1ed33ef8d238ea168eb760"},
     {file = "iniconfig-2.1.0.tar.gz", hash = "sha256:3abbd2e30b36733fee78f9c7f7308f2d0050e88f0087fd25c2645f63c773e1c7"},
@@ -616,6 +679,17 @@ files = [
 ]
 
 [[package]]
+name = "nominatim"
+version = "0.1"
+description = "OSM Nominatim API module"
+optional = false
+python-versions = "*"
+groups = ["main"]
+files = [
+    {file = "nominatim-0.1.tar.gz", hash = "sha256:6a3684be6b7f8dd08a1f60366718bea15635a6df9e85779d089245e161ded290"},
+]
+
+[[package]]
 name = "numpy"
 version = "1.26.4"
 description = "Fundamental package for array computing in Python"
@@ -693,7 +767,7 @@ version = "24.2"
 description = "Core utilities for Python packages"
 optional = false
 python-versions = ">=3.8"
-groups = ["main"]
+groups = ["main", "dev"]
 files = [
     {file = "packaging-24.2-py3-none-any.whl", hash = "sha256:09abb1bccd265c01f4a3aa3f7a7db064b36514d2cba19a2f694fe6150451a759"},
     {file = "packaging-24.2.tar.gz", hash = "sha256:c228a6dc5e932d346bc5739379109d49e8853dd8223571c7c5b55260edc0b97f"},
@@ -809,7 +883,7 @@ version = "1.5.0"
 description = "plugin and hook calling mechanisms for python"
 optional = false
 python-versions = ">=3.8"
-groups = ["main"]
+groups = ["dev"]
 files = [
     {file = "pluggy-1.5.0-py3-none-any.whl", hash = "sha256:44e1ad92c8ca002de6377e165f3e0f1be63266ab4d554740532335b9d75ea669"},
     {file = "pluggy-1.5.0.tar.gz", hash = "sha256:2cffa88e94fdc978c4c574f15f9e59b7f4201d439195c3715ca9e2486f1d0cf1"},
@@ -1037,7 +1111,7 @@ version = "8.3.5"
 description = "pytest: simple powerful testing with Python"
 optional = false
 python-versions = ">=3.8"
-groups = ["main"]
+groups = ["dev"]
 files = [
     {file = "pytest-8.3.5-py3-none-any.whl", hash = "sha256:c69214aa47deac29fad6c2a4f590b9c4a9fdb16a403176fe154b79c0b4d4d820"},
     {file = "pytest-8.3.5.tar.gz", hash = "sha256:f4efe70cc14e511565ac476b57c279e12a855b11f48f212af1080ef2263d3845"},
@@ -1586,7 +1660,7 @@ version = "2.2.1"
 description = "A lil' TOML parser"
 optional = false
 python-versions = ">=3.8"
-groups = ["main"]
+groups = ["dev"]
 markers = "python_version < \"3.11\""
 files = [
     {file = "tomli-2.2.1-cp311-cp311-macosx_10_9_x86_64.whl", hash = "sha256:678e4fa69e4575eb77d103de3df8a895e1591b48e740211bd1067378c69e8249"},
@@ -1785,4 +1859,4 @@ type = ["pytest-mypy"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.9, <3.13"
-content-hash = "7cd83067e56bf345097dab8b182aa4041d8356dbc086bbffec8df6dd7188ce70"
+content-hash = "ff98087a73d57925b9d05274e1b61bb8399f7648a214c387745bacc402ee0156"
