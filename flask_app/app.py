@@ -75,8 +75,6 @@ def submit_file():
 def get_data():
     """
     Return the data stored in the session variable input_data as a JSON object.
-    This function is called when the "Get Started" button on the homepage is clicked.
-    In Angular, this is called by getInitialData()
     """
     app.logger.info("function: get_data")
 
