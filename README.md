@@ -22,6 +22,16 @@ There are multiple workflows for generating or validating a covered buildings li
 
 ### Prerequisites
 
+### CBL Workflow package
+
+The CBL Web Tool depends on a general [CBL workflow package](https://github.com/SEED-platform/cbl-workflow). For development, it is recommended to checkout this dependency locally at the same directory level as the cbl-web-tool.
+
+```bash
+git clone git@github.com:SEED-platform/cbl-workflow.git
+```
+
+The package will be automatically installed when running poetry update in the CBL web tool.
+
 #### flask_app
 
 - Create a MapBox account and create new key, a free tier should suffice <https://www.mapbox.com/>
@@ -92,6 +102,17 @@ There are multiple workflows for generating or validating a covered buildings li
 - flagging duplicate buildings, selecting which building to use (in some cases a dataset will have different building boundaries)
 - adding building heights from heuristics and multiple datasets
 - reimporting CBL lists
+
+# Releasing
+
+- These instructions are not yet complete
+
+---
+
+- Release CBL workflow
+- Update this repo's `pyproject.toml` to point to the cbl-workflow version on PyPi
+- Update CHANGELOG by running auto generation on GitHub.
+- Tag on GitHub
 
 ### Disclaimer
 
