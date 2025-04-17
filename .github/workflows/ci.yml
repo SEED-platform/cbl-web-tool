@@ -18,6 +18,10 @@ jobs:
         with:
           repository: SEED-platform/cbl-workflow
           path: cbl-workflow
+      - name: Move cbl-workflow to expected location
+        run: |
+          mkdir -p ../
+          mv cbl-workflow ../cbl-workflow  # Move to one level up
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5.1.0
         with:
