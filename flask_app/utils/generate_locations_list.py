@@ -1,4 +1,4 @@
-from flask_app.utils.common import Location
+from cbl_workflow.utils.common import Location
 
 
 # Generating a list of locations from user-inputted file
