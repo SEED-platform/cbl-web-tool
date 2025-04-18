@@ -24,13 +24,19 @@ tqdm = "^4.67.1"
 # pin to pypi versions before using in production.
 cbl-workflow = { path = "../cbl-workflow", develop = true }
 # cbl-workflow = { git = "https://github.com/seed-platform/cbl-workflow.git", rev = "develop" }
-osmnx = "^2.0.2"
 
 [tool.poetry.group.dev.dependencies]
 pre-commit = "^3.8.0"
 pytest = "8.3.5"
 nbformat = "^5.10.4"
 folium = "^0.19.5"
+osmnx = "^2.0.2"
+notebook = "^7.4.0"
+
+
+[tool.poetry.group.devgit.dependencies]
+osmnx = "^2.0.2"
+st = "^0.0.8"
 
 [build-system]
 # Need to provide the build system information for the package to be built

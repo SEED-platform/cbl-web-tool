@@ -15,3 +15,5 @@ flask_app/.pytest_cache
 
 # Jupyter Notebook
 .ipynb_checkpoints
+docs/notebooks/data
+docs/notebooks/samples_golden
