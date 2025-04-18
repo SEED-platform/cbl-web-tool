@@ -151,15 +151,9 @@ export class FileUploadComponent {
     this.apiHandler.sendInitialData(fileData).subscribe(
       (response) => {
         console.log(response.message); // Handle successful response
-        this.initialJsonData = response.user_data;
-        sessionStorage.setItem('FIRSTTABLEDATA', LZString.compress(this.initialJsonData));
-        if (JSON.parse(this.initialJsonData).length !== 0) {
-          sessionStorage.setItem('CURRENTPAGE', 'first-table');
-          sessionStorage.setItem('HOMEACCESS', JSON.stringify(false));
-          this.router.navigate(['/first-table']);
-        } else {
-          alert('No File Submitted');
-        }
+        sessionStorage.setItem('CURRENTPAGE', 'first-table');
+        sessionStorage.setItem('HOMEACCESS', JSON.stringify(false));
+        this.router.navigate(['/first-table']);
         this.isLoading = false;
         this.ref.detectChanges();
       },
