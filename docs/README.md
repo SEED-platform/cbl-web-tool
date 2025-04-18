@@ -13,7 +13,7 @@ The goal of this tool is to enhance your data about buildings with additional so
 Data can be uploaded into the CBL Web Tool in these formats.
 
 1. Excel spreadsheet: .xlsx
-1. Comma-seperated values: .csv
+1. Comma-separated values: .csv
 1. JavaScript Object Notation: .json
 1. Geographic JSON: .geojson
 
@@ -36,7 +36,7 @@ All geographic data must be in the projection EPSG:4326.
 1.  If addresses provided:
     1. Normalize
     1. Geocode
-    1. Pick geocoding service and provide creds
+    1. Pick geocoding service and provide credentials
 
 ### 3. Add public data
 
