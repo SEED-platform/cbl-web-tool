@@ -105,3 +105,14 @@ def convert_geojson_to_dict(file_data):
             #     return LocationError("A feature in the GeoJSON input did not have any geometry.")
 
     return new_dict_list
+
+
+def convert_file_to_geodataframe(file):
+    """
+    Convert a file into a series of dicts, depending on the file type
+
+    File types are checked here: angular-app/src/app/home/file-upload/file-upload.component.ts
+    An error is displayed to the user if they attempt to upload a file of a different type.
+    """
+
+    return gpd.read_file(file)

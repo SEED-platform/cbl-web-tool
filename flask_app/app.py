@@ -22,7 +22,7 @@ from flask_cors import CORS
 from shapely.geometry import Point, Polygon
 
 import flask_app.config as config
-from flask_app.utils.convert_file_to_dicts import convert_file_to_dicts, geodataframe_to_json
+from flask_app.utils.convert_file_to_dicts import convert_file_to_dicts, geodataframe_to_json, convert_file_to_geodataframe
 from flask_app.utils.generate_locations_list import generate_locations_list
 from flask_app.utils.location_error import LocationError
 from flask_app.utils.merge_dicts import merge_dicts
@@ -59,7 +59,7 @@ def submit_file():
         if file.filename in session["input_data"]:
             return jsonify({"message": "Uploaded two files with the same filename. Please upload non-duplicate files."}), 400
 
-        file_data = convert_file_to_dicts(file)
+        file_data = convert_file_to_geodataframe(file)
         if not file_data or len(file_data) == 0:
             return jsonify({"message": "Uploaded a file in the wrong format. Please upload different format"}), 400
 
