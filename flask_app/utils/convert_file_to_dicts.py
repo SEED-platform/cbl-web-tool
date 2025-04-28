@@ -40,7 +40,7 @@ def convert_file_to_dicts(file):
     return file_data
 
 
-def geodataframe_to_json(geojson_gdf):
+def geodataframe_to_json(gdf):
     """
     Convert a GeoDataFrame to text json so that it can be sent to user_data in the Angular app
 
@@ -48,7 +48,7 @@ def geodataframe_to_json(geojson_gdf):
     # todo: sort this by east and north first, not street address, which may not be present
     """
 
-    geojson_str = geojson_gdf.to_json()
+    geojson_str = gdf.to_json()
     geojson_dict = json.loads(geojson_str)
     geojson_dict["features"].sort(key=lambda feature: feature["properties"].get("street_address", ""))
 
@@ -115,4 +115,24 @@ def convert_file_to_geodataframe(file):
     An error is displayed to the user if they attempt to upload a file of a different type.
     """
 
-    return gpd.read_file(file)
+    file_type = file.content_type
+
+    if file_type == "application/json":
+        file_content = file.read().decode("utf-8")
+        file_data = json.loads(file_content)
+
+    elif file_type == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
+        data_frame = pd.read_excel(file)
+        json_data = data_frame.to_json(orient="records")
+        file_data = json.loads(json_data)
+
+    elif file_type in {"application/csv", "text/csv"}:
+        data_frame = pd.read_csv(file)
+        json_data = data_frame.to_json(orient="records")
+        file_data = json.loads(json_data)
+
+    elif file_type in {"application/geo+json", "application/octet-stream"}:
+        data_gdf = gpd.read_file(file)
+
+
+    return data_gdf
