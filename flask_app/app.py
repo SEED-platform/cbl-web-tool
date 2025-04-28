@@ -2,6 +2,7 @@ import gzip
 import json
 import json.scanner
 import os
+import secrets
 import warnings
 from collections import OrderedDict
 from typing import Any
@@ -16,12 +17,12 @@ from cbl_workflow.utils.ubid import encode_ubid
 from cbl_workflow.utils.update_dataset_links import update_dataset_links
 from cbl_workflow.utils.update_quadkeys import update_quadkeys
 from dotenv import load_dotenv
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, session
 from flask_cors import CORS
 from shapely.geometry import Point, Polygon
 
 import flask_app.config as config
-from flask_app.utils.convert_file_to_dicts import convert_file_to_dicts, geodataframe_to_json
+from flask_app.utils.convert_file_to_dicts import convert_file_to_dicts, geodataframe_to_json, convert_file_to_geodataframe
 from flask_app.utils.generate_locations_list import generate_locations_list
 from flask_app.utils.location_error import LocationError
 from flask_app.utils.merge_dicts import merge_dicts
@@ -33,38 +34,66 @@ warnings.filterwarnings("ignore", category=UserWarning)
 app = Flask(__name__)
 CORS(app)
 load_dotenv()
+app.secret_key = secrets.token_hex() # Generate a secret key for user session
 
 api_key = ""
 
+import pandas as pd
 
 @app.route("/api/submit_file", methods=["POST"])
 def submit_file():
     """
-    Read uploaded file(s), confirm file names are different, confirm file names the same, return user data.
+    Read uploaded file(s), confirm file names are different, confirm file names the same.
 
     This function is called with the "Get Started" button on the homepage is clicked and when edited data is saved.
     In Angular, sendInitialData() and sendData()
     """
     app.logger.info("function: submit_file")
 
+    if "input_data" not in session:
+        # Initialize a empty, ordered dictionary as a session variable to store input files
+        session["input_data"] = OrderedDict()
+
     files = request.files.getlist("userFiles[]")
-    input_dict = OrderedDict()  # will this order be maintained when sending JSON back and forth to the front end?
 
     for file in files:
-        if file.filename in input_dict:
+        if file.filename in session["input_data"]:
             return jsonify({"message": "Uploaded two files with the same filename. Please upload non-duplicate files."}), 400
 
-        file_data = convert_file_to_dicts(file)
-        if not file_data or len(file_data) == 0:
-            return jsonify({"message": "Uploaded a file in the wrong format. Please upload different format"}), 400
+        # file_data = pd.DataFrame({'a':[1,2]}) # gpd.GeoDataFrame({'a':[1,2]}) # convert_file_to_geodataframe(file)
+        file_data = {'a':[1,2]}
+        if len(file_data) == 0: # todo: what scenario was "not file_data or " trying to catch here?
+            # todo: this error not being displayed to the user by the frontend
+            return jsonify({"message": "Uploaded a file with zero rows. Please upload a file with rows."}), 400
 
-        if isinstance(file_data, LocationError):
-            return jsonify({"message": f"{file_data.message}"}), 400
+        # if isinstance(file_data, LocationError):
+        #     return jsonify({"message": f"{file_data.message}"}), 400
 
-        input_dict[file.filename] = file_data
+        print(file_data)
+        session["input_data"][file.filename] = file_data
 
-    input_json_str = json.dumps(input_dict)
-    return jsonify({"message": "success", "user_data": input_json_str}), 200
+    return jsonify({"message": "success"}), 200
+
+
+@app.route("/api/get_data", methods=["GET"])
+def get_data():
+    """
+    Return the data stored in the session variable input_data as a JSON object.
+    """
+    app.logger.info("function: get_data")
+
+    if "input_data" not in session:
+        return jsonify({"message": "No data found"}), 400
+
+    # Convert the session variable to a JSON object
+    input_data_dict = OrderedDict()
+
+    for key, value in session["input_data"].items():
+        input_data_dict[key] = geodataframe_to_json(value)
+
+    input_data_string = json.dumps(input_data_dict)
+
+    return jsonify({"message": "success", "user_data": input_data_string}), 200
 
 
 @app.route("/api/check_data", methods=["POST"])
