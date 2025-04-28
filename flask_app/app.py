@@ -64,6 +64,9 @@ def submit_file():
         input_dict[file.filename] = file_data
 
     input_json_str = json.dumps(input_dict)
+    print('input_json_str')
+    print(input_json_str)
+
     return jsonify({"message": "success", "user_data": input_json_str}), 200
 
 

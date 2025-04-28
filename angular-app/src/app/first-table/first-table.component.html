@@ -1,3 +1,4 @@
+<!-- NREL button at top -->
 <nav class="border-grey border-b-2 bg-white">
   <div class="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
     <div class="h-35 relative flex items-center justify-between">
@@ -12,6 +13,7 @@
 </nav>
 
 <div class="mt-10 flex w-[100vw] flex-col items-center justify-center">
+  <!-- Data Validation Table blue header -->
   <div class="bg-nrel-second-dark-blue flex h-16 w-[90vw] items-center justify-between rounded-tl-lg rounded-tr-lg">
     <div class="flex h-full flex-row items-center">
       <h5 class="mb-4 ml-4 mt-2 text-4xl font-bold text-white">Data Validation Table</h5>
@@ -22,56 +24,111 @@
         <label class="mb-2 block text-sm font-medium text-gray-900 dark:text-white" for="api_key"></label>
         <input
           class="text-md mr-[10px] block h-10 w-[17rem] rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
-          id="api_key"
-          [(ngModel)]="apiKey"
-          type="text"
-          name="api_Key"
-          placeholder="Enter your MapQuest API key"
-          required
-        />
+          id="api_key" [(ngModel)]="apiKey" type="text" name="api_Key" placeholder="Enter your MapQuest API key"
+          required />
         <button
           class="relative mr-4 flex h-8 items-center justify-center rounded-md bg-gray-100 px-6 text-sm font-medium text-gray-700 hover:bg-gray-200"
-          type="submit"
-        >
+          type="submit">
           Submit
         </button>
       </form>
     </div>
   </div>
-  <div class="row">
-    <div class="col-12">
-      <ag-grid-angular
-        class="ag-theme-quartz"
-        [columnDefs]="colDefs"
-        [defaultColDef]="defaultColDef"
-        [rowData]="userList"
-        (gridReady)="onGridReady($event)"
-        style="height: 70vh; width: 90vw"
-      />
+
+  <!-- Static sidebar for desktop -->
+  <div class="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col">
+    <!-- Sidebar component, swap this element with another sidebar if you like -->
+    <div class="flex grow flex-col gap-y-5 overflow-y-auto border-r border-gray-200 bg-white px-6">
+      <nav class="flex flex-1 flex-col">
+        <ul role="list" class="flex flex-1 flex-col gap-y-7">
+          <li>
+            <ul role="list" class="-mx-2 space-y-1">
+              <li>
+                <!-- Current: "bg-gray-50 text-indigo-600", Default: "text-gray-700 hover:text-indigo-600 hover:bg-gray-50" -->
+                <a href="#"
+                  class="bg-gray-50 text-indigo-600 group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold">
+                  Dashboard
+                </a>
+              </li>
+              <li>
+                <a href="#"
+                  class="text-gray-700 hover:text-indigo-600 hover:bg-gray-50 group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold">
+                  Team
+                </a>
+              </li>
+              <li>
+                <a href="#"
+                  class="text-gray-700 hover:text-indigo-600 hover:bg-gray-50 group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold">
+                  Projects
+                </a>
+              </li>
+              <li>
+                <a href="#"
+                  class="text-gray-700 hover:text-indigo-600 hover:bg-gray-50 group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold">
+                  Calendar
+                </a>
+              </li>
+              <li>
+                <a href="#"
+                  class="text-gray-700 hover:text-indigo-600 hover:bg-gray-50 group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold">
+                  Documents
+                </a>
+              </li>
+              <li>
+                <a href="#"
+                  class="text-gray-700 hover:text-indigo-600 hover:bg-gray-50 group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold">
+                  Reports
+                </a>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </nav>
     </div>
   </div>
-  <div class="mt-4 inline-flex w-[90vw] justify-end">
-    <button
-      class="bg-nrel-second-dark-blue hover:bg-nrel-dark-blue relative flex h-14 w-[12rem] items-center justify-center rounded-md bg-neutral-950 px-6 text-2xl font-medium text-neutral-50 text-white shadow-neutral-500/20 transition active:scale-95"
-      [disabled]="isLoading"
-      (click)="checkData()"
-    >
-      <ng-container *ngIf="!isLoading"> Run CBL Tool </ng-container>
 
-      <svg
-        class="absolute inset-0 m-auto h-8 w-8 animate-spin text-white"
-        *ngIf="isLoading"
-        xmlns="http://www.w3.org/2000/svg"
-        fill="none"
-        viewBox="0 0 24 24"
-      >
-        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-        <path
-          class="opacity-75"
-          fill="currentColor"
-          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-        ></path>
+  <div class="sticky top-0 z-40 flex items-center gap-x-6 bg-white px-4 py-4 shadow-sm sm:px-6 lg:hidden">
+    <button type="button" class="-m-2.5 p-2.5 text-gray-700 lg:hidden">
+      <span class="sr-only">Open sidebar</span>
+      <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
       </svg>
     </button>
+    <div class="flex-1 text-sm font-semibold leading-6 text-gray-900">Dashboard</div>
+    <a href="#">
+      <span class="sr-only">Your profile</span>
+      <img class="h-8 w-8 rounded-full bg-gray-50"
+        src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+        alt="">
+    </a>
   </div>
+
+  <main class="py-10 lg:pl-72">
+    <div class="px-4 sm:px-6 lg:px-8">
+      <!-- Your content -->
+
+      <!-- Main body of page -->
+      <div class="row">
+        <div class="col-12">
+          <ag-grid-angular class="ag-theme-quartz" [columnDefs]="colDefs" [defaultColDef]="defaultColDef"
+            [rowData]="userList" (gridReady)="onGridReady($event)" style="height: 70vh; width: 90vw" />
+        </div>
+      </div>
+      <div class="mt-4 inline-flex w-[90vw] justify-end">
+        <button
+          class="bg-nrel-second-dark-blue hover:bg-nrel-dark-blue relative flex h-14 w-[12rem] items-center justify-center rounded-md bg-neutral-950 px-6 text-2xl font-medium text-neutral-50 text-white shadow-neutral-500/20 transition active:scale-95"
+          [disabled]="isLoading" (click)="checkData()">
+          <ng-container *ngIf="!isLoading"> Run CBL Tool </ng-container>
+
+          <svg class="absolute inset-0 m-auto h-8 w-8 animate-spin text-white" *ngIf="isLoading"
+            xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor"
+              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+            </path>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </main>
 </div>
