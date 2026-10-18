@@ -18,6 +18,8 @@ updates:
     directory: "/angular-app"
     schedule:
       interval: "weekly"
+    allow:
+      - dependency-type: "direct"
     groups:
       npm-dev-deps:
         dependency-type: "development"
